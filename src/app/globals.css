@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Conecta+ — Fondo blanco, sidebar azul marino */
+    --brand-50: 218 100% 97%;
+    --brand-100: 218 100% 92%;
+    --brand-200: 218 100% 82%;
+    --brand-500: 218 100% 55%;
+    --brand-600: 218 100% 45%;
+    --brand-700: 220 70% 11%;
+    --brand-900: 220 75% 8%;
+
+    /* Contenido: fondo blanco */
+    --background: 0 0% 98%;
+    --foreground: 220 25% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 12%;
+    --primary: 218 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 218 30% 94%;
+    --secondary-foreground: 220 25% 20%;
+    --muted: 218 20% 95%;
+    --muted-foreground: 220 15% 50%;
+    --accent: 218 30% 94%;
+    --accent-foreground: 220 25% 20%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 218 20% 88%;
+    --input: 218 20% 88%;
+    --ring: 218 100% 50%;
+    --radius: 0.75rem;
+
+    /* Sidebar azul marino */
+    --sidebar-bg: #0B1D3E;
+    --sidebar-accent: linear-gradient(135deg, #1A6FFF, #00C8FF);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
