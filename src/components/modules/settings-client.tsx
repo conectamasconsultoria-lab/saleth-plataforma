@@ -1,15 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Save, Loader2 } from "lucide-react";
+import { Save, Loader2, RefreshCw } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { Questionnaire } from "@/lib/supabase/types";
+import { ARCHETYPES } from "@/lib/archetypes";
+import type { ArchetypeName } from "@/lib/archetypes";
 
 type Props = {
   initialQuestionnaire: Questionnaire | null;
@@ -30,6 +33,9 @@ export function SettingsClient({ initialQuestionnaire, profile }: Props) {
   });
   const [saving, setSaving] = useState(false);
   const supabase = createClient();
+
+  const archetypeName = initialQuestionnaire?.personality_archetype as ArchetypeName | undefined;
+  const archetype = archetypeName ? ARCHETYPES[archetypeName] : null;
 
   function update(field: string, value: string) {
     setForm((f) => ({ ...f, [field]: value }));
@@ -63,6 +69,54 @@ export function SettingsClient({ initialQuestionnaire, profile }: Props) {
 
   return (
     <div className="space-y-6 max-w-2xl">
+      {/* Arquetipo */}
+      {archetype ? (
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-4">
+              <div
+                className="h-14 w-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0"
+                style={{ background: `${archetype.color}18`, border: `1px solid ${archetype.color}30` }}
+              >
+                {archetype.emoji}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p
+                  className="text-xs font-bold uppercase tracking-wider mb-0.5"
+                  style={{ color: archetype.color }}
+                >
+                  Tu arquetipo de marca personal
+                </p>
+                <p className="font-bold text-gray-900 text-lg leading-tight">{archetype.name}</p>
+                <p className="text-sm text-gray-500 truncate">{archetype.tagline}</p>
+              </div>
+              <Link href="/personality">
+                <Button variant="outline" size="sm" className="flex-shrink-0 gap-1.5">
+                  <RefreshCw className="h-3.5 w-3.5" />
+                  Rehacer test
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="font-semibold text-gray-900">Arquetipo de marca personal</p>
+                <p className="text-sm text-gray-500 mt-0.5">Todavía no completaste el test de arquetipo</p>
+              </div>
+              <Link href="/personality">
+                <Button size="sm" style={{ background: "linear-gradient(135deg, #1A6FFF, #00C8FF)" }} className="text-white">
+                  Hacer el test
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle>Perfil de cuenta</CardTitle>

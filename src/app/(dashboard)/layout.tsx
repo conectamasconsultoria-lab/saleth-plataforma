@@ -22,12 +22,17 @@ export default async function DashboardLayout({
   // Redirigir a onboarding si no completó el cuestionario
   const { data: questionnaire } = await supabase
     .from("questionnaires")
-    .select("id")
+    .select("id, personality_archetype")
     .eq("user_id", user.id)
     .single();
 
   if (!questionnaire) {
     redirect("/onboarding");
+  }
+
+  // Redirigir a test de arquetipo si no lo completó aún
+  if (!questionnaire.personality_archetype) {
+    redirect("/personality");
   }
 
   return (

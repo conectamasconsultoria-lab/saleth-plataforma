@@ -14,6 +14,8 @@ import {
   Zap,
   Activity,
 } from "lucide-react";
+import { ARCHETYPES } from "@/lib/archetypes";
+import type { ArchetypeName } from "@/lib/archetypes";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -42,7 +44,7 @@ export default async function DashboardPage() {
       .single(),
     supabase
       .from("questionnaires")
-      .select("niche")
+      .select("niche, personality_archetype")
       .eq("user_id", user!.id)
       .single(),
     supabase
@@ -91,6 +93,8 @@ export default async function DashboardPage() {
   ]);
 
   const firstName = profile?.full_name?.split(" ")[0] ?? "bienvenido";
+  const archetypeName = questionnaire?.personality_archetype as ArchetypeName | undefined;
+  const archetype = archetypeName ? ARCHETYPES[archetypeName] : null;
   const totalActions =
     (scriptsCount ?? 0) +
     (carouselsCount ?? 0) +
@@ -228,6 +232,38 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Arquetipo de marca */}
+      {archetype && (
+        <Link href="/dashboard/settings">
+          <div
+            className="rounded-2xl p-5 flex items-center gap-4 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group"
+            style={{
+              background: `linear-gradient(135deg, ${archetype.color}18, ${archetype.color}08)`,
+              border: `1px solid ${archetype.color}30`,
+              boxShadow: `0 2px 12px ${archetype.color}14`,
+            }}
+          >
+            <div
+              className="h-12 w-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
+              style={{
+                background: `${archetype.color}20`,
+                border: `1px solid ${archetype.color}30`,
+              }}
+            >
+              {archetype.emoji}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold uppercase tracking-wider mb-0.5" style={{ color: archetype.color }}>
+                Tu arquetipo de marca personal
+              </p>
+              <p className="font-bold text-gray-900 text-base">{archetype.name}</p>
+              <p className="text-xs text-gray-500 truncate">{archetype.tagline}</p>
+            </div>
+            <ArrowRight className="h-4 w-4 flex-shrink-0 text-gray-300 group-hover:text-gray-500 transition-colors" />
+          </div>
+        </Link>
+      )}
 
       {/* Stats grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">

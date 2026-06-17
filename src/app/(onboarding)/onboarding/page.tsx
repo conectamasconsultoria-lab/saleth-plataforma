@@ -79,9 +79,8 @@ export default function OnboardingPage() {
       return;
     }
 
-    toast.success("¡Perfil completado!");
-    router.push("/dashboard");
-    router.refresh();
+    toast.success("¡Perfil completado! Ahora descubrí tu arquetipo");
+    router.push("/personality");
   }
 
   const progress = ((step + 1) / STEPS.length) * 100;

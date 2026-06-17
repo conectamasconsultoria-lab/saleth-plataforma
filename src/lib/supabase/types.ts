@@ -22,6 +22,13 @@ export type Questionnaire = {
     target_audience: string;
     content_pillars: string;
   };
+  personality_archetype?: string | null;
+  personality_scores?: {
+    M: number;
+    E: number;
+    I: number;
+    R: number;
+  } | null;
   completed_at: string;
 };
 
