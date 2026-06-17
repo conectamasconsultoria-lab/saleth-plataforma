@@ -8,28 +8,47 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, ShieldCheck } from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"coach" | "client">("client");
+  const [inviteCode, setInviteCode] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
+
+    if (!inviteCode.trim()) {
+      toast.error("Ingresá tu código de invitación");
+      setLoading(false);
+      return;
+    }
+
+    const validateRes = await fetch("/api/auth/validate-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: inviteCode }),
+    });
+    const validateData = await validateRes.json();
+
+    if (!validateData.valid) {
+      toast.error(validateData.error || "Código de invitación inválido");
+      setLoading(false);
+      return;
+    }
+
     const supabase = createClient();
 
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: fullName, role },
+        data: { full_name: fullName, role: "client" },
       },
     });
 
@@ -40,8 +59,14 @@ export default function RegisterPage() {
     }
 
     if (data.user) {
-      toast.success("Cuenta creada. Completá tu perfil.");
-      router.push("/onboarding");
+      await fetch("/api/auth/use-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: inviteCode, userId: data.user.id }),
+      });
+
+      toast.success("Cuenta creada. Tu acceso está pendiente de aprobación.");
+      router.push("/pending");
       router.refresh();
     }
   }
@@ -54,10 +79,24 @@ export default function RegisterPage() {
             <span className="text-white font-bold text-lg">C+</span>
           </div>
           <CardTitle className="text-2xl">Crear cuenta</CardTitle>
-          <CardDescription>Comenzá con Conecta+ hoy</CardDescription>
+          <CardDescription>Ingresá tu código de invitación para comenzar</CardDescription>
         </CardHeader>
         <form onSubmit={handleRegister}>
           <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="code" className="flex items-center gap-1.5">
+                <ShieldCheck className="h-4 w-4 text-primary" />
+                Código de invitación
+              </Label>
+              <Input
+                id="code"
+                placeholder="SALETH-XXXXXX"
+                value={inviteCode}
+                onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+                className="font-mono tracking-wider text-center text-lg"
+                required
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="name">Nombre completo</Label>
               <Input
@@ -90,18 +129,6 @@ export default function RegisterPage() {
                 minLength={8}
                 required
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="role">Tipo de cuenta</Label>
-              <Select value={role} onValueChange={(v) => setRole(v as "coach" | "client")}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="client">Cliente</SelectItem>
-                  <SelectItem value="coach">Coach</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-3">

@@ -33,8 +33,8 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Rutas públicas
-  if (pathname.startsWith("/login") || pathname.startsWith("/register")) {
-    if (user) {
+  if (pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/pending")) {
+    if (user && (pathname.startsWith("/login") || pathname.startsWith("/register"))) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
     return supabaseResponse;
@@ -50,17 +50,30 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // Rutas solo para coach
-  if (pathname.startsWith("/dashboard/admin")) {
+  // Verificar aprobación para rutas protegidas (dashboard, onboarding)
+  if (user && (pathname.startsWith("/dashboard") || pathname.startsWith("/onboarding"))) {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("role")
-      .eq("user_id", user?.id)
+      .select("role, is_approved")
+      .eq("user_id", user.id)
       .single();
 
-    if (profile?.role !== "coach") {
+    // Coach siempre tiene acceso
+    if (profile?.role === "coach") {
+      return supabaseResponse;
+    }
+
+    // Clientes no aprobados van a /pending
+    if (!profile?.is_approved) {
+      return NextResponse.redirect(new URL("/pending", request.url));
+    }
+
+    // Rutas solo para coach
+    if (pathname.startsWith("/dashboard/admin")) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
+
+    return supabaseResponse;
   }
 
   return supabaseResponse;

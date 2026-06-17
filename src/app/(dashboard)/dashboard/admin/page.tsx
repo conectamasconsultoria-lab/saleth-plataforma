@@ -2,7 +2,9 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, Mail } from "lucide-react";
+import { Users } from "lucide-react";
+import { AdminActions } from "./admin-actions";
+import { ApproveButtonClient } from "./approve-button";
 
 export default async function AdminPage() {
   const supabase = await createClient();
@@ -18,25 +20,26 @@ export default async function AdminPage() {
 
   const { data: clients } = await supabase
     .from("profiles")
-    .select("id, full_name, created_at, user_id")
+    .select("id, full_name, created_at, user_id, is_approved")
     .eq("role", "client")
     .order("created_at", { ascending: false });
 
-  // Para cada cliente, verificar si completó el onboarding
   const clientIds = clients?.map((c) => c.user_id) ?? [];
   const { data: questionnaires } = await supabase
     .from("questionnaires")
     .select("user_id, niche")
-    .in("user_id", clientIds);
+    .in("user_id", clientIds.length > 0 ? clientIds : ["none"]);
 
   const completedSet = new Set(questionnaires?.map((q) => q.user_id));
   const nicheMap = Object.fromEntries(questionnaires?.map((q) => [q.user_id, q.niche]) ?? []);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      <AdminActions />
+
       <div>
-        <h1 className="text-2xl font-bold">Gestión de Clientes</h1>
-        <p className="text-muted-foreground mt-1">{clients?.length ?? 0} clientes registrados</p>
+        <h2 className="text-xl font-bold mb-1">Clientes</h2>
+        <p className="text-muted-foreground text-sm">{clients?.length ?? 0} clientes registrados</p>
       </div>
 
       {!clients?.length ? (
@@ -60,15 +63,38 @@ export default async function AdminPage() {
                       )}
                     </CardDescription>
                   </div>
-                  <Badge variant={completedSet.has(client.user_id) ? "default" : "secondary"} className="text-xs">
-                    {completedSet.has(client.user_id) ? "Activo" : "Sin perfil"}
-                  </Badge>
+                  <div className="flex flex-col items-end gap-1">
+                    <Badge variant={completedSet.has(client.user_id) ? "default" : "secondary"} className="text-xs">
+                      {completedSet.has(client.user_id) ? "Activo" : "Sin perfil"}
+                    </Badge>
+                    <Badge
+                      variant={client.is_approved ? "default" : "destructive"}
+                      className="text-xs"
+                    >
+                      {client.is_approved ? "Aprobado" : "Pendiente"}
+                    </Badge>
+                  </div>
                 </div>
               </CardHeader>
-              <CardContent className="pt-0">
+              <CardContent className="pt-0 space-y-3">
                 <p className="text-xs text-muted-foreground">
                   Registrado: {new Date(client.created_at).toLocaleDateString("es-AR")}
                 </p>
+                {!client.is_approved ? (
+                  <ApproveButtonClient
+                    userId={client.user_id}
+                    clientName={client.full_name}
+                    approved={true}
+                    label="Aprobar acceso"
+                  />
+                ) : (
+                  <ApproveButtonClient
+                    userId={client.user_id}
+                    clientName={client.full_name}
+                    approved={false}
+                    label="Revocar acceso"
+                  />
+                )}
               </CardContent>
             </Card>
           ))}
