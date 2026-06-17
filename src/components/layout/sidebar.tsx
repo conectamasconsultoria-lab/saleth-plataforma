@@ -26,6 +26,7 @@ type Role = "coach" | "client";
 const clientNav = [
   { href: "/dashboard", label: "Inicio", icon: LayoutDashboard },
   { href: "/dashboard/estrategia", label: "Estrategia de Marca", icon: Target },
+  { href: "/dashboard/auditorias", label: "Auditorías", icon: ClipboardList },
   { href: "/dashboard/viral-scanner", label: "Escáner Viral", icon: TrendingUp },
   { href: "/dashboard/scripts", label: "Guiones", icon: FileText },
   { href: "/dashboard/carousels", label: "Carruseles", icon: Layers },
@@ -35,7 +36,6 @@ const clientNav = [
   { href: "/dashboard/prompts", label: "Biblioteca de Prompts", icon: BookOpen },
   { href: "/dashboard/referentes", label: "Videos Referentes", icon: Video },
   { href: "/dashboard/mis-referentes", label: "Referentes IA", icon: Zap },
-  { href: "/dashboard/auditorias", label: "Auditorías", icon: ClipboardList },
 ];
 
 const coachOnlyNav = [

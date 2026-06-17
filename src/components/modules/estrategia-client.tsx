@@ -1056,7 +1056,7 @@ function MarcoTableGrouped({
                   </div>
                   <div className="px-4 py-3">
                     <textarea
-                      className="w-full bg-transparent text-white/90 text-sm placeholder-white/25 focus:outline-none resize-none leading-relaxed"
+                      className="w-full bg-transparent text-white text-sm placeholder-white/30 focus:outline-none resize-none leading-relaxed border-0 outline-none ring-0 focus:ring-0 p-0"
                       rows={section.value ? Math.max(2, section.value.split("\n").length + 1) : 2}
                       placeholder={section.placeholder}
                       value={section.value}
@@ -1087,7 +1087,7 @@ function MarcoTableGrouped({
                         </div>
                         <div className="px-4 py-3">
                           <textarea
-                            className="w-full bg-transparent text-white/90 text-sm placeholder-white/25 focus:outline-none resize-none leading-relaxed"
+                            className="w-full bg-transparent text-white text-sm placeholder-white/30 focus:outline-none resize-none leading-relaxed border-0 outline-none ring-0 focus:ring-0 p-0"
                             rows={sub.value ? Math.max(2, sub.value.split("\n").length + 1) : 2}
                             placeholder={sub.placeholder}
                             value={sub.value}
@@ -1167,7 +1167,7 @@ function MarcoTable({
               </div>
               <div className="px-4 py-3">
                 <textarea
-                  className="w-full bg-transparent text-white/90 text-sm placeholder-white/25 focus:outline-none resize-none leading-relaxed"
+                  className="w-full bg-transparent text-white text-sm placeholder-white/30 focus:outline-none resize-none leading-relaxed border-0 outline-none ring-0 focus:ring-0 p-0"
                   rows={row.value ? Math.max(3, row.value.split("\n").length + 1) : 3}
                   placeholder={row.placeholder}
                   value={row.value}
