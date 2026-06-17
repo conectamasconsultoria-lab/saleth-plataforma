@@ -19,6 +19,9 @@ import {
   Target,
   Zap,
   ClipboardList,
+  Calendar,
+  FolderOpen,
+  Trophy,
 } from "lucide-react";
 
 type Role = "coach" | "client";
@@ -27,15 +30,18 @@ const clientNav = [
   { href: "/dashboard", label: "Inicio", icon: LayoutDashboard },
   { href: "/dashboard/estrategia", label: "Estrategia de Marca", icon: Target },
   { href: "/dashboard/auditorias", label: "Auditorías", icon: ClipboardList },
+  { href: "/dashboard/calendario", label: "Calendario", icon: Calendar },
   { href: "/dashboard/viral-scanner", label: "Escáner Viral", icon: TrendingUp },
   { href: "/dashboard/scripts", label: "Guiones", icon: FileText },
   { href: "/dashboard/carousels", label: "Carruseles", icon: Layers },
   { href: "/dashboard/awareness", label: "Nivel de Conciencia", icon: Brain },
+  { href: "/dashboard/formatos", label: "Top Formatos", icon: Trophy },
   { href: "/dashboard/metrics", label: "Métricas", icon: BarChart3 },
   { href: "/dashboard/transcriptions", label: "Transcripciones", icon: Captions },
   { href: "/dashboard/prompts", label: "Biblioteca de Prompts", icon: BookOpen },
   { href: "/dashboard/referentes", label: "Videos Referentes", icon: Video },
   { href: "/dashboard/mis-referentes", label: "Referentes IA", icon: Zap },
+  { href: "/dashboard/recursos", label: "Recursos", icon: FolderOpen },
 ];
 
 const coachOnlyNav = [
