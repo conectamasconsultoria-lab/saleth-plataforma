@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { Sidebar } from "@/components/layout/sidebar";
 import { TopBar } from "@/components/layout/topbar";
 
@@ -14,43 +13,37 @@ export default async function DashboardLayout({
 
   if (!user) redirect("/login");
 
-  // Usar admin client para evitar problemas de RLS en el layout
-  const admin = createAdminClient();
-  const { data: profile } = await admin
+  const { data: profile } = await supabase
     .from("profiles")
     .select("*")
     .eq("user_id", user.id)
     .single();
 
-  if (!profile) redirect("/onboarding");
+  const role = profile?.role ?? "client";
+  const isApproved = profile?.is_approved ?? false;
 
   // Clientes no aprobados van a /pending
-  if (profile.role !== "coach" && !profile.is_approved) {
+  if (role !== "coach" && !isApproved) {
     redirect("/pending");
   }
 
-  // Coach puede saltarse el onboarding
-  if (profile.role !== "coach") {
+  // Solo clientes necesitan onboarding completo
+  if (role !== "coach") {
     const { data: questionnaire } = await supabase
       .from("questionnaires")
       .select("id, personality_archetype")
       .eq("user_id", user.id)
       .single();
 
-    if (!questionnaire) {
-      redirect("/onboarding");
-    }
-
-    if (!questionnaire.personality_archetype) {
-      redirect("/personality");
-    }
+    if (!questionnaire) redirect("/onboarding");
+    if (!questionnaire.personality_archetype) redirect("/personality");
   }
 
   return (
     <div className="flex h-screen bg-[#f6f8fc]">
-      <Sidebar role={profile.role ?? "client"} />
+      <Sidebar role={role} />
       <div className="flex flex-1 flex-col overflow-hidden">
-        <TopBar user={{ name: profile.full_name ?? user.email ?? "", role: profile.role ?? "client" }} />
+        <TopBar user={{ name: profile?.full_name ?? user.email ?? "", role }} />
         <main className="flex-1 overflow-y-auto p-6 bg-[#f6f8fc]">{children}</main>
       </div>
     </div>
