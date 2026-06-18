@@ -37,6 +37,18 @@ export async function proxy(request: NextRequest) {
     if (user && (pathname.startsWith("/login") || pathname.startsWith("/register"))) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
+    // Si el usuario está en /pending, verificar si ya fue aprobado o es coach
+    if (user && pathname.startsWith("/pending")) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role, is_approved")
+        .eq("user_id", user.id)
+        .single();
+
+      if (profile?.role === "coach" || profile?.is_approved) {
+        return NextResponse.redirect(new URL("/dashboard", request.url));
+      }
+    }
     return supabaseResponse;
   }
 
