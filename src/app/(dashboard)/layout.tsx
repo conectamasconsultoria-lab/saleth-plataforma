@@ -19,8 +19,16 @@ export default async function DashboardLayout({
     .eq("user_id", user.id)
     .single();
 
+  // Si no hay perfil, algo salió mal
+  if (!profile) redirect("/login");
+
+  // Clientes no aprobados van a /pending
+  if (profile.role !== "coach" && !profile.is_approved) {
+    redirect("/pending");
+  }
+
   // Coach puede saltarse el onboarding
-  if (profile?.role !== "coach") {
+  if (profile.role !== "coach") {
     const { data: questionnaire } = await supabase
       .from("questionnaires")
       .select("id, personality_archetype")
@@ -38,9 +46,9 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex h-screen bg-[#f6f8fc]">
-      <Sidebar role={profile?.role ?? "client"} />
+      <Sidebar role={profile.role ?? "client"} />
       <div className="flex flex-1 flex-col overflow-hidden">
-        <TopBar user={{ name: profile?.full_name ?? user.email ?? "", role: profile?.role ?? "client" }} />
+        <TopBar user={{ name: profile.full_name ?? user.email ?? "", role: profile.role ?? "client" }} />
         <main className="flex-1 overflow-y-auto p-6 bg-[#f6f8fc]">{children}</main>
       </div>
     </div>
