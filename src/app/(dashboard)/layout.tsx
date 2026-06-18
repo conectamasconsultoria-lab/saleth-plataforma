@@ -13,14 +13,18 @@ export default async function DashboardLayout({
 
   if (!user) redirect("/login");
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("*")
     .eq("user_id", user.id)
     .single();
 
-  // Si no hay perfil, algo salió mal
-  if (!profile) redirect("/login");
+  // Si no hay perfil, cerrar sesión para evitar redirect loop
+  if (!profile) {
+    console.error("Profile not found for user:", user.id, "Error:", profileError);
+    await supabase.auth.signOut();
+    redirect("/login");
+  }
 
   // Clientes no aprobados van a /pending
   if (profile.role !== "coach" && !profile.is_approved) {
