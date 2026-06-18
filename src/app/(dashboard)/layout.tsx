@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { Sidebar } from "@/components/layout/sidebar";
 import { TopBar } from "@/components/layout/topbar";
 
@@ -13,18 +14,15 @@ export default async function DashboardLayout({
 
   if (!user) redirect("/login");
 
-  const { data: profile, error: profileError } = await supabase
+  // Usar admin client para evitar problemas de RLS en el layout
+  const admin = createAdminClient();
+  const { data: profile } = await admin
     .from("profiles")
     .select("*")
     .eq("user_id", user.id)
     .single();
 
-  // Si no hay perfil, cerrar sesión para evitar redirect loop
-  if (!profile) {
-    console.error("Profile not found for user:", user.id, "Error:", profileError);
-    await supabase.auth.signOut();
-    redirect("/login");
-  }
+  if (!profile) redirect("/onboarding");
 
   // Clientes no aprobados van a /pending
   if (profile.role !== "coach" && !profile.is_approved) {
