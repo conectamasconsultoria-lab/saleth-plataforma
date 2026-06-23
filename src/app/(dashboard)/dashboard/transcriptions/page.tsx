@@ -71,8 +71,15 @@ export default function TranscriptionsPage() {
         body: JSON.stringify({ videoUrl: audioUrl }),
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error("Error del servidor. Verificá que el deploy haya terminado e intentá de nuevo.");
+      }
+
+      if (!res.ok) throw new Error(data.error || "Error al transcribir");
       setTranscript(data.transcript);
       toast.success("Transcripción completada");
     } catch (e: unknown) {
