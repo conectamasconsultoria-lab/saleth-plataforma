@@ -164,14 +164,15 @@ export default function TranscriptionsPage() {
             </div>
           ) : (
             <div className="space-y-2">
-              <Label>URL del video o audio</Label>
+              <Label>URL directa al archivo de audio/video</Label>
               <Input
-                placeholder="https://..."
+                placeholder="https://ejemplo.com/audio.mp3"
                 value={videoUrl}
                 onChange={(e) => setVideoUrl(e.target.value)}
               />
               <p className="text-xs text-muted-foreground">
-                YouTube, Loom, o cualquier URL directa a un archivo de audio/video
+                Debe ser un link directo a un archivo (.mp3, .mp4, .wav, etc.).
+                URLs de TikTok, YouTube o Instagram no funcionan — usá &quot;Subir archivo&quot; en su lugar.
               </p>
             </div>
           )}
