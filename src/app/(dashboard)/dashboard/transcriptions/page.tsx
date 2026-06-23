@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +14,7 @@ export default function TranscriptionsPage() {
   const [videoUrl, setVideoUrl] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState("");
   const [transcript, setTranscript] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -27,23 +29,47 @@ export default function TranscriptionsPage() {
     }
 
     setLoading(true);
+    setStatus("");
+
     try {
-      let res: Response;
+      let audioUrl: string;
 
       if (mode === "file" && file) {
-        const formData = new FormData();
-        formData.append("file", file);
-        res = await fetch("/api/transcriptions", {
-          method: "POST",
-          body: formData,
-        });
+        setStatus("Subiendo archivo...");
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("No autorizado");
+
+        const ext = file.name.split(".").pop() || "mp4";
+        const filePath = `${user.id}/${Date.now()}.${ext}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("transcriptions")
+          .upload(filePath, file);
+
+        if (uploadError) {
+          console.error("Upload error:", uploadError);
+          throw new Error("Error al subir el archivo: " + uploadError.message);
+        }
+
+        const { data: signedData } = await supabase.storage
+          .from("transcriptions")
+          .createSignedUrl(filePath, 3600);
+
+        if (!signedData?.signedUrl) throw new Error("Error al obtener URL del archivo");
+
+        audioUrl = signedData.signedUrl;
       } else {
-        res = await fetch("/api/transcriptions", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ videoUrl }),
-        });
+        audioUrl = videoUrl;
       }
+
+      setStatus("Transcribiendo... esto puede tardar 1-2 minutos");
+
+      const res = await fetch("/api/transcriptions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ videoUrl: audioUrl }),
+      });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -53,6 +79,7 @@ export default function TranscriptionsPage() {
       toast.error(e instanceof Error ? e.message : "Error al transcribir");
     } finally {
       setLoading(false);
+      setStatus("");
     }
   }
 
@@ -65,9 +92,9 @@ export default function TranscriptionsPage() {
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const selected = e.target.files?.[0];
     if (selected) {
-      const maxSize = 100 * 1024 * 1024;
+      const maxSize = 200 * 1024 * 1024;
       if (selected.size > maxSize) {
-        toast.error("El archivo es muy grande. Máximo 100MB.");
+        toast.error("El archivo es muy grande. Máximo 200MB.");
         return;
       }
       setFile(selected);
@@ -150,7 +177,7 @@ export default function TranscriptionsPage() {
                   <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
                   <p className="text-sm font-medium">Hacé click para seleccionar</p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    MP3, MP4, WAV, M4A, WebM — máx. 100MB
+                    MP3, MP4, WAV, M4A, WebM — máx. 200MB
                   </p>
                 </div>
               )}
@@ -179,8 +206,12 @@ export default function TranscriptionsPage() {
 
           <Button onClick={handleTranscribe} disabled={loading || !canSubmit} className="w-full">
             {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Captions className="h-4 w-4 mr-2" />}
-            {loading ? "Transcribiendo... (esto puede tardar 1-2 min)" : "Transcribir"}
+            {loading ? "Procesando..." : "Transcribir"}
           </Button>
+
+          {status && (
+            <p className="text-sm text-muted-foreground text-center animate-pulse">{status}</p>
+          )}
         </CardContent>
       </Card>
 

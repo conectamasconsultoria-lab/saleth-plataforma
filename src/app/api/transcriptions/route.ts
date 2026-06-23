@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 
 const ASSEMBLYAI_BASE = "https://api.assemblyai.com/v2";
 
+export const maxDuration = 300;
+
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -15,42 +17,9 @@ export async function POST(req: NextRequest) {
   const apiKey = process.env.ASSEMBLYAI_API_KEY;
 
   try {
-    const contentType = req.headers.get("content-type") || "";
-    let audioUrl: string;
-
-    if (contentType.includes("multipart/form-data")) {
-      const formData = await req.formData();
-      const file = formData.get("file") as File | null;
-
-      if (!file) {
-        return NextResponse.json({ error: "No se recibió archivo" }, { status: 400 });
-      }
-
-      const buffer = Buffer.from(await file.arrayBuffer());
-
-      const uploadRes = await fetch(`${ASSEMBLYAI_BASE}/upload`, {
-        method: "POST",
-        headers: {
-          authorization: apiKey,
-          "content-type": "application/octet-stream",
-        },
-        body: buffer,
-      });
-
-      if (!uploadRes.ok) {
-        const err = await uploadRes.text();
-        console.error("AssemblyAI upload error:", err);
-        throw new Error("Error al subir el archivo");
-      }
-
-      const uploadData = await uploadRes.json();
-      audioUrl = uploadData.upload_url;
-    } else {
-      const body = await req.json();
-      if (!body.videoUrl) {
-        return NextResponse.json({ error: "Falta la URL del video" }, { status: 400 });
-      }
-      audioUrl = body.videoUrl;
+    const { videoUrl } = await req.json();
+    if (!videoUrl) {
+      return NextResponse.json({ error: "Falta la URL del audio/video" }, { status: 400 });
     }
 
     const submitRes = await fetch(`${ASSEMBLYAI_BASE}/transcript`, {
@@ -60,7 +29,7 @@ export async function POST(req: NextRequest) {
         "content-type": "application/json",
       },
       body: JSON.stringify({
-        audio_url: audioUrl,
+        audio_url: videoUrl,
         language_detection: true,
       }),
     });
@@ -98,7 +67,7 @@ export async function POST(req: NextRequest) {
       .from("transcriptions")
       .insert({
         user_id: user.id,
-        video_url: audioUrl,
+        video_url: videoUrl,
         transcript,
       })
       .select()
