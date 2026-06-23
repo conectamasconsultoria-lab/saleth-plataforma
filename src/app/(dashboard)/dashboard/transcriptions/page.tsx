@@ -76,7 +76,12 @@ export default function TranscriptionsPage() {
       setTranscript(data.transcript);
       toast.success("Transcripción completada");
     } catch (e: unknown) {
-      toast.error(e instanceof Error ? e.message : "Error al transcribir");
+      const msg = e instanceof Error ? e.message : String(e);
+      if (msg.includes("Payload too large") || msg.includes("Request En") || msg.includes("413")) {
+        toast.error("El archivo es muy grande para subir. Probá con uno más pequeño (máx. 50MB).");
+      } else {
+        toast.error(msg || "Error al transcribir");
+      }
     } finally {
       setLoading(false);
       setStatus("");
@@ -92,9 +97,9 @@ export default function TranscriptionsPage() {
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const selected = e.target.files?.[0];
     if (selected) {
-      const maxSize = 200 * 1024 * 1024;
+      const maxSize = 50 * 1024 * 1024;
       if (selected.size > maxSize) {
-        toast.error("El archivo es muy grande. Máximo 200MB.");
+        toast.error("El archivo es muy grande. Máximo 50MB. Podés aumentar el límite en Supabase Storage.");
         return;
       }
       setFile(selected);
@@ -177,7 +182,7 @@ export default function TranscriptionsPage() {
                   <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
                   <p className="text-sm font-medium">Hacé click para seleccionar</p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    MP3, MP4, WAV, M4A, WebM — máx. 200MB
+                    MP3, MP4, WAV, M4A, WebM — máx. 50MB
                   </p>
                 </div>
               )}
