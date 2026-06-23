@@ -1,4 +1,4 @@
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -8,20 +8,22 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Código y userId requeridos" }, { status: 400 });
   }
 
-  const supabase = createAdminClient();
+  try {
+    const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from("invitation_codes")
-    .update({ used_by: userId, used_at: new Date().toISOString() })
-    .eq("code", code.trim().toUpperCase())
-    .eq("is_active", true)
-    .is("used_by", null)
-    .select("id")
-    .single();
+    const { data, error } = await supabase.rpc("use_invitation_code", {
+      code_input: code.trim().toUpperCase(),
+      user_id_input: userId,
+    });
 
-  if (error || !data) {
-    return NextResponse.json({ error: "No se pudo usar el código" }, { status: 400 });
+    if (error) {
+      console.error("use-code error:", error);
+      return NextResponse.json({ error: "No se pudo usar el código" }, { status: 400 });
+    }
+
+    return NextResponse.json({ success: !!data });
+  } catch (e) {
+    console.error("use-code crash:", e);
+    return NextResponse.json({ error: "Error del servidor" }, { status: 500 });
   }
-
-  return NextResponse.json({ success: true });
 }

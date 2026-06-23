@@ -29,45 +29,58 @@ export default function RegisterPage() {
       return;
     }
 
-    const validateRes = await fetch("/api/auth/validate-code", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code: inviteCode }),
-    });
-    const validateData = await validateRes.json();
-
-    if (!validateData.valid) {
-      toast.error(validateData.error || "Código de invitación inválido");
-      setLoading(false);
-      return;
-    }
-
-    const supabase = createClient();
-
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName, role: "client" },
-      },
-    });
-
-    if (error) {
-      toast.error(error.message);
-      setLoading(false);
-      return;
-    }
-
-    if (data.user) {
-      await fetch("/api/auth/use-code", {
+    try {
+      const validateRes = await fetch("/api/auth/validate-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: inviteCode, userId: data.user.id }),
+        body: JSON.stringify({ code: inviteCode }),
       });
 
-      toast.success("Cuenta creada. Tu acceso está pendiente de aprobación.");
-      router.push("/pending");
-      router.refresh();
+      if (!validateRes.ok) {
+        toast.error("Error al validar el código. Intentá de nuevo.");
+        setLoading(false);
+        return;
+      }
+
+      const validateData = await validateRes.json();
+
+      if (!validateData.valid) {
+        toast.error(validateData.error || "Código de invitación inválido");
+        setLoading(false);
+        return;
+      }
+
+      const supabase = createClient();
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { full_name: fullName, role: "client" },
+        },
+      });
+
+      if (error) {
+        toast.error(error.message);
+        setLoading(false);
+        return;
+      }
+
+      if (data.user) {
+        await fetch("/api/auth/use-code", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code: inviteCode, userId: data.user.id }),
+        });
+
+        toast.success("Cuenta creada. Tu acceso está pendiente de aprobación.");
+        router.push("/pending");
+        router.refresh();
+      }
+    } catch {
+      toast.error("Error de conexión. Intentá de nuevo.");
+    } finally {
+      setLoading(false);
     }
   }
 

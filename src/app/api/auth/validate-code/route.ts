@@ -1,4 +1,4 @@
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -8,19 +8,21 @@ export async function POST(req: Request) {
     return NextResponse.json({ valid: false, error: "Código requerido" }, { status: 400 });
   }
 
-  const supabase = createAdminClient();
+  try {
+    const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from("invitation_codes")
-    .select("id")
-    .eq("code", code.trim().toUpperCase())
-    .eq("is_active", true)
-    .is("used_by", null)
-    .single();
+    const { data, error } = await supabase.rpc("validate_invitation_code", {
+      code_input: code.trim().toUpperCase(),
+    });
 
-  if (error || !data) {
-    return NextResponse.json({ valid: false, error: "Código inválido o ya usado" });
+    if (error) {
+      console.error("validate-code error:", error);
+      return NextResponse.json({ valid: false, error: "Error al validar código" });
+    }
+
+    return NextResponse.json({ valid: !!data });
+  } catch (e) {
+    console.error("validate-code crash:", e);
+    return NextResponse.json({ valid: false, error: "Error del servidor" }, { status: 500 });
   }
-
-  return NextResponse.json({ valid: true });
 }
