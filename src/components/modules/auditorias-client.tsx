@@ -375,16 +375,16 @@ export function AuditoriasClient({ initialData }: Props) {
   return (
     <div className="space-y-5">
       {/* Tabs */}
-      <div className="flex flex-wrap gap-1 rounded-2xl p-1.5 border border-white/10 w-fit" style={{ background: "rgba(255,255,255,0.05)" }}>
+      <div className="flex flex-wrap gap-2 rounded-2xl p-2 w-fit" style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)" }}>
         {TABS.map((tab, i) => (
           <button
             key={tab}
             onClick={() => setActiveTab(i)}
             className={cn(
-              "px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200",
-              activeTab === i ? "text-white shadow-sm" : "text-white/50 hover:text-white"
+              "px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200",
+              activeTab === i ? "text-white shadow-sm" : "text-white/80 hover:text-white hover:bg-white/10"
             )}
-            style={activeTab === i ? { background: "linear-gradient(135deg, #1A6FFF, #00C8FF)", boxShadow: "0 4px 12px rgba(26,111,255,0.3)" } : {}}
+            style={activeTab === i ? { background: "linear-gradient(135deg, #1A6FFF, #00C8FF)", boxShadow: "0 4px 12px rgba(26,111,255,0.3)" } : { background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}
           >
             {tab}
           </button>
