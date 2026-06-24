@@ -153,7 +153,7 @@ const TABS = ["Oferta nueva", "Visión base", "Promesas", "Avatar", "Adquisició
 function Row({ label, children, span }: { label: string; children: React.ReactNode; span?: boolean }) {
   return (
     <div className={cn("grid border-b border-white/10 min-h-[44px]", span ? "grid-cols-1" : "grid-cols-[300px_1fr]")}>
-      <div className="px-4 py-3 text-sm text-white/75 font-medium border-r border-white/10 flex items-start pt-3 leading-snug">{label}</div>
+      <div className="px-4 py-3 text-sm text-white/90 font-medium border-r border-white/10 flex items-start pt-3 leading-snug">{label}</div>
       <div className="px-3 py-2 flex items-center">{children}</div>
     </div>
   );
@@ -175,7 +175,7 @@ function SubHeader({ title }: { title: string }) {
   );
 }
 
-const cellInput = "w-full bg-transparent text-white text-sm placeholder-white/30 focus:outline-none py-1";
+const cellInput = "w-full bg-transparent text-white text-sm placeholder-white/40 focus:outline-none py-1";
 const cellSelect = "w-full bg-transparent text-white text-sm focus:outline-none py-1 cursor-pointer appearance-none";
 
 function AuditInput({ value, onChange, placeholder, multiline }: { value: string; onChange: (v: string) => void; placeholder?: string; multiline?: boolean }) {
@@ -255,7 +255,7 @@ function OfertaForm({ oferta, onChange, title }: {
       {/* Planes de pago */}
       <div className="mt-4 px-4 pb-1 text-base font-semibold text-white">Planes de pago</div>
       <div className="mx-4 rounded-xl overflow-hidden border border-white/10 mb-4">
-        <div className="grid grid-cols-3 text-xs font-semibold text-white/50 px-3 py-2 border-b border-white/10">
+        <div className="grid grid-cols-3 text-xs font-semibold text-white/70 px-3 py-2 border-b border-white/10">
           <span>Tiempo y cantidad de pagos</span>
           <span>Monto de cuota</span>
           <span>Ticket</span>
@@ -272,7 +272,7 @@ function OfertaForm({ oferta, onChange, title }: {
       {/* Costos */}
       <div className="px-4 pb-1 text-base font-semibold text-white">Costos</div>
       <div className="mx-4 rounded-xl overflow-hidden border border-white/10 mb-4">
-        <div className="grid grid-cols-4 text-xs font-semibold text-white/50 px-3 py-2 border-b border-white/10">
+        <div className="grid grid-cols-4 text-xs font-semibold text-white/70 px-3 py-2 border-b border-white/10">
           <span>Concepto</span><span>Monto</span><span>Tipo de moneda</span><span>Tipo</span>
         </div>
         {oferta.costos.map((c, i) => (
@@ -375,16 +375,16 @@ export function AuditoriasClient({ initialData }: Props) {
   return (
     <div className="space-y-5">
       {/* Tabs */}
-      <div className="flex flex-wrap gap-2 rounded-2xl p-2 w-fit" style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)" }}>
+      <div className="flex flex-wrap gap-1.5 bg-white rounded-2xl p-1.5 border border-gray-100 w-fit" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
         {TABS.map((tab, i) => (
           <button
             key={tab}
             onClick={() => setActiveTab(i)}
             className={cn(
-              "px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200",
-              activeTab === i ? "text-white shadow-sm" : "text-white/80 hover:text-white hover:bg-white/10"
+              "px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200",
+              activeTab === i ? "text-white shadow-sm" : "text-gray-500 hover:text-gray-900"
             )}
-            style={activeTab === i ? { background: "linear-gradient(135deg, #1A6FFF, #00C8FF)", boxShadow: "0 4px 12px rgba(26,111,255,0.3)" } : { background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}
+            style={activeTab === i ? { background: "linear-gradient(135deg, #1A6FFF, #00C8FF)", boxShadow: "0 4px 12px rgba(26,111,255,0.3)" } : {}}
           >
             {tab}
           </button>
@@ -400,13 +400,13 @@ export function AuditoriasClient({ initialData }: Props) {
               <div key={o.id} className="flex items-center gap-1">
                 <button
                   onClick={() => setActiveOfertaIdx(i)}
-                  className={cn("px-3 py-1.5 rounded-lg text-sm font-medium transition-all", activeOfertaIdx === i ? "text-white" : "text-white/50 hover:text-white")}
+                  className={cn("px-3 py-1.5 rounded-lg text-sm font-medium transition-all", activeOfertaIdx === i ? "text-white" : "text-white/70 hover:text-white")}
                   style={activeOfertaIdx === i ? { background: "linear-gradient(135deg, #1A6FFF, #00C8FF)" } : { background: "rgba(255,255,255,0.07)" }}
                 >
                   Oferta {i + 1}
                 </button>
                 {data.ofertas.length > 1 && (
-                  <button onClick={() => deleteOferta(i)} className="text-white/30 hover:text-red-400 transition-colors">
+                  <button onClick={() => deleteOferta(i)} className="text-white/50 hover:text-red-400 transition-colors">
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 )}
@@ -414,7 +414,7 @@ export function AuditoriasClient({ initialData }: Props) {
             ))}
             <button
               onClick={addOferta}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm text-white/50 hover:text-white transition-colors"
+              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm text-white/70 hover:text-white transition-colors"
               style={{ background: "rgba(255,255,255,0.05)", border: "1px dashed rgba(255,255,255,0.2)" }}
             >
               <Plus className="h-3.5 w-3.5" /> Nueva oferta
@@ -512,7 +512,7 @@ export function AuditoriasClient({ initialData }: Props) {
               <div key={i} className="rounded-xl overflow-hidden border border-white/10">
                 <div className="grid grid-cols-[220px_1fr]">
                   <div className="px-4 py-3 text-sm font-semibold text-white/80 border-r border-white/10 flex items-start">{f.label}</div>
-                  <div className="px-4 py-3 text-sm text-white/60 italic leading-relaxed">{f.text}</div>
+                  <div className="px-4 py-3 text-sm text-white/80 italic leading-relaxed">{f.text}</div>
                 </div>
               </div>
             ))}
@@ -521,14 +521,14 @@ export function AuditoriasClient({ initialData }: Props) {
             <div className="rounded-xl border border-blue-500/30 p-4 space-y-1" style={{ background: "rgba(26,111,255,0.08)" }}>
               <p className="text-sm font-bold text-white mb-2">Instrucciones para la actividad</p>
               {["Escribe tus 5 versiones en base a estas fórmulas.", "No busques la promesa perfecta, busca explorar diferentes ángulos.", "No uses palabras genéricas como contenido premium, más clientes o resultados increíbles.", "Sé específico. Usa números, emociones reales y problemas concretos.", "Cuando termines, elige la promesa que sientas más potente y la que mejor conecte con el cliente que quieres atraer."].map((instr, i) => (
-                <p key={i} className="text-xs text-white/60">{i + 1}. {instr}</p>
+                <p key={i} className="text-xs text-white/80">{i + 1}. {instr}</p>
               ))}
             </div>
 
             {/* Tus 5 promesas */}
             <div>
               <h3 className="text-lg font-bold text-white mb-1">Tus 5 promesas</h3>
-              <p className="text-xs text-white/50 mb-4">Escribe una versión por cada fórmula. No intentes sonar perfecto; busca claridad, especificidad y conexión con el cliente correcto.</p>
+              <p className="text-xs text-white/70 mb-4">Escribe una versión por cada fórmula. No intentes sonar perfecto; busca claridad, especificidad y conexión con el cliente correcto.</p>
               <div className="rounded-xl overflow-hidden border border-white/10">
                 {(["promesa_1", "promesa_2", "promesa_3", "promesa_4", "promesa_5"] as (keyof Promesas)[]).map((key, i) => (
                   <div key={key} className="grid grid-cols-[180px_1fr] border-b border-white/10 last:border-0">
@@ -546,7 +546,7 @@ export function AuditoriasClient({ initialData }: Props) {
       {activeTab === 3 && (
         <div style={darkContainer} className="rounded-2xl overflow-hidden border border-white/10">
           <div className="px-5 pt-5 pb-3">
-            <p className="text-xs text-white/50 leading-relaxed">Completa esta sección pensando en una persona o negocio real. Mientras más específicas sean tus respuestas, más fácil será crear contenido, propuestas y mensajes que conecten con el cliente correcto.</p>
+            <p className="text-xs text-white/70 leading-relaxed">Completa esta sección pensando en una persona o negocio real. Mientras más específicas sean tus respuestas, más fácil será crear contenido, propuestas y mensajes que conecten con el cliente correcto.</p>
           </div>
 
           <div className="px-5 pb-2 text-lg font-bold text-white">Datos base del avatar</div>
@@ -569,14 +569,14 @@ export function AuditoriasClient({ initialData }: Props) {
           <div className="mx-5 mb-5 space-y-2">
             {(["dolor_1", "dolor_2", "dolor_3"] as (keyof Avatar)[]).map((key, i) => (
               <div key={key} className="flex items-center gap-3">
-                <span className="text-white/50 text-sm w-4">{i + 1}.</span>
+                <span className="text-white/70 text-sm w-4">{i + 1}.</span>
                 <input className={cn(cellInput, "border-b border-white/20 pb-1 flex-1")} value={data.avatar[key]} onChange={(e) => setAvatar(key, e.target.value)} placeholder={`Dolor ${i + 1}`} />
               </div>
             ))}
           </div>
 
           <div className="px-5 pb-2 text-lg font-bold text-white">1. Perfil del cliente ideal</div>
-          <div className="px-5 pb-2 text-xs text-white/50">Aquí añadimos la profundización. Primero define con claridad a quién quieres atraer y a quién no. Esto te ayudará a enfocar todo tu negocio.</div>
+          <div className="px-5 pb-2 text-xs text-white/70">Aquí añadimos la profundización. Primero define con claridad a quién quieres atraer y a quién no. Esto te ayudará a enfocar todo tu negocio.</div>
           <div className="mx-5 mb-5 rounded-xl overflow-hidden border border-white/10">
             {[
               { label: "1. ¿En qué mercado quiero especializarme?", key: "q_mercado" as keyof Avatar, placeholder: "Ejemplo: moda, gastronomía, fitness, marcas personales, artistas o ecommerce." },
@@ -699,7 +699,7 @@ export function AuditoriasClient({ initialData }: Props) {
               <div className="grid grid-cols-[1fr_200px] border-b border-white/10">
                 <div className="px-4 py-3 text-sm text-white/70 border-r border-white/10">Revelar resultado (solo si todas las respuestas fueron respondidas)</div>
                 <div className="px-3 py-2 flex items-center">
-                  <span className={cn("text-xs font-medium", allAnswered ? "text-green-400" : "text-white/30")}>
+                  <span className={cn("text-xs font-medium", allAnswered ? "text-green-400" : "text-white/50")}>
                     {allAnswered ? "Ver resultado ↓" : `${answered}/${checklistKeys.length} respondidas`}
                   </span>
                 </div>
@@ -707,7 +707,7 @@ export function AuditoriasClient({ initialData }: Props) {
               {allAnswered && (
                 <div className="px-4 py-4 text-sm font-semibold text-white" style={{ background: "rgba(26,111,255,0.12)", borderTop: "1px solid rgba(26,111,255,0.3)" }}>
                   {resultado}
-                  <p className="text-xs text-white/50 font-normal mt-1">Puntaje: {siCount}/12 respuestas positivas</p>
+                  <p className="text-xs text-white/70 font-normal mt-1">Puntaje: {siCount}/12 respuestas positivas</p>
                 </div>
               )}
             </div>
@@ -720,7 +720,7 @@ export function AuditoriasClient({ initialData }: Props) {
         <div style={darkContainer} className="rounded-2xl overflow-hidden border border-white/10">
           <div className="px-5 pt-5 pb-3">
             <h2 className="text-xl font-bold text-white mb-1">Clasificador de Clientes</h2>
-            <p className="text-xs text-white/50">Evaluá a un prospecto antes de aceptarlo como cliente. Completá cada criterio para ver si encaja con tu perfil de cliente ideal.</p>
+            <p className="text-xs text-white/70">Evaluá a un prospecto antes de aceptarlo como cliente. Completá cada criterio para ver si encaja con tu perfil de cliente ideal.</p>
           </div>
           <div className="mx-5 mb-5 rounded-xl overflow-hidden border border-white/10">
             {[
@@ -769,7 +769,7 @@ export function AuditoriasClient({ initialData }: Props) {
           {data.clasificador.resultado && (
             <div className="mx-5 mb-5 px-4 py-3 rounded-xl text-sm font-semibold text-white" style={{ background: "rgba(26,111,255,0.15)", border: "1px solid rgba(26,111,255,0.3)" }}>
               {data.clasificador.resultado}
-              {data.clasificador.cliente_nombre && <span className="font-normal text-white/60 ml-2">— {data.clasificador.cliente_nombre}</span>}
+              {data.clasificador.cliente_nombre && <span className="font-normal text-white/80 ml-2">— {data.clasificador.cliente_nombre}</span>}
             </div>
           )}
         </div>
