@@ -35,6 +35,10 @@ import {
   Lightbulb,
   ClipboardList,
   Send,
+  Zap,
+  Flame,
+  Rocket,
+  Wand2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { CalendarPost } from "@/lib/supabase/types";
@@ -105,6 +109,86 @@ function getStatusMeta(status: string) {
   return STATUSES.find((s) => s.value === status) || STATUSES[1];
 }
 
+// ─── Planes de publicación ────────────────────────────────────────────────────
+
+type ContentType = CalendarPost["content_type"];
+
+const PLANS = [
+  {
+    id: "basico" as const,
+    label: "Básico",
+    postsPerWeek: 3,
+    icon: Zap,
+    days: "Lunes · Miércoles · Viernes",
+    description: "Ideal para empezar sin abrumarte. Crea el hábito de publicar con consistencia.",
+    distribution: "2 Atracción · 1 Nutrición · Venta quincenal",
+    color: "border-blue-200 hover:border-blue-400",
+    activeColor: "border-blue-500 ring-2 ring-blue-500/20",
+    gradient: "from-blue-500 to-blue-600",
+  },
+  {
+    id: "intermedio" as const,
+    label: "Intermedio",
+    postsPerWeek: 7,
+    icon: Flame,
+    days: "Todos los días",
+    description: "Para acelerar resultados. 1 video diario aumenta tu alcance y construye autoridad.",
+    distribution: "4 Atracción · 2 Nutrición · 1 Venta",
+    color: "border-orange-200 hover:border-orange-400",
+    activeColor: "border-orange-500 ring-2 ring-orange-500/20",
+    gradient: "from-orange-500 to-orange-600",
+  },
+  {
+    id: "avanzado" as const,
+    label: "Avanzado",
+    postsPerWeek: 14,
+    icon: Rocket,
+    days: "2 videos por día",
+    description: "Para dominar la atención del mercado y posicionarte agresivamente.",
+    distribution: "8 Atracción · 4 Nutrición · 2 Venta",
+    color: "border-red-200 hover:border-red-400",
+    activeColor: "border-red-500 ring-2 ring-red-500/20",
+    gradient: "from-red-500 to-red-600",
+  },
+];
+
+function getPostsForDay(planId: string, dayOfWeek: number, weekNumber: number): ContentType[] {
+  const isOddWeek = weekNumber % 2 === 1;
+
+  switch (planId) {
+    case "basico":
+      // Mon=0, Wed=2, Fri=4
+      if (dayOfWeek === 0) return ["atraccion"];
+      if (dayOfWeek === 2) return isOddWeek ? ["atraccion"] : ["nutricion"];
+      if (dayOfWeek === 4) return isOddWeek ? ["venta"] : ["atraccion"];
+      return [];
+    case "intermedio":
+      // Every day: Mon-Sat mostly atracción+nutrición, Sun venta
+      return [
+        (["atraccion", "atraccion", "nutricion", "atraccion", "atraccion", "nutricion", "venta"] as ContentType[])[dayOfWeek],
+      ];
+    case "avanzado":
+      // 2 per day
+      return ([
+        ["atraccion", "nutricion"],
+        ["atraccion", "atraccion"],
+        ["atraccion", "nutricion"],
+        ["atraccion", "atraccion"],
+        ["nutricion", "venta"],
+        ["atraccion", "atraccion"],
+        ["atraccion", "venta"],
+      ] as ContentType[][])[dayOfWeek];
+    default:
+      return [];
+  }
+}
+
+const CONTENT_LABELS: Record<ContentType, string> = {
+  atraccion: "Contenido de atracción",
+  nutricion: "Contenido de nutrición",
+  venta: "Contenido de venta",
+};
+
 type Props = {
   initialPosts: CalendarPost[];
 };
@@ -139,6 +223,8 @@ export function CalendarioClient({ initialPosts }: Props) {
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [loadingMonth, setLoadingMonth] = useState(false);
+  const [showPlans, setShowPlans] = useState(false);
+  const [generatingPlan, setGeneratingPlan] = useState<string | null>(null);
 
   const supabase = createClient();
   const fetchedMonths = useRef<Set<string>>(new Set([`${today.getFullYear()}-${today.getMonth()}`]));
@@ -342,6 +428,79 @@ export function CalendarioClient({ initialPosts }: Props) {
     setPosts((prev) => prev.map((p) => (p.id === post.id ? { ...p, status: nextStatus } : p)));
   }
 
+  async function handleApplyPlan(planId: string) {
+    setGeneratingPlan(planId);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const lastDay = new Date(currentYear, currentMonth + 1, 0).getDate();
+      const firstDay = new Date(currentYear, currentMonth, 1);
+      const pad = (n: number) => String(n).padStart(2, "0");
+
+      // Find which week number (relative to month start) each day is in
+      let weekCounter = 0;
+      let lastWeekDay = -1;
+
+      const newPosts: {
+        user_id: string;
+        date: string;
+        title: string;
+        content_type: ContentType;
+        platform: string;
+        status: string;
+        display_order: number;
+      }[] = [];
+
+      for (let day = 1; day <= lastDay; day++) {
+        const d = new Date(currentYear, currentMonth, day);
+        let dow = d.getDay() - 1; // Mon=0..Sun=6
+        if (dow < 0) dow = 6;
+
+        if (dow === 0 && lastWeekDay === 6) weekCounter++;
+        lastWeekDay = dow;
+
+        const dateKey = `${currentYear}-${pad(currentMonth + 1)}-${pad(day)}`;
+
+        // Skip days that already have posts
+        if (postsByDate[dateKey]?.length) continue;
+
+        const types = getPostsForDay(planId, dow, weekCounter);
+        types.forEach((ct, i) => {
+          newPosts.push({
+            user_id: user!.id,
+            date: dateKey,
+            title: CONTENT_LABELS[ct],
+            content_type: ct,
+            platform: "tiktok",
+            status: "idea",
+            display_order: i,
+          });
+        });
+      }
+
+      if (newPosts.length === 0) {
+        toast.info("Todos los días del mes ya tienen publicaciones");
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("calendar_posts")
+        .insert(newPosts)
+        .select();
+
+      if (error) throw error;
+      if (data) {
+        setPosts((prev) => [...prev, ...data]);
+      }
+
+      toast.success(`${data?.length || 0} publicaciones sugeridas agregadas`);
+      setShowPlans(false);
+    } catch {
+      toast.error("Error al generar el plan");
+    } finally {
+      setGeneratingPlan(null);
+    }
+  }
+
   function formatSelectedDate(dateStr: string) {
     const [y, m, d] = dateStr.split("-").map(Number);
     const date = new Date(y, m - 1, d);
@@ -402,6 +561,84 @@ export function CalendarioClient({ initialPosts }: Props) {
           )}
         </div>
       </div>
+
+      {/* Plan selector */}
+      <div className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowPlans((v) => !v)}
+          className={cn("gap-1.5 rounded-xl text-xs transition-all", showPlans && "ring-2 ring-blue-500/20 border-blue-400")}
+        >
+          <Wand2 className="h-3.5 w-3.5" style={{ color: "#1A6FFF" }} />
+          Sugerir plan de publicación
+        </Button>
+        {showPlans && (
+          <span className="text-[11px] text-gray-400">Elegí tu ritmo y el calendario se llena automáticamente</span>
+        )}
+      </div>
+
+      {showPlans && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {PLANS.map((plan) => {
+            const Icon = plan.icon;
+            const isGenerating = generatingPlan === plan.id;
+            return (
+              <div
+                key={plan.id}
+                className={cn(
+                  "rounded-2xl border-2 bg-white p-4 transition-all duration-200",
+                  plan.color,
+                )}
+                style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <div className={`h-8 w-8 rounded-lg bg-gradient-to-br ${plan.gradient} flex items-center justify-center`}>
+                    <Icon className="h-4 w-4 text-white" strokeWidth={2} />
+                  </div>
+                  <div>
+                    <p className="font-bold text-sm text-gray-900">{plan.label}</p>
+                    <p className="text-[11px] text-gray-400 font-medium">{plan.postsPerWeek} videos/semana</p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 leading-relaxed mb-2">{plan.description}</p>
+                <p className="text-[10px] text-gray-400 mb-1">{plan.days}</p>
+                <div className="flex flex-wrap gap-1 mb-3">
+                  {plan.distribution.split(" · ").map((d) => {
+                    const isA = d.includes("Atracción");
+                    const isN = d.includes("Nutrición");
+                    return (
+                      <span
+                        key={d}
+                        className={cn(
+                          "text-[10px] font-semibold px-1.5 py-0.5 rounded-full",
+                          isA ? "bg-violet-100 text-violet-700" : isN ? "bg-blue-100 text-blue-700" : "bg-emerald-100 text-emerald-700"
+                        )}
+                      >
+                        {d}
+                      </span>
+                    );
+                  })}
+                </div>
+                <Button
+                  size="sm"
+                  onClick={() => handleApplyPlan(plan.id)}
+                  disabled={!!generatingPlan}
+                  className="w-full gap-1.5 text-white text-xs h-8"
+                  style={{ background: "linear-gradient(135deg, #1A6FFF, #00C8FF)" }}
+                >
+                  {isGenerating ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Calendar className="h-3.5 w-3.5" />
+                  )}
+                  {isGenerating ? "Generando..." : `Aplicar a ${MONTHS[currentMonth]}`}
+                </Button>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Calendar grid */}
