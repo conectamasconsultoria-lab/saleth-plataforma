@@ -431,12 +431,15 @@ export function CalendarioClient({ initialPosts }: Props) {
   async function handleApplyPlan(planId: string) {
     setGeneratingPlan(planId);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        toast.error("Sesión expirada — recargá la página");
+        return;
+      }
+
       const lastDay = new Date(currentYear, currentMonth + 1, 0).getDate();
-      const firstDay = new Date(currentYear, currentMonth, 1);
       const pad = (n: number) => String(n).padStart(2, "0");
 
-      // Find which week number (relative to month start) each day is in
       let weekCounter = 0;
       let lastWeekDay = -1;
 
@@ -452,7 +455,7 @@ export function CalendarioClient({ initialPosts }: Props) {
 
       for (let day = 1; day <= lastDay; day++) {
         const d = new Date(currentYear, currentMonth, day);
-        let dow = d.getDay() - 1; // Mon=0..Sun=6
+        let dow = d.getDay() - 1;
         if (dow < 0) dow = 6;
 
         if (dow === 0 && lastWeekDay === 6) weekCounter++;
@@ -460,13 +463,12 @@ export function CalendarioClient({ initialPosts }: Props) {
 
         const dateKey = `${currentYear}-${pad(currentMonth + 1)}-${pad(day)}`;
 
-        // Skip days that already have posts
         if (postsByDate[dateKey]?.length) continue;
 
         const types = getPostsForDay(planId, dow, weekCounter);
         types.forEach((ct, i) => {
           newPosts.push({
-            user_id: user!.id,
+            user_id: user.id,
             date: dateKey,
             title: CONTENT_LABELS[ct],
             content_type: ct,
@@ -482,20 +484,28 @@ export function CalendarioClient({ initialPosts }: Props) {
         return;
       }
 
-      const { data, error } = await supabase
-        .from("calendar_posts")
-        .insert(newPosts)
-        .select();
+      // Insert in batches of 20 to avoid potential limits
+      const allInserted: CalendarPost[] = [];
+      for (let i = 0; i < newPosts.length; i += 20) {
+        const batch = newPosts.slice(i, i + 20);
+        const { data, error } = await supabase
+          .from("calendar_posts")
+          .insert(batch)
+          .select();
 
-      if (error) throw error;
-      if (data) {
-        setPosts((prev) => [...prev, ...data]);
+        if (error) {
+          console.error("Supabase insert error:", error);
+          throw new Error(error.message);
+        }
+        if (data) allInserted.push(...data);
       }
 
-      toast.success(`${data?.length || 0} publicaciones sugeridas agregadas`);
+      setPosts((prev) => [...prev, ...allInserted]);
+      toast.success(`${allInserted.length} publicaciones sugeridas agregadas`);
       setShowPlans(false);
-    } catch {
-      toast.error("Error al generar el plan");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Error desconocido";
+      toast.error(`Error al generar el plan: ${msg}`);
     } finally {
       setGeneratingPlan(null);
     }
