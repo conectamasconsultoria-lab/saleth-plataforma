@@ -109,3 +109,18 @@ export type ReferenceVideo = {
   description?: string;
   created_at: string;
 };
+
+export type CalendarPost = {
+  id: string;
+  user_id: string;
+  date: string;
+  time: string | null;
+  title: string;
+  content_type: "atraccion" | "nutricion" | "venta";
+  platform: string;
+  status: "idea" | "planned" | "draft" | "published";
+  notes: string | null;
+  script_id: string | null;
+  display_order: number;
+  created_at: string;
+};

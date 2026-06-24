@@ -1,41 +1,32 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { toast } from "sonner";
 import {
   Plus,
   Trash2,
   ExternalLink,
-  Video,
   Loader2,
   ArrowLeft,
   User,
   Home,
   Plane,
   Heart,
+  ChevronRight,
+  BookOpen,
+  Bookmark,
+  Dumbbell,
   Brain,
   ShoppingBag,
   Film,
   Target,
-  Folder,
-  ChevronRight,
-  BookOpen,
-  Bookmark,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import type { ReferenceVideo } from "@/lib/supabase/types";
 import { cn } from "@/lib/utils";
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -49,41 +40,129 @@ type PersonalVideo = {
   created_at: string;
 };
 
-const NICHES = [
-  "Marca personal",
-  "Asesores inmobiliarios",
-  "Agencias de viajes",
-  "Nutricionistas y fitness",
-  "Psicólogos y coaches",
-  "Negocios físicos",
-  "Agencias de marketing / Filmmakers",
-  "Coach",
-];
-
 type NicheMeta = {
   icon: React.ElementType;
   gradient: string;
   iconColor: string;
-  badgeColor: string;
 };
 
 const NICHE_META: Record<string, NicheMeta> = {
-  "Marca personal": { icon: User, gradient: "from-blue-500 to-blue-600", iconColor: "text-blue-600", badgeColor: "bg-blue-50 text-blue-700 border-blue-100" },
-  "Asesores inmobiliarios": { icon: Home, gradient: "from-emerald-500 to-emerald-600", iconColor: "text-emerald-600", badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-100" },
-  "Agencias de viajes": { icon: Plane, gradient: "from-sky-500 to-sky-600", iconColor: "text-sky-600", badgeColor: "bg-sky-50 text-sky-700 border-sky-100" },
-  "Nutricionistas y fitness": { icon: Heart, gradient: "from-orange-500 to-orange-600", iconColor: "text-orange-600", badgeColor: "bg-orange-50 text-orange-700 border-orange-100" },
-  "Psicólogos y coaches": { icon: Brain, gradient: "from-purple-500 to-purple-600", iconColor: "text-purple-600", badgeColor: "bg-purple-50 text-purple-700 border-purple-100" },
-  "Negocios físicos": { icon: ShoppingBag, gradient: "from-rose-500 to-rose-600", iconColor: "text-rose-600", badgeColor: "bg-rose-50 text-rose-700 border-rose-100" },
-  "Agencias de marketing / Filmmakers": { icon: Film, gradient: "from-indigo-500 to-indigo-600", iconColor: "text-indigo-600", badgeColor: "bg-indigo-50 text-indigo-700 border-indigo-100" },
-  "Coach": { icon: Target, gradient: "from-amber-500 to-amber-600", iconColor: "text-amber-600", badgeColor: "bg-amber-50 text-amber-700 border-amber-100" },
+  "Marca personal": { icon: User, gradient: "from-blue-500 to-blue-600", iconColor: "text-blue-600" },
+  "Asesores inmobiliarios": { icon: Home, gradient: "from-emerald-500 to-emerald-600", iconColor: "text-emerald-600" },
+  "Agencias de viajes": { icon: Plane, gradient: "from-sky-500 to-sky-600", iconColor: "text-sky-600" },
+  "Nutricionistas y fitness": { icon: Dumbbell, gradient: "from-orange-500 to-orange-600", iconColor: "text-orange-600" },
+  "Psicólogos y coaches": { icon: Brain, gradient: "from-purple-500 to-purple-600", iconColor: "text-purple-600" },
+  "Negocios físicos": { icon: ShoppingBag, gradient: "from-rose-500 to-rose-600", iconColor: "text-rose-600" },
+  "Agencias de marketing / Filmmakers": { icon: Film, gradient: "from-indigo-500 to-indigo-600", iconColor: "text-indigo-600" },
+  "Coach": { icon: Target, gradient: "from-amber-500 to-amber-600", iconColor: "text-amber-600" },
 };
 
-const DEFAULT_META: NicheMeta = {
-  icon: Folder,
-  gradient: "from-gray-400 to-gray-500",
-  iconColor: "text-gray-500",
-  badgeColor: "bg-gray-50 text-gray-600 border-gray-100",
+const REFERENTES: Record<string, string[]> = {
+  "Marca personal": [
+    "https://vt.tiktok.com/ZSQm5Teum/",
+    "https://vt.tiktok.com/ZSQm59maX/",
+    "https://vt.tiktok.com/ZSQm5HGub/",
+    "https://vt.tiktok.com/ZSQmafVkn/",
+    "https://vt.tiktok.com/ZSQma1d1F/",
+    "https://vt.tiktok.com/ZSQmaS1Be/",
+    "https://vt.tiktok.com/ZSQmaekLR/",
+    "https://vt.tiktok.com/ZSQmaAcPw/",
+    "https://vt.tiktok.com/ZSQmarSxj/",
+    "https://vt.tiktok.com/ZSQmavcro/",
+    "https://vt.tiktok.com/ZSQma7q7R/",
+  ],
+  "Asesores inmobiliarios": [
+    "https://vt.tiktok.com/ZSQmaHQ3H/",
+    "https://vt.tiktok.com/ZSQmaxRNF/",
+    "https://vt.tiktok.com/ZSQmaaY5L/",
+    "https://vt.tiktok.com/ZSQmm2V9L/",
+    "https://vt.tiktok.com/ZSQmmJvxd/",
+    "https://www.instagram.com/reel/DWxUNGQkS4N/?igsh=MWszdDhpbGhvZWx2aA==",
+    "https://www.instagram.com/reel/DSJTPJ2Ebdr/?igsh=YjdjMHVhd3JueDlq",
+    "https://www.instagram.com/reel/DYpzoyozKlE/?igsh=OGY5Nmo1d3Zrc2k5",
+    "https://www.instagram.com/reel/DPo-wzsjviy/?igsh=NW52MG4yeDhod2lh",
+    "https://www.instagram.com/reel/DK5LjC6RwiC/?igsh=M3JsdGpwdW4wOXRn",
+    "https://vt.tiktok.com/ZSQmuPpcQ/",
+    "https://vt.tiktok.com/ZSQmH19Xk/",
+    "https://vt.tiktok.com/ZSQmuv8PW/",
+    "https://www.instagram.com/reel/DZQ4doeRnL2/?igsh=ZnkwOGFqdGpmN3pq",
+    "https://vt.tiktok.com/ZSQmHFtmD/",
+    "https://vt.tiktok.com/ZSQmHQ16a/",
+  ],
+  "Agencias de viajes": [
+    "https://vt.tiktok.com/ZSQm9LdgX/",
+    "https://vt.tiktok.com/ZSQm9HWfA/",
+    "https://vt.tiktok.com/ZSQm95QV5/",
+    "https://vt.tiktok.com/ZSQm9BBmv/",
+    "https://vt.tiktok.com/ZSQm9qFc2/",
+    "https://vt.tiktok.com/ZSQm9Cco8/",
+    "https://vt.tiktok.com/ZSQm9Kvu1/",
+    "https://vt.tiktok.com/ZSQm9wEqy/",
+  ],
+  "Nutricionistas y fitness": [
+    "https://vt.tiktok.com/ZSQmxVeCu/",
+    "https://vt.tiktok.com/ZSQmxsN1d/",
+    "https://vt.tiktok.com/ZSQmxpYVa/",
+    "https://vt.tiktok.com/ZSQmQSvo1/",
+    "https://vt.tiktok.com/ZSQmQANy5/",
+    "https://vt.tiktok.com/ZSQmQAYDf/",
+    "https://vt.tiktok.com/ZSQmQ1vWq/",
+    "https://vt.tiktok.com/ZSQmQJ3jN/",
+    "https://vt.tiktok.com/ZSQmQU2YV/",
+    "https://www.instagram.com/reel/DZQrNdFPhdM/?igsh=MXZ4M3VwY2l2NnVtMw==",
+    "https://www.instagram.com/reel/DZEBwEXttA7/?igsh=MXF0NzFoNm53OHZqcg==",
+    "https://vt.tiktok.com/ZSQmCG6jw/",
+  ],
+  "Psicólogos y coaches": [
+    "https://vt.tiktok.com/ZSQmCBXJD/",
+    "https://vt.tiktok.com/ZSQmCBhUE/",
+    "https://vt.tiktok.com/ZSQmCaeVR/",
+    "https://vt.tiktok.com/ZSQmC9npG/",
+    "https://vt.tiktok.com/ZSQmCy9Bu/",
+    "https://vt.tiktok.com/ZSQmCg3MT/",
+    "https://vt.tiktok.com/ZSQmCHuS1/",
+    "https://vt.tiktok.com/ZSQmCGJR2/",
+    "https://vt.tiktok.com/ZSQmXj4Lw/",
+    "https://vt.tiktok.com/ZSQmXNgdr/",
+  ],
+  "Negocios físicos": [
+    "https://vt.tiktok.com/ZSQmXNUhH/",
+    "https://vt.tiktok.com/ZSQmXwKUB/",
+    "https://vt.tiktok.com/ZSQm41TUQ/",
+    "https://vt.tiktok.com/ZSQmXGo45/",
+    "https://vt.tiktok.com/ZSQm4Nv7t/",
+    "https://vt.tiktok.com/ZSQmXv88g/",
+    "https://vt.tiktok.com/ZSQm4k3kw/",
+    "https://vt.tiktok.com/ZSQm4uL3j/",
+    "https://vt.tiktok.com/ZSQm4SrCA/",
+    "https://vt.tiktok.com/ZSQm4DFDY/",
+    "https://vt.tiktok.com/ZSQm4Aaou/",
+    "https://vt.tiktok.com/ZSQm4XMcg/",
+    "https://vt.tiktok.com/ZSQm43qv6/",
+    "https://vt.tiktok.com/ZSQmV11XL/",
+  ],
+  "Agencias de marketing / Filmmakers": [
+    "https://vt.tiktok.com/ZSQmquQVB/",
+    "https://vt.tiktok.com/ZSQmq7U66/",
+    "https://vt.tiktok.com/ZSQmq9FBp/",
+    "https://vt.tiktok.com/ZSQmqc7BF/",
+    "https://vt.tiktok.com/ZSQmqofqG/",
+    "https://vt.tiktok.com/ZSQmqKoDT/",
+    "https://vt.tiktok.com/ZSQmbYfKB/",
+    "https://vt.tiktok.com/ZSQmbDjWg/",
+    "https://vt.tiktok.com/ZSQmbmb2S/",
+    "https://vt.tiktok.com/ZSQmbXpEM/",
+  ],
+  "Coach": [
+    "https://vt.tiktok.com/ZSQmbVPHw/",
+    "https://vt.tiktok.com/ZSQmbVPt3/",
+    "https://vt.tiktok.com/ZSQmbD5JV/",
+    "https://vt.tiktok.com/ZSQmbQxqy/",
+    "https://vt.tiktok.com/ZSQmbxoxc/",
+  ],
 };
+
+const NICHE_ORDER = Object.keys(REFERENTES);
 
 function getPlatform(url: string): { label: string; className: string } {
   if (url.includes("tiktok.com")) return { label: "TikTok", className: "bg-black text-white border-0" };
@@ -92,110 +171,22 @@ function getPlatform(url: string): { label: string; className: string } {
   return { label: "Web", className: "bg-gray-100 text-gray-600 border-0" };
 }
 
-function VideoCard({ video, isCoach, onDelete }: { video: ReferenceVideo; isCoach: boolean; onDelete: (id: string) => void }) {
-  const platform = getPlatform(video.url);
-  return (
-    <Card className="flex flex-col group hover:shadow-md transition-all border border-gray-100 bg-white">
-      <CardContent className="p-4 flex flex-col gap-3 h-full">
-        <div className="flex items-center justify-between">
-          <Badge className={`text-[10px] px-2 py-0.5 font-semibold ${platform.className}`}>{platform.label}</Badge>
-          {isCoach && (
-            <button onClick={() => onDelete(video.id)} className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity">
-              <Trash2 className="h-3.5 w-3.5" />
-            </button>
-          )}
-        </div>
-        <p className="text-sm font-medium line-clamp-3 flex-1 leading-snug text-gray-800">{video.title}</p>
-        {video.description && <p className="text-xs text-muted-foreground line-clamp-2">{video.description}</p>}
-        <a href={video.url} target="_blank" rel="noopener noreferrer">
-          <Button variant="outline" size="sm" className="w-full text-xs gap-1.5 h-8">
-            <ExternalLink className="h-3 w-3" /> Ver video
-          </Button>
-        </a>
-      </CardContent>
-    </Card>
-  );
-}
+// ─── Componente principal ─────────────────────────────────────────────────────
 
-function PersonalVideoCard({ video, onDelete }: { video: PersonalVideo; onDelete: (id: string) => void }) {
-  const platform = getPlatform(video.url);
-  return (
-    <Card className="flex flex-col group hover:shadow-md transition-all border border-gray-100 bg-white">
-      <CardContent className="p-4 flex flex-col gap-3 h-full">
-        <div className="flex items-center justify-between">
-          <Badge className={`text-[10px] px-2 py-0.5 font-semibold ${platform.className}`}>{platform.label}</Badge>
-          <button onClick={() => onDelete(video.id)} className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity">
-            <Trash2 className="h-3.5 w-3.5" />
-          </button>
-        </div>
-        <p className="text-sm font-medium line-clamp-3 flex-1 leading-snug text-gray-800">{video.title}</p>
-        {video.description && <p className="text-xs text-muted-foreground line-clamp-2">{video.description}</p>}
-        <a href={video.url} target="_blank" rel="noopener noreferrer">
-          <Button variant="outline" size="sm" className="w-full text-xs gap-1.5 h-8">
-            <ExternalLink className="h-3 w-3" /> Ver video
-          </Button>
-        </a>
-      </CardContent>
-    </Card>
-  );
-}
+type Props = {
+  initialPersonalVideos: PersonalVideo[];
+};
 
-type Props = { initialVideos: ReferenceVideo[]; initialPersonalVideos: PersonalVideo[]; isCoach: boolean };
-
-export function ReferentesClient({ initialVideos, initialPersonalVideos, isCoach }: Props) {
+export function ReferentesClient({ initialPersonalVideos }: Props) {
   const [view, setView] = useState<"biblioteca" | "mis-videos">("biblioteca");
-  const [videos, setVideos] = useState<ReferenceVideo[]>(initialVideos);
-  const [personalVideos, setPersonalVideos] = useState<PersonalVideo[]>(initialPersonalVideos);
-  const [adding, setAdding] = useState(false);
-  const [addingPersonal, setAddingPersonal] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [savingPersonal, setSavingPersonal] = useState(false);
   const [activeNiche, setActiveNiche] = useState<string | null>(null);
-  const [form, setForm] = useState({ url: "", title: "", niche: "", description: "" });
+  const [personalVideos, setPersonalVideos] = useState<PersonalVideo[]>(initialPersonalVideos);
+  const [addingPersonal, setAddingPersonal] = useState(false);
+  const [savingPersonal, setSavingPersonal] = useState(false);
   const [personalForm, setPersonalForm] = useState({ url: "", title: "", description: "" });
   const supabase = createClient();
 
-  // ── Biblioteca: agrupación por nicho ─────────────────────────────────────
-  const nicheOrder = useMemo(() => {
-    const counts: Record<string, number> = {};
-    videos.forEach((v) => { const k = v.niche || "Sin nicho"; counts[k] = (counts[k] || 0) + 1; });
-    return Object.keys(counts).sort((a, b) => (counts[b] || 0) - (counts[a] || 0));
-  }, [videos]);
-
-  const groupedByNiche = useMemo(() => {
-    const groups: Record<string, ReferenceVideo[]> = {};
-    videos.forEach((v) => { const key = v.niche || "Sin nicho"; if (!groups[key]) groups[key] = []; groups[key].push(v); });
-    return groups;
-  }, [videos]);
-
-  const activeVideos = activeNiche ? (groupedByNiche[activeNiche] || []) : [];
-  const activeMeta = activeNiche ? (NICHE_META[activeNiche] || DEFAULT_META) : null;
-
-  // ── CRUD Biblioteca (coach) ──────────────────────────────────────────────
-  async function handleAdd() {
-    if (!form.url || !form.title) { toast.error("URL y título son obligatorios"); return; }
-    setSaving(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      const { data, error } = await supabase.from("reference_videos")
-        .insert({ coach_id: user!.id, url: form.url, title: form.title, niche: form.niche || activeNiche || null, description: form.description || null })
-        .select().single();
-      if (error) throw error;
-      setVideos((prev) => [data, ...prev]);
-      setForm({ url: "", title: "", niche: "", description: "" });
-      setAdding(false);
-      toast.success("Video agregado");
-    } catch { toast.error("Error al agregar"); } finally { setSaving(false); }
-  }
-
-  async function handleDelete(id: string) {
-    const { error } = await supabase.from("reference_videos").delete().eq("id", id);
-    if (error) { toast.error("Error al eliminar"); return; }
-    setVideos((prev) => prev.filter((v) => v.id !== id));
-    toast.success("Video eliminado");
-  }
-
-  // ── CRUD Mis Videos (alumno) ─────────────────────────────────────────────
+  // ── CRUD Mis Videos ─────────────────────────────────────────────────────
   async function handleAddPersonal() {
     if (!personalForm.url || !personalForm.title) { toast.error("URL y título son obligatorios"); return; }
     setSavingPersonal(true);
@@ -219,10 +210,10 @@ export function ReferentesClient({ initialVideos, initialPersonalVideos, isCoach
     toast.success("Video eliminado");
   }
 
-  // ── Tabs de vista ─────────────────────────────────────────────────────────
+  // ── Tab buttons ─────────────────────────────────────────────────────────
   const tabBtn = (v: typeof view, label: string, Icon: React.ElementType) => (
     <button
-      onClick={() => { setView(v); setActiveNiche(null); setAdding(false); setAddingPersonal(false); }}
+      onClick={() => { setView(v); setActiveNiche(null); }}
       className={cn(
         "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200",
         view === v ? "text-white shadow-sm" : "text-gray-500 hover:text-gray-900"
@@ -234,11 +225,13 @@ export function ReferentesClient({ initialVideos, initialPersonalVideos, isCoach
     </button>
   );
 
-  // ── Vista: nicho activo de la Biblioteca ──────────────────────────────────
-  if (view === "biblioteca" && activeNiche && activeMeta) {
-    const Icon = activeMeta.icon;
-    const tiktokCount = activeVideos.filter((v) => v.url.includes("tiktok")).length;
-    const igCount = activeVideos.filter((v) => v.url.includes("instagram")).length;
+  // ── Vista: Nicho activo ──────────────────────────────────────────────────
+  if (view === "biblioteca" && activeNiche) {
+    const meta = NICHE_META[activeNiche];
+    const links = REFERENTES[activeNiche] || [];
+    const Icon = meta?.icon || User;
+    const tiktokCount = links.filter((u) => u.includes("tiktok")).length;
+    const igCount = links.filter((u) => u.includes("instagram")).length;
 
     return (
       <div className="space-y-5">
@@ -248,34 +241,47 @@ export function ReferentesClient({ initialVideos, initialPersonalVideos, isCoach
         </div>
 
         <button onClick={() => setActiveNiche(null)} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-gray-900 transition-colors">
-          <ArrowLeft className="h-4 w-4" /> Volver a módulos
+          <ArrowLeft className="h-4 w-4" /> Volver a nichos
         </button>
 
         <div className="flex items-center gap-4">
-          <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${activeMeta.gradient} flex items-center justify-center flex-shrink-0`}>
+          <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${meta?.gradient || "from-gray-400 to-gray-500"} flex items-center justify-center flex-shrink-0`}>
             <Icon className="h-6 w-6 text-white" strokeWidth={1.8} />
           </div>
           <div>
             <h2 className="text-xl font-bold text-gray-900">{activeNiche}</h2>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-sm text-muted-foreground">{activeVideos.length} videos</span>
+              <span className="text-sm text-muted-foreground">{links.length} videos referentes</span>
               {tiktokCount > 0 && <span className="text-[10px] font-semibold bg-black text-white px-2 py-0.5 rounded-full">TikTok {tiktokCount}</span>}
               {igCount > 0 && <span className="text-[10px] font-semibold bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-0.5 rounded-full">Instagram {igCount}</span>}
             </div>
           </div>
-          {isCoach && (
-            <div className="ml-auto">
-              <Button size="sm" onClick={() => { if (!adding) setForm((f) => ({ ...f, niche: activeNiche ?? f.niche })); setAdding((v) => !v); }}>
-                <Plus className="h-4 w-4 mr-1.5" /> Agregar video
-              </Button>
-            </div>
-          )}
         </div>
 
-        {adding && isCoach && <AddVideoForm form={form} setForm={setForm} onSave={handleAdd} onCancel={() => setAdding(false)} saving={saving} showNiche />}
-
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-          {activeVideos.map((video) => <VideoCard key={video.id} video={video} isCoach={isCoach} onDelete={handleDelete} />)}
+          {links.map((url, i) => {
+            const platform = getPlatform(url);
+            return (
+              <Card key={i} className="flex flex-col group hover:shadow-md transition-all border border-gray-100 bg-white">
+                <CardContent className="p-4 flex flex-col gap-3 h-full">
+                  <div className="flex items-center justify-between">
+                    <Badge className={`text-[10px] px-2 py-0.5 font-semibold ${platform.className}`}>{platform.label}</Badge>
+                    <span className="text-xs text-gray-300 font-medium">#{i + 1}</span>
+                  </div>
+                  <div className="flex-1 flex items-center justify-center py-3">
+                    <div className={`h-10 w-10 rounded-xl bg-gradient-to-br ${meta?.gradient || "from-gray-400 to-gray-500"} flex items-center justify-center opacity-20`}>
+                      <Icon className="h-5 w-5 text-white" strokeWidth={1.8} />
+                    </div>
+                  </div>
+                  <a href={url} target="_blank" rel="noopener noreferrer">
+                    <Button variant="outline" size="sm" className="w-full text-xs gap-1.5 h-8">
+                      <ExternalLink className="h-3 w-3" /> Ver video
+                    </Button>
+                  </a>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </div>
     );
@@ -291,9 +297,7 @@ export function ReferentesClient({ initialVideos, initialPersonalVideos, isCoach
         </div>
 
         <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-gray-500">Tu colección personal de videos que te inspiran o querés guardar como referencia</p>
-          </div>
+          <p className="text-sm text-gray-500">Tu colección personal de videos que te inspiran o querés guardar como referencia</p>
           <Button size="sm" onClick={() => setAddingPersonal((v) => !v)}
             className="gap-1.5 text-white" style={{ background: "linear-gradient(135deg, #1A6FFF, #00C8FF)" }}>
             <Plus className="h-4 w-4" /> Guardar video
@@ -336,14 +340,35 @@ export function ReferentesClient({ initialVideos, initialPersonalVideos, isCoach
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-            {personalVideos.map((video) => <PersonalVideoCard key={video.id} video={video} onDelete={handleDeletePersonal} />)}
+            {personalVideos.map((video) => {
+              const platform = getPlatform(video.url);
+              return (
+                <Card key={video.id} className="flex flex-col group hover:shadow-md transition-all border border-gray-100 bg-white">
+                  <CardContent className="p-4 flex flex-col gap-3 h-full">
+                    <div className="flex items-center justify-between">
+                      <Badge className={`text-[10px] px-2 py-0.5 font-semibold ${platform.className}`}>{platform.label}</Badge>
+                      <button onClick={() => handleDeletePersonal(video.id)} className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity">
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                    <p className="text-sm font-medium line-clamp-3 flex-1 leading-snug text-gray-800">{video.title}</p>
+                    {video.description && <p className="text-xs text-muted-foreground line-clamp-2">{video.description}</p>}
+                    <a href={video.url} target="_blank" rel="noopener noreferrer">
+                      <Button variant="outline" size="sm" className="w-full text-xs gap-1.5 h-8">
+                        <ExternalLink className="h-3 w-3" /> Ver video
+                      </Button>
+                    </a>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>
     );
   }
 
-  // ── Vista principal: Biblioteca (grilla de módulos) ───────────────────────
+  // ── Vista principal: Nichos ─────────────────────────────────────────────
   return (
     <div className="space-y-5">
       <div className="flex gap-1 bg-white rounded-2xl p-1.5 border border-gray-100 w-fit" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
@@ -351,106 +376,43 @@ export function ReferentesClient({ initialVideos, initialPersonalVideos, isCoach
         {tabBtn("mis-videos", "Mis Videos", Bookmark)}
       </div>
 
-      {isCoach && (
-        <div className="flex justify-end">
-          <Button onClick={() => setAdding((v) => !v)}>
-            <Plus className="h-4 w-4 mr-2" /> Agregar referente
-          </Button>
-        </div>
-      )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {NICHE_ORDER.map((niche) => {
+          const links = REFERENTES[niche];
+          const meta = NICHE_META[niche];
+          const Icon = meta?.icon || User;
+          const tiktokCount = links.filter((u) => u.includes("tiktok")).length;
+          const igCount = links.filter((u) => u.includes("instagram")).length;
 
-      {adding && isCoach && <AddVideoForm form={form} setForm={setForm} onSave={handleAdd} onCancel={() => setAdding(false)} saving={saving} showNiche />}
-
-      {videos.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground">
-          <Video className="h-12 w-12 mx-auto mb-4 opacity-30" />
-          <p className="font-medium">Aún no hay videos referentes</p>
-          {isCoach && <p className="text-sm mt-1">Agregá el primero con el botón de arriba</p>}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {nicheOrder.map((niche) => {
-            const nicheVideos = groupedByNiche[niche] || [];
-            const meta = NICHE_META[niche] || DEFAULT_META;
-            const Icon = meta.icon;
-            const tiktokCount = nicheVideos.filter((v) => v.url.includes("tiktok")).length;
-            const igCount = nicheVideos.filter((v) => v.url.includes("instagram")).length;
-
-            return (
-              <Card key={niche} className="cursor-pointer hover:shadow-lg transition-all duration-200 border border-gray-100 overflow-hidden group" onClick={() => setActiveNiche(niche)}>
-                <div className={`h-1.5 w-full bg-gradient-to-r ${meta.gradient}`} />
-                <CardContent className="p-5">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className={`h-10 w-10 rounded-xl bg-gradient-to-br ${meta.gradient} flex items-center justify-center`}>
-                      <Icon className="h-5 w-5 text-white" strokeWidth={1.8} />
-                    </div>
-                    <span className="text-2xl font-bold text-gray-300 group-hover:text-gray-400 transition-colors">{nicheVideos.length}</span>
+          return (
+            <Card
+              key={niche}
+              className="cursor-pointer hover:shadow-lg transition-all duration-200 border border-gray-100 overflow-hidden group"
+              onClick={() => setActiveNiche(niche)}
+            >
+              <div className={`h-1.5 w-full bg-gradient-to-r ${meta?.gradient || "from-gray-400 to-gray-500"}`} />
+              <CardContent className="p-5">
+                <div className="flex items-start justify-between mb-4">
+                  <div className={`h-10 w-10 rounded-xl bg-gradient-to-br ${meta?.gradient || "from-gray-400 to-gray-500"} flex items-center justify-center`}>
+                    <Icon className="h-5 w-5 text-white" strokeWidth={1.8} />
                   </div>
-                  <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Módulo</p>
-                  <h3 className="font-bold text-gray-900 text-sm leading-snug mb-3">{niche}</h3>
-                  <div className="flex flex-wrap gap-1.5 mb-4">
-                    {tiktokCount > 0 && <span className="text-[10px] font-semibold bg-black text-white px-2 py-0.5 rounded-full">TikTok · {tiktokCount}</span>}
-                    {igCount > 0 && <span className="text-[10px] font-semibold bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-0.5 rounded-full">Instagram · {igCount}</span>}
-                  </div>
-                  <div className="flex items-center justify-between text-sm text-[#1A6FFF] font-medium">
-                    <span>Ver módulo</span>
-                    <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      )}
+                  <span className="text-2xl font-bold text-gray-300 group-hover:text-gray-400 transition-colors">{links.length}</span>
+                </div>
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Nicho</p>
+                <h3 className="font-bold text-gray-900 text-sm leading-snug mb-3">{niche}</h3>
+                <div className="flex flex-wrap gap-1.5 mb-4">
+                  {tiktokCount > 0 && <span className="text-[10px] font-semibold bg-black text-white px-2 py-0.5 rounded-full">TikTok · {tiktokCount}</span>}
+                  {igCount > 0 && <span className="text-[10px] font-semibold bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-0.5 rounded-full">Instagram · {igCount}</span>}
+                </div>
+                <div className="flex items-center justify-between text-sm text-[#1A6FFF] font-medium">
+                  <span>Ver referentes</span>
+                  <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
     </div>
-  );
-}
-
-// ─── Sub-componente: form agregar video ───────────────────────────────────────
-
-function AddVideoForm({
-  form, setForm, onSave, onCancel, saving, showNiche,
-}: {
-  form: { url: string; title: string; niche: string; description: string };
-  setForm: React.Dispatch<React.SetStateAction<{ url: string; title: string; niche: string; description: string }>>;
-  onSave: () => void;
-  onCancel: () => void;
-  saving: boolean;
-  showNiche: boolean;
-}) {
-  return (
-    <Card className="border-primary/30">
-      <CardContent className="pt-6 space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2 col-span-2">
-            <Label>URL del video</Label>
-            <Input placeholder="https://..." value={form.url} onChange={(e) => setForm((f) => ({ ...f, url: e.target.value }))} />
-          </div>
-          <div className="space-y-2">
-            <Label>Título</Label>
-            <Input placeholder="Nombre descriptivo" value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} />
-          </div>
-          {showNiche && (
-            <div className="space-y-2">
-              <Label>Nicho</Label>
-              <Select value={form.niche} onValueChange={(v) => setForm((f) => ({ ...f, niche: v }))}>
-                <SelectTrigger><SelectValue placeholder="Seleccionar nicho..." /></SelectTrigger>
-                <SelectContent>{NICHES.map((n) => <SelectItem key={n} value={n}>{n}</SelectItem>)}</SelectContent>
-              </Select>
-            </div>
-          )}
-          <div className="space-y-2 col-span-2">
-            <Label>Por qué es referente (opcional)</Label>
-            <Input placeholder="Qué hace bien, qué técnica usa..." value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
-          </div>
-        </div>
-        <div className="flex gap-3">
-          <Button onClick={onSave} disabled={saving}>
-            {saving && <Loader2 className="h-4 w-4 animate-spin mr-2" />} Guardar
-          </Button>
-          <Button variant="outline" onClick={onCancel}>Cancelar</Button>
-        </div>
-      </CardContent>
-    </Card>
   );
 }
