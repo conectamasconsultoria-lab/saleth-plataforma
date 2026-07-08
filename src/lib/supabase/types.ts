@@ -58,6 +58,8 @@ export type Script = {
   cta: string;
   awareness_level?: "high" | "medium" | "low";
   stage?: "attraction" | "conversion" | "nurturing";
+  format?: "problema" | "camara" | "pregunta";
+  duration?: 15 | 30 | 60;
   created_at: string;
 };
 

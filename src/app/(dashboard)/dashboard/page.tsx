@@ -8,7 +8,6 @@ import {
   BarChart3,
   BookOpen,
   Video,
-  Brain,
   ArrowRight,
   Clock,
   Zap,
@@ -174,13 +173,6 @@ export default async function DashboardPage() {
       href: "/dashboard/referentes",
       desc: "de industria",
     },
-    {
-      label: "Nivel de Conciencia",
-      value: "—",
-      icon: Brain,
-      href: "/dashboard/awareness",
-      desc: "módulo activo",
-    },
   ];
 
   const quickActions = [
@@ -188,7 +180,6 @@ export default async function DashboardPage() {
     { href: "/dashboard/scripts", label: "Generar guión con IA", icon: FileText },
     { href: "/dashboard/carousels", label: "Crear carrusel", icon: Layers },
     { href: "/dashboard/metrics", label: "Analizar métricas", icon: BarChart3 },
-    { href: "/dashboard/awareness", label: "Guión por nivel de conciencia", icon: Brain },
     { href: "/dashboard/transcriptions", label: "Transcribir video", icon: Captions },
   ];
 

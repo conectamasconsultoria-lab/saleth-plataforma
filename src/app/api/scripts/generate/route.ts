@@ -128,12 +128,33 @@ Fórmula: RESULTADO FINAL → PROBLEMA INICIAL → FRUSTRACIÓN → SOLUCIÓN �
 7. CTA: "Si tú también quieres un cambio así, envíanos un mensaje con la palabra 'CAMBIO'."`
 };
 
+const FORMAT_GUIDANCE: Record<string, string> = {
+  problema: `FORMATO DE GRABACIÓN: Formato de Problema
+Escribí el gancho y el desarrollo como una situación cotidiana incómoda que el cliente ideal reconozca al instante ("eso me pasa a mí"). Describí la escena o situación en vez de hablar todo el tiempo directo a cámara. Amplificá el dolor antes de revelar la causa real.`,
+  camara: `FORMATO DE GRABACIÓN: Hablando a Cámara
+Escribí el guión en primera persona, como si el creador hablara directo a cámara de principio a fin. Lenguaje conversacional, frases cortas, energía alta y autoridad desde el segundo 1. Sin descripciones de escena — todo es texto hablado.`,
+  pregunta: `FORMATO DE GRABACIÓN: Pregunta de Instagram
+Estructurá el guión como si respondiera una pregunta real de la audiencia (caja de preguntas de Instagram). Empezá citando o parafraseando la pregunta, y respondé aportando valor concreto y accionable.`,
+};
+
+const DURATION_GUIDANCE: Record<number, string> = {
+  15: "DURACIÓN OBJETIVO: 15 segundos (≈35-45 palabras en total). Un solo golpe: gancho ultra directo + una idea + CTA. Sin rodeos, cada palabra cuenta.",
+  30: "DURACIÓN OBJETIVO: 30 segundos (≈70-90 palabras en total). Gancho + una idea de desarrollo + CTA. Breve pero con espacio para una transición.",
+  60: "DURACIÓN OBJETIVO: 60 segundos (≈150-180 palabras en total). Gancho + desarrollo completo siguiendo la estructura + CTA con espacio para un ejemplo.",
+};
+
+const AWARENESS_GUIDANCE: Record<string, string> = {
+  low: "Nivel de conciencia: Bajo — el cliente no sabe que tiene el problema. El gancho debe generar una toma de conciencia (ej: \"esto te está pasando y no lo sabías\").",
+  medium: "Nivel de conciencia: Medio — el cliente sabe que tiene el problema pero no conoce la solución. El gancho debe educar y posicionar sin vender directo.",
+  high: "Nivel de conciencia: Alto — el cliente ya conoce al creador y está evaluando comprar. El gancho debe usar prueba social o resultados concretos.",
+};
+
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
-  const { viralVideoId, topic, awarenessLevel, stage, contentType, subType } = await req.json();
+  const { viralVideoId, topic, awarenessLevel, stage, contentType, subType, format, duration } = await req.json();
 
   const { data: questionnaire } = await supabase
     .from("questionnaires")
@@ -172,6 +193,9 @@ Video viral de referencia:
   };
 
   const effectiveStructure = structure || (stage ? STRUCTURES[stageMap[stage]] : null);
+  const formatGuidance = format ? FORMAT_GUIDANCE[format] : null;
+  const durationGuidance = duration ? DURATION_GUIDANCE[duration] : null;
+  const awarenessGuidance = awarenessLevel ? AWARENESS_GUIDANCE[awarenessLevel] : null;
 
   const prompt = `Sos un experto en marketing de contenidos y copywriting para redes sociales, especialmente TikTok e Instagram.
 
@@ -186,14 +210,16 @@ PERFIL DEL CREADOR:
 
 ${effectiveStructure ? `SIGUE ESTA ESTRUCTURA EXACTAMENTE:\n${effectiveStructure}` : ""}
 
+${formatGuidance ? `${formatGuidance}\n` : ""}
+${durationGuidance ? `${durationGuidance}\n` : ""}
+${awarenessGuidance ? `${awarenessGuidance}\n` : ""}
 ${videoContext}
 ${topic ? `Tema o contexto adicional: ${topic}` : ""}
-${awarenessLevel ? `Nivel de conciencia: ${awarenessLevel === "high" ? "Alto" : awarenessLevel === "medium" ? "Medio" : "Bajo"}` : ""}
 
 INSTRUCCIONES:
-- Genera un guión completo para un video corto (60-90 segundos)
 - Adapta TODO al nicho y oferta del creador
 - El gancho debe ser IRRESISTIBLE y de ROOM ALTO (temas universales que le importan a todos)
+- Respetá la duración objetivo indicada arriba en la extensión del guión completo
 - El CTA debe incluir una palabra clave específica para comentar
 - Usa lenguaje natural, como si estuviera hablando a cámara
 - NO uses emojis en el guión
@@ -234,6 +260,8 @@ Respondé en formato JSON:
         cta: scriptData.cta,
         awareness_level: awarenessLevel ?? null,
         stage: effectiveStage,
+        format: format ?? null,
+        duration: duration ?? null,
       })
       .select()
       .single();

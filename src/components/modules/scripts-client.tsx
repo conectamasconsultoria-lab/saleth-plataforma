@@ -7,11 +7,51 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Loader2, Wand2, Copy, ChevronDown, ChevronUp, Megaphone, Heart, ShoppingCart } from "lucide-react";
+import {
+  Loader2,
+  Wand2,
+  Copy,
+  ChevronDown,
+  ChevronUp,
+  Megaphone,
+  Heart,
+  ShoppingCart,
+  AlertTriangle,
+  Camera,
+  HelpCircle,
+  Timer,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Script } from "@/lib/supabase/types";
 
 type Props = { initialScripts: Script[] };
+
+const AWARENESS_LEVELS = [
+  {
+    id: "low",
+    label: "Conciencia Baja",
+    emoji: "😴",
+    activeColor: "border-orange-500 bg-orange-100 dark:bg-orange-900 ring-2 ring-orange-500/30",
+    color: "border-border bg-card hover:border-orange-300",
+    description: "No sabe que tiene el problema. Hay que despertar conciencia.",
+  },
+  {
+    id: "medium",
+    label: "Conciencia Media",
+    emoji: "🤔",
+    activeColor: "border-blue-500 bg-blue-100 dark:bg-blue-900 ring-2 ring-blue-500/30",
+    color: "border-border bg-card hover:border-blue-300",
+    description: "Sabe el problema pero no tu solución. Hay que educar y posicionar.",
+  },
+  {
+    id: "high",
+    label: "Conciencia Alta",
+    emoji: "🎯",
+    activeColor: "border-green-500 bg-green-100 dark:bg-green-900 ring-2 ring-green-500/30",
+    color: "border-border bg-card hover:border-green-300",
+    description: "Te conoce y evalúa comprar. Hay que convertir con prueba social.",
+  },
+];
 
 const CONTENT_TYPES = [
   {
@@ -82,19 +122,69 @@ const CONTENT_TYPES = [
   },
 ];
 
+// Etapa del funnel (id local en español) → valor de stage usado en la base de datos
+const STAGE_MAP: Record<string, "attraction" | "nurturing" | "conversion"> = {
+  atraccion: "attraction",
+  nutricion: "nurturing",
+  ventas: "conversion",
+};
+
+const FORMATS = [
+  {
+    id: "problema",
+    label: "Formato de Problema",
+    icon: AlertTriangle,
+    activeColor: "border-red-500 bg-red-100 dark:bg-red-900 ring-2 ring-red-500/30",
+    color: "border-border bg-card hover:border-red-300",
+    description: "Escena cotidiana incómoda que el cliente reconoce al instante (\"eso me pasa a mí\")",
+  },
+  {
+    id: "camara",
+    label: "Hablando a Cámara",
+    icon: Camera,
+    activeColor: "border-cyan-500 bg-cyan-100 dark:bg-cyan-900 ring-2 ring-cyan-500/30",
+    color: "border-border bg-card hover:border-cyan-300",
+    description: "Directo y auténtico, de principio a fin frente a cámara",
+  },
+  {
+    id: "pregunta",
+    label: "Pregunta de Instagram",
+    icon: HelpCircle,
+    activeColor: "border-amber-500 bg-amber-100 dark:bg-amber-900 ring-2 ring-amber-500/30",
+    color: "border-border bg-card hover:border-amber-300",
+    description: "Responde una pregunta real de la caja de preguntas de Instagram",
+  },
+];
+
+const DURATIONS = [
+  { id: 15, label: "15 segundos", description: "Un solo golpe: gancho + 1 idea + CTA" },
+  { id: 30, label: "30 segundos", description: "Gancho + una idea de desarrollo + CTA" },
+  { id: 60, label: "1 minuto", description: "Gancho + desarrollo completo + CTA" },
+];
+
+const formatLabel: Record<string, string> = {
+  problema: "Formato de Problema",
+  camara: "Hablando a Cámara",
+  pregunta: "Pregunta de Instagram",
+};
+
 export function ScriptsClient({ initialScripts }: Props) {
   const [scripts, setScripts] = useState<Script[]>(initialScripts);
+  const [awarenessLevel, setAwarenessLevel] = useState<string | null>(null);
   const [contentType, setContentType] = useState<string | null>(null);
   const [subType, setSubType] = useState<string | null>(null);
+  const [format, setFormat] = useState<string | null>(null);
+  const [duration, setDuration] = useState<number | null>(null);
   const [topic, setTopic] = useState("");
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
 
   const selectedType = CONTENT_TYPES.find((t) => t.id === contentType);
+  const canGenerate = awarenessLevel && contentType && subType && format && duration;
 
   async function handleGenerate() {
-    if (!contentType || !subType) {
-      toast.error("Seleccioná el tipo de contenido y la estructura");
+    if (!canGenerate) {
+      toast.error("Completá los 4 pasos: nivel de conciencia, etapa, formato y duración");
       return;
     }
     setLoading(true);
@@ -102,7 +192,15 @@ export function ScriptsClient({ initialScripts }: Props) {
       const res = await fetch("/api/scripts/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contentType, subType, topic: topic || undefined }),
+        body: JSON.stringify({
+          contentType,
+          subType,
+          topic: topic || undefined,
+          awarenessLevel,
+          stage: STAGE_MAP[contentType!],
+          format,
+          duration,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -131,21 +229,48 @@ export function ScriptsClient({ initialScripts }: Props) {
     nurturing: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
     conversion: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200",
   };
+  const awarenessLabel: Record<string, string> = {
+    low: "Conciencia Baja", medium: "Conciencia Media", high: "Conciencia Alta",
+  };
 
   return (
     <div className="space-y-6">
-      {/* Paso 1: Tipo de contenido */}
+      {/* Generador */}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
             <Wand2 className="h-4 w-4 text-primary" />
             Nuevo guión con IA
           </CardTitle>
-          <CardDescription>Elegí el tipo de contenido y la estructura que querés usar</CardDescription>
+          <CardDescription>Definí nivel de conciencia, etapa, formato y duración para tu guión</CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
+          {/* Paso 1: Nivel de conciencia */}
           <div>
-            <Label className="text-sm font-semibold mb-3 block">1. ¿Qué tipo de contenido querés crear?</Label>
+            <Label className="text-sm font-semibold mb-3 block">1. ¿En qué nivel de conciencia está tu cliente?</Label>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {AWARENESS_LEVELS.map((level) => (
+                <button
+                  key={level.id}
+                  onClick={() => setAwarenessLevel(level.id)}
+                  className={cn(
+                    "text-left p-4 rounded-lg border-2 transition-all",
+                    awarenessLevel === level.id ? level.activeColor : level.color
+                  )}
+                >
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span className="text-lg">{level.emoji}</span>
+                    <span className="font-semibold text-sm">{level.label}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">{level.description}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Paso 2: Etapa del funnel */}
+          <div>
+            <Label className="text-sm font-semibold mb-3 block">2. ¿Cuál es la etapa del funnel?</Label>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               {CONTENT_TYPES.map((type) => {
                 const Icon = type.icon;
@@ -169,10 +294,10 @@ export function ScriptsClient({ initialScripts }: Props) {
             </div>
           </div>
 
-          {/* Paso 2: Sub-tipo / estructura */}
+          {/* Paso 3: Estructura narrativa */}
           {selectedType && (
             <div>
-              <Label className="text-sm font-semibold mb-3 block">2. ¿Qué estructura querés usar?</Label>
+              <Label className="text-sm font-semibold mb-3 block">3. ¿Qué estructura narrativa querés usar?</Label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {selectedType.subtypes.map((st) => (
                   <button
@@ -194,10 +319,65 @@ export function ScriptsClient({ initialScripts }: Props) {
             </div>
           )}
 
-          {/* Paso 3: Tema opcional */}
+          {/* Paso 4: Formato de grabación */}
           {subType && (
+            <div>
+              <Label className="text-sm font-semibold mb-3 block">4. ¿Con qué formato lo vas a grabar?</Label>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {FORMATS.map((f) => {
+                  const Icon = f.icon;
+                  return (
+                    <button
+                      key={f.id}
+                      onClick={() => setFormat(f.id)}
+                      className={cn(
+                        "text-left p-4 rounded-lg border-2 transition-all",
+                        format === f.id ? f.activeColor : f.color
+                      )}
+                    >
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <Icon className="h-4 w-4" />
+                        <span className="font-semibold text-sm">{f.label}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">{f.description}</p>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Paso 5: Duración */}
+          {format && (
+            <div>
+              <Label className="text-sm font-semibold mb-3 block">5. ¿Cuánto va a durar el video?</Label>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {DURATIONS.map((d) => (
+                  <button
+                    key={d.id}
+                    onClick={() => setDuration(d.id)}
+                    className={cn(
+                      "text-left p-4 rounded-lg border-2 transition-all flex items-start gap-2.5",
+                      duration === d.id
+                        ? "border-primary bg-primary/5 ring-2 ring-primary/20"
+                        : "border-border bg-card hover:border-primary/40"
+                    )}
+                  >
+                    <Timer className="h-4 w-4 mt-0.5 text-muted-foreground flex-shrink-0" />
+                    <div>
+                      <p className="font-semibold text-sm">{d.label}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{d.description}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Paso 6: Tema opcional */}
+          {duration && (
             <div className="space-y-2">
-              <Label className="text-sm font-semibold">3. Tema o contexto adicional (opcional)</Label>
+              <Label className="text-sm font-semibold">6. Tema o contexto adicional (opcional)</Label>
               <Textarea
                 placeholder="Ej: Usar el caso de Elon Musk, hablar sobre disciplina financiera, mi cliente ideal son coaches..."
                 value={topic}
@@ -209,7 +389,7 @@ export function ScriptsClient({ initialScripts }: Props) {
 
           <Button
             onClick={handleGenerate}
-            disabled={loading || !contentType || !subType}
+            disabled={loading || !canGenerate}
             className="w-full sm:w-auto"
           >
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
@@ -235,6 +415,21 @@ export function ScriptsClient({ initialScripts }: Props) {
                       {script.stage && (
                         <Badge className={cn("text-xs border-0", stageColor[script.stage] || "")}>
                           {stageLabel[script.stage]}
+                        </Badge>
+                      )}
+                      {script.awareness_level && (
+                        <Badge variant="outline" className="text-xs">
+                          {awarenessLabel[script.awareness_level]}
+                        </Badge>
+                      )}
+                      {script.format && (
+                        <Badge variant="outline" className="text-xs">
+                          {formatLabel[script.format]}
+                        </Badge>
+                      )}
+                      {script.duration && (
+                        <Badge variant="outline" className="text-xs">
+                          {script.duration === 60 ? "1 min" : `${script.duration}s`}
                         </Badge>
                       )}
                     </div>
