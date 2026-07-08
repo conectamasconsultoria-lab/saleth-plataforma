@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Save, Loader2, RefreshCw } from "lucide-react";
+import { Save, Loader2, RefreshCw, Palette } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { Questionnaire } from "@/lib/supabase/types";
 import { ARCHETYPES } from "@/lib/archetypes";
@@ -16,7 +17,13 @@ import type { ArchetypeName } from "@/lib/archetypes";
 
 type Props = {
   initialQuestionnaire: Questionnaire | null;
-  profile: { full_name: string; role: string } | null;
+  profile: {
+    full_name: string;
+    role: string;
+    avatar_url?: string;
+    brand_color?: string;
+    brand_style?: "dark" | "light";
+  } | null;
 };
 
 export function SettingsClient({ initialQuestionnaire, profile }: Props) {
@@ -32,7 +39,29 @@ export function SettingsClient({ initialQuestionnaire, profile }: Props) {
     content_pillars: bp.content_pillars ?? "",
   });
   const [saving, setSaving] = useState(false);
+
+  const [brandColor, setBrandColor] = useState(profile?.brand_color ?? "#1A6FFF");
+  const [brandStyle, setBrandStyle] = useState<"dark" | "light">(profile?.brand_style ?? "dark");
+  const [savingBrand, setSavingBrand] = useState(false);
+
   const supabase = createClient();
+
+  async function handleSaveBrand() {
+    setSavingBrand(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { error } = await supabase
+        .from("profiles")
+        .update({ brand_color: brandColor, brand_style: brandStyle })
+        .eq("user_id", user!.id);
+      if (error) throw error;
+      toast.success("Identidad visual actualizada");
+    } catch {
+      toast.error("Error al guardar la identidad visual");
+    } finally {
+      setSavingBrand(false);
+    }
+  }
 
   const archetypeName = initialQuestionnaire?.personality_archetype as ArchetypeName | undefined;
   const archetype = archetypeName ? ARCHETYPES[archetypeName] : null;
@@ -130,6 +159,90 @@ export function SettingsClient({ initialQuestionnaire, profile }: Props) {
             <Label className="text-xs text-muted-foreground">Tipo de cuenta</Label>
             <p className="text-sm font-medium mt-1 capitalize">{profile?.role === "coach" ? "Coach" : "Cliente"}</p>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Palette className="h-4 w-4" style={{ color: "#1A6FFF" }} strokeWidth={1.8} />
+            Identidad visual de marca
+          </CardTitle>
+          <CardDescription>
+            Define el color y estilo con el que se generan tus carruseles y otras piezas visuales
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Color de marca</Label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={brandColor}
+                  onChange={(e) => setBrandColor(e.target.value)}
+                  className="h-9 w-11 rounded-md border border-input cursor-pointer bg-transparent p-0.5"
+                />
+                <Input
+                  value={brandColor}
+                  onChange={(e) => setBrandColor(e.target.value)}
+                  className="text-sm font-mono"
+                  maxLength={7}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Estilo</Label>
+              <Select value={brandStyle} onValueChange={(v) => setBrandStyle(v as "dark" | "light")}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="dark">Oscuro</SelectItem>
+                  <SelectItem value="light">Claro</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div
+            className="rounded-xl p-4 flex items-center gap-3"
+            style={{
+              background: brandStyle === "dark" ? "#0A0A0C" : "#FAFAF8",
+              border: `1px solid ${brandStyle === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}`,
+            }}
+          >
+            <div
+              className="h-9 w-9 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+              style={{ background: brandColor }}
+            >
+              {(profile?.full_name || "TU")
+                .split(" ")
+                .map((w) => w[0])
+                .slice(0, 2)
+                .join("")
+                .toUpperCase()}
+            </div>
+            <div>
+              <p
+                className="text-sm font-semibold"
+                style={{ color: brandStyle === "dark" ? "#fff" : "#0F172A" }}
+              >
+                Así se va a ver la marca en tus carruseles
+              </p>
+              <p
+                className="text-xs mt-0.5"
+                style={{ color: brandStyle === "dark" ? "rgba(255,255,255,0.5)" : "rgba(15,23,42,0.5)" }}
+              >
+                Vista previa del color y estilo elegidos
+              </p>
+            </div>
+          </div>
+
+          <Button onClick={handleSaveBrand} disabled={savingBrand}>
+            {savingBrand ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            Guardar identidad visual
+          </Button>
         </CardContent>
       </Card>
 

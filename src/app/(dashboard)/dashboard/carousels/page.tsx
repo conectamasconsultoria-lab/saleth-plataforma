@@ -11,13 +11,19 @@ export default async function CarouselsPage() {
     .eq("user_id", user!.id)
     .order("created_at", { ascending: false });
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("full_name, avatar_url, brand_color, brand_style")
+    .eq("user_id", user!.id)
+    .single();
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Carruseles</h1>
         <p className="text-muted-foreground mt-1">Generá estructuras de carrusel personalizadas para Instagram y LinkedIn</p>
       </div>
-      <CarouselsClient initialCarousels={carousels ?? []} />
+      <CarouselsClient initialCarousels={carousels ?? []} profile={profile} />
     </div>
   );
 }

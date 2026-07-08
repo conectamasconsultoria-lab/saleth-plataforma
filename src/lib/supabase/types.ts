@@ -6,6 +6,8 @@ export type Profile = {
   role: UserRole;
   full_name: string;
   avatar_url?: string;
+  brand_color?: string;
+  brand_style?: "dark" | "light";
   coach_id?: string; // solo para clientes
   created_at: string;
 };
@@ -63,6 +65,7 @@ export type Carousel = {
   id: string;
   user_id: string;
   topic: string;
+  formula: string;
   slides: {
     slide_number: number;
     title: string;

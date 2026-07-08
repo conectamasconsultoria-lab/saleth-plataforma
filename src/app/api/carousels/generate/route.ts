@@ -176,6 +176,7 @@ REGLAS GENERALES DE VIRALIDAD:
 6. El contenido de cada slide: máximo 3-4 líneas. Claro, denso en valor, sin relleno.
 7. Usá • para bullet points cuando sea necesario.
 8. El CTA final debe pedir UNA sola acción, no tres.
+9. Resaltado: en el título Y en el contenido de cada slide, envolvé entre 1 y 3 palabras o frases cortas (máx 3 palabras cada una) con doble asterisco, ej: "**este resultado**". Elegí lo de mayor impacto: números, resultados concretos o palabras con carga emocional. Nunca envuelvas la oración completa ni más de 3 fragmentos por slide — el resaltado pierde fuerza si se abusa.
 
 Respondé ÚNICAMENTE con este JSON (sin markdown, sin texto extra):
 {
@@ -184,8 +185,8 @@ Respondé ÚNICAMENTE con este JSON (sin markdown, sin texto extra):
   "slides": [
     {
       "slide_number": 1,
-      "title": "Título del slide",
-      "content": "Contenido del slide"
+      "title": "Título con **una frase clave** resaltada",
+      "content": "Contenido con **el dato o resultado** más importante resaltado"
     }
   ]
 }
@@ -244,6 +245,7 @@ export async function POST(req: NextRequest) {
       .insert({
         user_id: user.id,
         topic,
+        formula,
         slides: carouselData.slides,
       })
       .select()
