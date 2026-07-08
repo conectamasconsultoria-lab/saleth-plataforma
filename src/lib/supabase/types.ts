@@ -66,6 +66,7 @@ export type Carousel = {
   user_id: string;
   topic: string;
   formula: string;
+  export_format: string;
   slides: {
     slide_number: number;
     title: string;

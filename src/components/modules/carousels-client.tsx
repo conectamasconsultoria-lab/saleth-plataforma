@@ -130,6 +130,14 @@ const FORMULAS = [
   },
 ];
 
+// ─── Formatos de exportación (medidas ideales de carrusel IG) ─────────────────
+
+const FORMATS = {
+  "4:5": { label: "4:5 · 1080×1350", ratio: "4 / 5", width: 1080, height: 1350 },
+  "3:4": { label: "3:4 · 1080×1440", ratio: "3 / 4", width: 1080, height: 1440 },
+} as const;
+type ExportFormat = keyof typeof FORMATS;
+
 // ─── Componente principal ──────────────────────────────────────────────────────
 
 export function CarouselsClient({ initialCarousels, profile }: Props) {
@@ -142,6 +150,10 @@ export function CarouselsClient({ initialCarousels, profile }: Props) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [downloading, setDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
+
+  // Formato de exportación: se guarda por carrusel (recordado entre sesiones)
+  const exportFormat: ExportFormat =
+    (selectedCarousel?.export_format as ExportFormat) ?? "4:5";
 
   const slideRef = useRef<HTMLDivElement>(null);
   const selectedFormula = FORMULAS.find((f) => f.id === formula)!;
@@ -199,6 +211,30 @@ export function CarouselsClient({ initialCarousels, profile }: Props) {
     setCurrentSlide(0);
   }
 
+  async function handleFormatChange(newFormat: ExportFormat) {
+    if (!selectedCarousel || newFormat === exportFormat) return;
+    const prevFormat = exportFormat;
+    const carouselId = selectedCarousel.id;
+
+    const applyFormat = (format: ExportFormat) => {
+      setSelectedCarousel((sc) => (sc && sc.id === carouselId ? { ...sc, export_format: format } : sc));
+      setCarousels((cs) => cs.map((c) => (c.id === carouselId ? { ...c, export_format: format } : c)));
+    };
+
+    applyFormat(newFormat);
+    try {
+      const res = await fetch(`/api/carousels/${carouselId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ export_format: newFormat }),
+      });
+      if (!res.ok) throw new Error();
+    } catch {
+      applyFormat(prevFormat);
+      toast.error("No se pudo guardar el formato");
+    }
+  }
+
   function copyAll(carousel: Carousel) {
     const slidesData = carousel.slides as Slide[];
     const text = slidesData
@@ -213,18 +249,33 @@ export function CarouselsClient({ initialCarousels, profile }: Props) {
     toast.success(`Slide ${slide.slide_number} copiado`);
   }
 
+  // Captura el slide visible y lo normaliza al tamaño exacto del formato elegido
+  // (el preview se renderiza a un ancho fluido en pantalla, así que se calcula
+  // el scale necesario y luego se reescala a píxeles exactos para evitar redondeos).
+  async function captureSlideCanvas() {
+    const html2canvas = (await import("html2canvas")).default;
+    const target = FORMATS[exportFormat];
+    const rect = slideRef.current!.getBoundingClientRect();
+    const scale = target.width / rect.width;
+    const raw = await html2canvas(slideRef.current!, {
+      scale,
+      useCORS: true,
+      allowTaint: false,
+      backgroundColor: null,
+      logging: false,
+    });
+    const canvas = document.createElement("canvas");
+    canvas.width = target.width;
+    canvas.height = target.height;
+    canvas.getContext("2d")!.drawImage(raw, 0, 0, target.width, target.height);
+    return canvas;
+  }
+
   async function downloadSlide() {
     if (!slideRef.current) return;
     setDownloading(true);
     try {
-      const html2canvas = (await import("html2canvas")).default;
-      const canvas = await html2canvas(slideRef.current, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: false,
-        backgroundColor: null,
-        logging: false,
-      });
+      const canvas = await captureSlideCanvas();
       const link = document.createElement("a");
       link.download = `slide-${currentSlide + 1}.jpg`;
       link.href = canvas.toDataURL("image/jpeg", 0.92);
@@ -243,10 +294,7 @@ export function CarouselsClient({ initialCarousels, profile }: Props) {
     setDownloadProgress(0);
     const slidesData = selectedCarousel.slides as Slide[];
     try {
-      const [{ default: html2canvas }, { default: JSZip }] = await Promise.all([
-        import("html2canvas"),
-        import("jszip"),
-      ]);
+      const { default: JSZip } = await import("jszip");
       const zip = new JSZip();
 
       for (let i = 0; i < slidesData.length; i++) {
@@ -255,14 +303,7 @@ export function CarouselsClient({ initialCarousels, profile }: Props) {
         await new Promise((r) => setTimeout(r, 400));
         setDownloadProgress(Math.round(((i + 1) / slidesData.length) * 85));
 
-        const canvas = await html2canvas(slideRef.current!, {
-          scale: 2,
-          useCORS: true,
-          allowTaint: false,
-          backgroundColor: null,
-          logging: false,
-        });
-
+        const canvas = await captureSlideCanvas();
         const blob = await new Promise<Blob>((resolve) => {
           canvas.toBlob((b) => resolve(b!), "image/jpeg", 0.92);
         });
@@ -448,25 +489,39 @@ export function CarouselsClient({ initialCarousels, profile }: Props) {
                 </p>
                 <p className="text-sm text-gray-400 mt-0.5">{totalSlides} slides · listo para IG</p>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => copyAll(selectedCarousel)}
-                className="gap-1.5 flex-shrink-0"
-              >
-                <Copy className="h-3.5 w-3.5" />
-                Copiar texto
-              </Button>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <Select value={exportFormat} onValueChange={(v) => handleFormatChange(v as ExportFormat)}>
+                  <SelectTrigger className="w-[9.5rem] h-8 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(FORMATS).map(([key, f]) => (
+                      <SelectItem key={key} value={key} className="text-xs">
+                        {f.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => copyAll(selectedCarousel)}
+                  className="gap-1.5"
+                >
+                  <Copy className="h-3.5 w-3.5" />
+                  Copiar texto
+                </Button>
+              </div>
             </div>
 
-            {/* ── Slide IG-ready (4:5, estilo de marca del cliente) ── */}
+            {/* ── Slide IG-ready (formato + estilo de marca del cliente) ── */}
             <div className="relative">
               {/* Este div es lo que se captura para el JPG */}
               <div
                 ref={slideRef}
                 style={{
                   width: "100%",
-                  aspectRatio: "4 / 5",
+                  aspectRatio: FORMATS[exportFormat].ratio,
                   position: "relative",
                   overflow: "hidden",
                   borderRadius: "16px",
