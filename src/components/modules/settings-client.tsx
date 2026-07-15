@@ -14,6 +14,8 @@ import { createClient } from "@/lib/supabase/client";
 import type { Questionnaire } from "@/lib/supabase/types";
 import { ARCHETYPES } from "@/lib/archetypes";
 import type { ArchetypeName } from "@/lib/archetypes";
+import { BRAND_FONT_LIST, resolveBrandFont, type BrandFontId } from "@/lib/fonts";
+import { cn } from "@/lib/utils";
 
 type Props = {
   initialQuestionnaire: Questionnaire | null;
@@ -23,6 +25,7 @@ type Props = {
     avatar_url?: string;
     brand_color?: string;
     brand_style?: "dark" | "light";
+    brand_font?: string;
   } | null;
 };
 
@@ -42,9 +45,11 @@ export function SettingsClient({ initialQuestionnaire, profile }: Props) {
 
   const [brandColor, setBrandColor] = useState(profile?.brand_color ?? "#1A6FFF");
   const [brandStyle, setBrandStyle] = useState<"dark" | "light">(profile?.brand_style ?? "dark");
+  const [brandFont, setBrandFont] = useState<BrandFontId>((profile?.brand_font as BrandFontId) ?? "inter");
   const [savingBrand, setSavingBrand] = useState(false);
 
   const supabase = createClient();
+  const activeFont = resolveBrandFont(brandFont);
 
   async function handleSaveBrand() {
     setSavingBrand(true);
@@ -52,7 +57,7 @@ export function SettingsClient({ initialQuestionnaire, profile }: Props) {
       const { data: { user } } = await supabase.auth.getUser();
       const { error } = await supabase
         .from("profiles")
-        .update({ brand_color: brandColor, brand_style: brandStyle })
+        .update({ brand_color: brandColor, brand_style: brandStyle, brand_font: brandFont })
         .eq("user_id", user!.id);
       if (error) throw error;
       toast.success("Identidad visual actualizada");
@@ -169,7 +174,7 @@ export function SettingsClient({ initialQuestionnaire, profile }: Props) {
             Identidad visual de marca
           </CardTitle>
           <CardDescription>
-            Define el color y estilo con el que se generan tus carruseles y otras piezas visuales
+            Define el color, estilo y tipografía con los que se generan tus carruseles y otras piezas visuales
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -205,6 +210,39 @@ export function SettingsClient({ initialQuestionnaire, profile }: Props) {
             </div>
           </div>
 
+          <div className="space-y-2">
+            <Label>Tipografía de titulares</Label>
+            <div className="grid grid-cols-2 gap-2">
+              {BRAND_FONT_LIST.map((f) => (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => setBrandFont(f.id)}
+                  className={cn(
+                    "text-left px-3 py-2.5 rounded-xl border transition-all duration-150",
+                    brandFont === f.id
+                      ? "border-transparent shadow-sm"
+                      : "border-gray-100 bg-white hover:border-gray-200"
+                  )}
+                  style={brandFont === f.id ? { background: `${brandColor}0d`, border: `1.5px solid ${brandColor}40` } : {}}
+                >
+                  <p
+                    className="text-base leading-tight truncate"
+                    style={{
+                      fontFamily: f.family,
+                      fontWeight: f.weight,
+                      textTransform: f.uppercase ? "uppercase" : "none",
+                      color: brandFont === f.id ? brandColor : "#1F2937",
+                    }}
+                  >
+                    {f.label}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-0.5">{f.vibe}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div
             className="rounded-xl p-4 flex items-center gap-3"
             style={{
@@ -225,16 +263,21 @@ export function SettingsClient({ initialQuestionnaire, profile }: Props) {
             </div>
             <div>
               <p
-                className="text-sm font-semibold"
-                style={{ color: brandStyle === "dark" ? "#fff" : "#0F172A" }}
+                className="text-sm leading-tight"
+                style={{
+                  color: brandStyle === "dark" ? "#fff" : "#0F172A",
+                  fontFamily: activeFont.family,
+                  fontWeight: activeFont.weight,
+                  textTransform: activeFont.uppercase ? "uppercase" : "none",
+                }}
               >
                 Así se va a ver la marca en tus carruseles
               </p>
               <p
-                className="text-xs mt-0.5"
+                className="text-xs mt-1"
                 style={{ color: brandStyle === "dark" ? "rgba(255,255,255,0.5)" : "rgba(15,23,42,0.5)" }}
               >
-                Vista previa del color y estilo elegidos
+                Vista previa del color, estilo y tipografía elegidos
               </p>
             </div>
           </div>

@@ -13,7 +13,7 @@ export default async function CarouselsPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name, avatar_url, brand_color, brand_style")
+    .select("full_name, avatar_url, brand_color, brand_style, brand_font")
     .eq("user_id", user!.id)
     .single();
 

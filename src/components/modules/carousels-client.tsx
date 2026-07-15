@@ -7,9 +7,24 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Wand2, Copy, Layers, ChevronLeft, ChevronRight, Clock, Download, BadgeCheck } from "lucide-react";
+import {
+  Loader2,
+  Wand2,
+  Copy,
+  Layers,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Download,
+  BadgeCheck,
+  ArrowRight,
+  Bookmark,
+  MessageCircle,
+  Share2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Carousel } from "@/lib/supabase/types";
+import { resolveBrandFont } from "@/lib/fonts";
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -19,6 +34,7 @@ type BrandProfile = {
   avatar_url?: string;
   brand_color?: string;
   brand_style?: "dark" | "light";
+  brand_font?: string;
 } | null;
 type Props = { initialCarousels: Carousel[]; profile?: BrandProfile };
 
@@ -166,6 +182,7 @@ export function CarouselsClient({ initialCarousels, profile }: Props) {
   const accent = profile?.brand_color || activeFormula.color;
   const isDark = (profile?.brand_style ?? "dark") === "dark";
   const handle = toHandle(profile?.full_name);
+  const headingFont = resolveBrandFont(profile?.brand_font);
   const theme = {
     bg: isDark ? "#0A0A0C" : "#FAFAF8",
     shadow: isDark ? "0 12px 48px rgba(0,0,0,0.5)" : "0 12px 40px rgba(15,23,42,0.14)",
@@ -178,6 +195,8 @@ export function CarouselsClient({ initialCarousels, profile }: Props) {
     glow: `radial-gradient(ellipse 640px 460px at 82% -8%, ${accent}3d, transparent 62%)`,
     badgeBg: isDark ? `${accent}22` : `${accent}14`,
     badgeBorder: `${accent}55`,
+    cardFrame: isDark ? "rgba(255,255,255,0.10)" : "rgba(15,23,42,0.09)",
+    numberInk: isDark ? `${accent}cc` : `${accent}` ,
   };
 
   async function handleGenerate() {
@@ -549,6 +568,31 @@ export function CarouselsClient({ initialCarousels, profile }: Props) {
                     pointerEvents: "none",
                   }}
                 />
+                {/* Marco de tarjeta interior (estructura "card premium") */}
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: "3.4%",
+                    border: `1px solid ${theme.cardFrame}`,
+                    borderRadius: "22px",
+                    pointerEvents: "none",
+                  }}
+                />
+                {/* Esquina acento superior derecha */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "3.4%",
+                    right: "3.4%",
+                    width: "26px",
+                    height: "26px",
+                    borderTop: `2px solid ${accent}`,
+                    borderRight: `2px solid ${accent}`,
+                    borderTopRightRadius: "22px",
+                    opacity: 0.8,
+                    pointerEvents: "none",
+                  }}
+                />
 
                 {/* Layout interior */}
                 <div
@@ -596,11 +640,12 @@ export function CarouselsClient({ initialCarousels, profile }: Props) {
                       style={{
                         color: theme.textMuted,
                         fontSize: "12px",
-                        fontWeight: 600,
+                        fontWeight: 700,
                         fontVariantNumeric: "tabular-nums",
+                        letterSpacing: "0.03em",
                       }}
                     >
-                      {currentSlide + 1} / {totalSlides}
+                      {String(currentSlide + 1).padStart(2, "0")}/{String(totalSlides).padStart(2, "0")}
                     </div>
                   </div>
 
@@ -613,30 +658,68 @@ export function CarouselsClient({ initialCarousels, profile }: Props) {
                       justifyContent: "center",
                     }}
                   >
-                    {/* Badge de paso / fórmula */}
-                    <div
-                      style={{
-                        display: "inline-flex",
-                        alignSelf: "flex-start",
-                        alignItems: "center",
-                        gap: 6,
-                        background: theme.badgeBg,
-                        border: `1px solid ${theme.badgeBorder}`,
-                        borderRadius: "100px",
-                        padding: "5px 13px",
-                        fontSize: "11px",
-                        fontWeight: 800,
-                        color: accent,
-                        letterSpacing: "0.05em",
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      {currentSlide === 0
-                        ? `${activeFormula.emoji} ${activeFormula.label}`
-                        : currentSlide === totalSlides - 1
-                        ? "✦ Tu turno"
-                        : `Paso ${currentSlide}`}
+                    {/* Kicker: chip de ícono + fórmula (persistente en todas las slides) */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <div
+                        style={{
+                          width: 34,
+                          height: 34,
+                          borderRadius: 10,
+                          flexShrink: 0,
+                          background: theme.badgeBg,
+                          border: `1px solid ${theme.badgeBorder}`,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: 16,
+                        }}
+                      >
+                        {currentSlide === totalSlides - 1 ? "💾" : activeFormula.emoji}
+                      </div>
+                      <span
+                        style={{
+                          fontSize: "11px",
+                          fontWeight: 800,
+                          color: accent,
+                          letterSpacing: "0.08em",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        {currentSlide === totalSlides - 1 ? "Guardá este post" : activeFormula.label}
+                      </span>
                     </div>
+
+                    {/* Subtítulo de portada */}
+                    {currentSlide === 0 && (
+                      <p
+                        style={{
+                          color: theme.textMuted,
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          letterSpacing: "0.06em",
+                          textTransform: "uppercase",
+                          margin: "8px 0 0 0",
+                        }}
+                      >
+                        Guardá esta guía · {totalSlides} pasos
+                      </p>
+                    )}
+
+                    {/* Número grande de paso (solo slides intermedias) */}
+                    {currentSlide > 0 && currentSlide < totalSlides - 1 && (
+                      <div
+                        style={{
+                          fontFamily: headingFont.family,
+                          fontSize: "52px",
+                          fontWeight: headingFont.weight,
+                          color: theme.numberInk,
+                          lineHeight: 1,
+                          margin: "18px 0 0 0",
+                        }}
+                      >
+                        {String(currentSlide).padStart(2, "0")}
+                      </div>
+                    )}
 
                     {/* Línea acento */}
                     <div
@@ -653,9 +736,11 @@ export function CarouselsClient({ initialCarousels, profile }: Props) {
                     <h2
                       style={{
                         color: theme.textPrimary,
+                        fontFamily: headingFont.family,
                         fontSize: "27px",
-                        fontWeight: 900,
-                        lineHeight: 1.22,
+                        fontWeight: headingFont.weight,
+                        lineHeight: headingFont.lineHeight,
+                        textTransform: headingFont.uppercase ? "uppercase" : "none",
                         margin: "0 0 14px 0",
                         wordBreak: "break-word",
                       }}
@@ -676,6 +761,35 @@ export function CarouselsClient({ initialCarousels, profile }: Props) {
                     >
                       {renderHighlighted(slides[currentSlide]?.content ?? "", accent)}
                     </p>
+
+                    {/* Pills de acción (solo última slide) */}
+                    {currentSlide === totalSlides - 1 && (
+                      <div style={{ display: "flex", gap: 8, marginTop: 22, flexWrap: "wrap" }}>
+                        {[
+                          { Icon: Bookmark, label: "Guardar" },
+                          { Icon: MessageCircle, label: "Comentar" },
+                          { Icon: Share2, label: "Compartir" },
+                        ].map(({ Icon, label }) => (
+                          <div
+                            key={label}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 6,
+                              padding: "7px 13px",
+                              borderRadius: "100px",
+                              background: theme.badgeBg,
+                              border: `1px solid ${theme.badgeBorder}`,
+                            }}
+                          >
+                            <Icon size={13} strokeWidth={2.2} style={{ color: accent, flexShrink: 0 }} />
+                            <span style={{ fontSize: "11px", fontWeight: 700, color: theme.textPrimary }}>
+                              {label}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   {/* Fila inferior */}
@@ -699,16 +813,26 @@ export function CarouselsClient({ initialCarousels, profile }: Props) {
                         />
                       ))}
                     </div>
-                    {/* Hint de swipe */}
+                    {/* Botón circular de avance / cierre */}
                     <div
                       style={{
-                        color: theme.textMuted,
-                        fontSize: "11px",
-                        fontWeight: 700,
-                        letterSpacing: "0.04em",
+                        width: 30,
+                        height: 30,
+                        borderRadius: "50%",
+                        flexShrink: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        ...(currentSlide === totalSlides - 1
+                          ? { background: accent }
+                          : { border: `1.5px solid ${accent}55` }),
                       }}
                     >
-                      {currentSlide === totalSlides - 1 ? "" : "Deslizá →"}
+                      {currentSlide === totalSlides - 1 ? (
+                        <Bookmark size={13} strokeWidth={2.4} style={{ color: "#FFFFFF" }} />
+                      ) : (
+                        <ArrowRight size={14} strokeWidth={2.4} style={{ color: accent }} />
+                      )}
                     </div>
                   </div>
                 </div>

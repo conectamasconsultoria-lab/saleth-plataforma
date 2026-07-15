@@ -8,6 +8,7 @@ export type Profile = {
   avatar_url?: string;
   brand_color?: string;
   brand_style?: "dark" | "light";
+  brand_font?: string;
   coach_id?: string; // solo para clientes
   created_at: string;
 };
