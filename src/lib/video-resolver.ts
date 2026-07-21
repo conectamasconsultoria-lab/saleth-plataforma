@@ -60,7 +60,13 @@ export async function resolveInstagramUrl(url: string): Promise<string | null> {
       console.error("Instagram resolver: error HTTP", res.status, JSON.stringify(data));
       return null;
     }
+    // La API responde { status, result: [{ url, type: "video/mp4", ... }] } —
+    // en posts tipo carrusel puede haber varios items (fotos + video mezclados),
+    // así que se prioriza el primero cuyo "type" sea de video.
+    const results = Array.isArray(data?.result) ? data.result : [];
     const resolved =
+      results.find((item: { type?: string; url?: string }) => item?.type?.startsWith("video"))?.url ||
+      results[0]?.url ||
       data?.video_url ||
       data?.video ||
       data?.media_url ||
