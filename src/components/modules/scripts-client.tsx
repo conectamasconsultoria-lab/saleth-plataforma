@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -140,6 +141,7 @@ const formatLabel: Record<string, string> = {
 };
 
 export function ScriptsClient({ initialScripts }: Props) {
+  const searchParams = useSearchParams();
   const [scripts, setScripts] = useState<Script[]>(initialScripts);
   const [awarenessLevel, setAwarenessLevel] = useState<string | null>(null);
   const [contentType, setContentType] = useState<string | null>(null);
@@ -151,6 +153,15 @@ export function ScriptsClient({ initialScripts }: Props) {
   const [targetNiche, setTargetNiche] = useState("");
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
+
+  useEffect(() => {
+    const prefillTopic = searchParams.get("prefillTopic");
+    if (prefillTopic) {
+      setTopic(prefillTopic);
+      toast.success("Transcripción cargada como contexto");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const selectedType = CONTENT_TYPES.find((t) => t.id === contentType);
   const effectiveFormat = format === "otro" ? customFormat.trim() : format;

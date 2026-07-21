@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase/server";
+import { resolveTikTokUrl } from "@/lib/video-resolver";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -21,22 +22,7 @@ export async function POST(req: NextRequest) {
   }
 
   // ── 1. Obtener URL de audio/video sin marca de agua ────────────────────────
-  let audioUrl: string | null = null;
-  try {
-    const metaRes = await fetch(
-      `https://tiktok-video-no-watermark2.p.rapidapi.com/?url=${encodeURIComponent(tiktokUrl)}&hd=1`,
-      {
-        headers: {
-          "x-rapidapi-host": "tiktok-video-no-watermark2.p.rapidapi.com",
-          "x-rapidapi-key": process.env.RAPIDAPI_KEY,
-        },
-      }
-    );
-    const metaData = await metaRes.json();
-    audioUrl = metaData?.data?.play || metaData?.data?.wmplay || metaData?.data?.music_info?.play || null;
-  } catch (e) {
-    console.error("Error obteniendo URL del video:", e);
-  }
+  const audioUrl = await resolveTikTokUrl(tiktokUrl);
 
   if (!audioUrl) {
     return NextResponse.json({ error: "No se pudo obtener el audio del video. Probá con otro video." }, { status: 400 });

@@ -106,6 +106,8 @@ export type Transcription = {
   id: string;
   user_id: string;
   video_url?: string;
+  source_url?: string;
+  source_platform?: "tiktok" | "instagram" | "file" | "link";
   transcript: string;
   created_at: string;
 };

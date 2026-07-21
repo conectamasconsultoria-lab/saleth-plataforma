@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -157,6 +158,7 @@ type ExportFormat = keyof typeof FORMATS;
 // ─── Componente principal ──────────────────────────────────────────────────────
 
 export function CarouselsClient({ initialCarousels, profile }: Props) {
+  const searchParams = useSearchParams();
   const [carousels, setCarousels] = useState<Carousel[]>(initialCarousels);
   const [idea, setIdea] = useState("");
   const [formula, setFormula] = useState("lista_valor");
@@ -166,6 +168,15 @@ export function CarouselsClient({ initialCarousels, profile }: Props) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [downloading, setDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
+
+  useEffect(() => {
+    const prefillTopic = searchParams.get("prefillTopic");
+    if (prefillTopic) {
+      setIdea(prefillTopic);
+      toast.success("Transcripción cargada como contexto");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Formato de exportación: se guarda por carrusel (recordado entre sesiones)
   const exportFormat: ExportFormat =

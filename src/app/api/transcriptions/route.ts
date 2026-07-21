@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { resolveDownloadableUrl } from "@/lib/video-resolver";
 
 const ASSEMBLYAI_BASE = "https://api.assemblyai.com/v2";
 
@@ -17,10 +18,17 @@ export async function POST(req: NextRequest) {
   const apiKey = process.env.ASSEMBLYAI_API_KEY;
 
   try {
-    const { videoUrl } = await req.json();
+    const { videoUrl, sourceType } = await req.json();
     if (!videoUrl) {
       return NextResponse.json({ error: "Falta la URL del audio/video" }, { status: 400 });
     }
+
+    // Si el usuario pegó un link (no un archivo ya subido a Storage), puede ser
+    // un link de TikTok/Instagram Reels — hay que resolverlo a un archivo
+    // descargable antes de mandarlo a AssemblyAI. Un archivo subido ya es una
+    // signed URL de Storage, se usa tal cual.
+    const { url: audioUrl, platform } =
+      sourceType === "file" ? { url: videoUrl, platform: "file" as const } : await resolveDownloadableUrl(videoUrl);
 
     const submitRes = await fetch(`${ASSEMBLYAI_BASE}/transcript`, {
       method: "POST",
@@ -29,7 +37,7 @@ export async function POST(req: NextRequest) {
         "content-type": "application/json",
       },
       body: JSON.stringify({
-        audio_url: videoUrl,
+        audio_url: audioUrl,
         language_detection: true,
       }),
     });
@@ -67,7 +75,9 @@ export async function POST(req: NextRequest) {
       .from("transcriptions")
       .insert({
         user_id: user.id,
-        video_url: videoUrl,
+        video_url: audioUrl,
+        source_url: videoUrl,
+        source_platform: platform,
         transcript,
       })
       .select()
@@ -78,7 +88,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ transcript });
     }
 
-    return NextResponse.json({ transcriptionId: transcription.id, transcript });
+    return NextResponse.json({ transcriptionId: transcription.id, transcript, transcription });
   } catch (e) {
     console.error("Error en transcripción:", e);
     return NextResponse.json(
