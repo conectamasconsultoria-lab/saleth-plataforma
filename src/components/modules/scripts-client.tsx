@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -20,9 +21,12 @@ import {
   Camera,
   HelpCircle,
   Timer,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Script } from "@/lib/supabase/types";
+import { getStructuresByContentType, STAGE_MAP, type ContentType } from "@/lib/scripts/structures";
+import { ScriptEditChat } from "@/components/modules/script-edit-chat";
 
 type Props = { initialScripts: Script[] };
 
@@ -53,81 +57,40 @@ const AWARENESS_LEVELS = [
   },
 ];
 
-const CONTENT_TYPES = [
-  {
-    id: "atraccion",
+const CONTENT_TYPE_META: Record<ContentType, { label: string; icon: typeof Megaphone; color: string; activeColor: string; description: string }> = {
+  atraccion: {
     label: "Atracción",
     icon: Megaphone,
     color: "border-violet-300 bg-violet-50 dark:bg-violet-950 dark:border-violet-800",
     activeColor: "border-violet-500 bg-violet-100 dark:bg-violet-900 ring-2 ring-violet-500/30",
     description: "Generar alcance, atraer audiencia nueva con temas universales",
-    subtypes: [
-      {
-        id: "polemico",
-        label: "Casos Polémicos",
-        description: "Usa un caso famoso o polémico para captar atención y conectar con tu nicho",
-        formula: "Pregunta Universal → Caso Famoso → Open Loop → Valor → CTA",
-      },
-      {
-        id: "deseos",
-        label: "Deseos Humanos",
-        description: "Conecta con deseos universales (dinero, estatus, atracción) y deriva a tu nicho",
-        formula: "Gancho Universal → Contexto → Desarrollo → Moraleja → CTA",
-      },
-    ],
   },
-  {
-    id: "nutricion",
+  nutricion: {
     label: "Nutrición",
     icon: Heart,
     color: "border-blue-300 bg-blue-50 dark:bg-blue-950 dark:border-blue-800",
     activeColor: "border-blue-500 bg-blue-100 dark:bg-blue-900 ring-2 ring-blue-500/30",
     description: "Educar, generar confianza y posicionarte como experto",
-    subtypes: [
-      {
-        id: "valor",
-        label: "Atracción + Valor",
-        description: "Enseña algo valioso sin vender, genera autoridad y ofrece un recurso",
-        formula: "Hook Resultado → Romper Creencia → Enseñar → Autoridad → Recurso → CTA",
-      },
-      {
-        id: "dolor",
-        label: "Dolor + Valor",
-        description: "Identifica el dolor del cliente, amplifica y revela la verdadera causa",
-        formula: "Dolor → Amplifica → Causa Real → Valor → Posicionamiento → Recurso",
-      },
-    ],
   },
-  {
-    id: "ventas",
+  ventas: {
     label: "Ventas",
     icon: ShoppingCart,
     color: "border-emerald-300 bg-emerald-50 dark:bg-emerald-950 dark:border-emerald-800",
     activeColor: "border-emerald-500 bg-emerald-100 dark:bg-emerald-900 ring-2 ring-emerald-500/30",
     description: "Generar deseo, eliminar objeciones y llevar a la acción",
-    subtypes: [
-      {
-        id: "directo",
-        label: "Directo al Dolor",
-        description: "Habla del dolor o deseo, agita el problema, presenta solución y elimina objeciones",
-        formula: "Hook Dolor → Agita → Solución → Beneficios → Objeciones → CTA",
-      },
-      {
-        id: "testimonio",
-        label: "Con Testimonios",
-        description: "Vende usando prueba social: muestra el antes y después de un cliente real",
-        formula: "Resultado → Situación Inicial → Emoción → Solución → Transformación → CTA",
-      },
-    ],
   },
-];
-
-// Etapa del funnel (id local en español) → valor de stage usado en la base de datos
-const STAGE_MAP: Record<string, "attraction" | "nurturing" | "conversion"> = {
-  atraccion: "attraction",
-  nutricion: "nurturing",
-  ventas: "conversion",
 };
+
+const CONTENT_TYPES = (Object.keys(CONTENT_TYPE_META) as ContentType[]).map((id) => ({
+  id,
+  ...CONTENT_TYPE_META[id],
+  subtypes: getStructuresByContentType(id).map((s) => ({
+    id: s.subType,
+    label: s.label,
+    description: s.description,
+    formula: s.formula,
+  })),
+}));
 
 const FORMATS = [
   {
@@ -154,6 +117,14 @@ const FORMATS = [
     color: "border-border bg-card hover:border-amber-300",
     description: "Responde una pregunta real de la caja de preguntas de Instagram",
   },
+  {
+    id: "otro",
+    label: "Otro",
+    icon: Sparkles,
+    activeColor: "border-fuchsia-500 bg-fuchsia-100 dark:bg-fuchsia-900 ring-2 ring-fuchsia-500/30",
+    color: "border-border bg-card hover:border-fuchsia-300",
+    description: "Escribí tu propio formato de grabación (unboxing, POV, duet...)",
+  },
 ];
 
 const DURATIONS = [
@@ -174,13 +145,16 @@ export function ScriptsClient({ initialScripts }: Props) {
   const [contentType, setContentType] = useState<string | null>(null);
   const [subType, setSubType] = useState<string | null>(null);
   const [format, setFormat] = useState<string | null>(null);
+  const [customFormat, setCustomFormat] = useState("");
   const [duration, setDuration] = useState<number | null>(null);
   const [topic, setTopic] = useState("");
+  const [targetNiche, setTargetNiche] = useState("");
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
 
   const selectedType = CONTENT_TYPES.find((t) => t.id === contentType);
-  const canGenerate = awarenessLevel && contentType && subType && format && duration;
+  const effectiveFormat = format === "otro" ? customFormat.trim() : format;
+  const canGenerate = Boolean(awarenessLevel && contentType && subType && effectiveFormat && duration);
 
   async function handleGenerate() {
     if (!canGenerate) {
@@ -197,9 +171,10 @@ export function ScriptsClient({ initialScripts }: Props) {
           subType,
           topic: topic || undefined,
           awarenessLevel,
-          stage: STAGE_MAP[contentType!],
-          format,
+          stage: STAGE_MAP[contentType as ContentType],
+          format: effectiveFormat,
           duration,
+          targetNiche: targetNiche || undefined,
         }),
       });
       const data = await res.json();
@@ -219,6 +194,10 @@ export function ScriptsClient({ initialScripts }: Props) {
     const text = `🎬 ${script.title}\n\n🎯 GANCHO:\n${script.hook}\n\n📝 DESARROLLO:\n${script.development}\n\n📣 CTA:\n${script.cta}`;
     navigator.clipboard.writeText(text);
     toast.success("Guión copiado al portapapeles");
+  }
+
+  function updateScript(updated: Script) {
+    setScripts((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
   }
 
   const stageLabel: Record<string, string> = {
@@ -321,7 +300,7 @@ export function ScriptsClient({ initialScripts }: Props) {
 
           {/* Paso 4: Formato de grabación */}
           {subType && (
-            <div>
+            <div className="space-y-3">
               <Label className="text-sm font-semibold mb-3 block">4. ¿Con qué formato lo vas a grabar?</Label>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {FORMATS.map((f) => {
@@ -344,11 +323,18 @@ export function ScriptsClient({ initialScripts }: Props) {
                   );
                 })}
               </div>
+              {format === "otro" && (
+                <Input
+                  placeholder="Ej: Unboxing, POV, Duet, Reacción..."
+                  value={customFormat}
+                  onChange={(e) => setCustomFormat(e.target.value)}
+                />
+              )}
             </div>
           )}
 
           {/* Paso 5: Duración */}
-          {format && (
+          {effectiveFormat && (
             <div>
               <Label className="text-sm font-semibold mb-3 block">5. ¿Cuánto va a durar el video?</Label>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -374,16 +360,26 @@ export function ScriptsClient({ initialScripts }: Props) {
             </div>
           )}
 
-          {/* Paso 6: Tema opcional */}
+          {/* Paso 6: Nicho específico + tema opcional */}
           {duration && (
-            <div className="space-y-2">
-              <Label className="text-sm font-semibold">6. Tema o contexto adicional (opcional)</Label>
-              <Textarea
-                placeholder="Ej: Usar el caso de Elon Musk, hablar sobre disciplina financiera, mi cliente ideal son coaches..."
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                rows={2}
-              />
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold">6. ¿A qué nicho o audiencia específica va dirigido? (opcional)</Label>
+                <Input
+                  placeholder="Ej: mamás primerizas de 25-35 años, coaches que recién empiezan..."
+                  value={targetNiche}
+                  onChange={(e) => setTargetNiche(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold">7. Tema o contexto adicional (opcional)</Label>
+                <Textarea
+                  placeholder="Ej: Usar el caso de Elon Musk, hablar sobre disciplina financiera, mi cliente ideal son coaches..."
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value)}
+                  rows={2}
+                />
+              </div>
             </div>
           )}
 
@@ -424,12 +420,17 @@ export function ScriptsClient({ initialScripts }: Props) {
                       )}
                       {script.format && (
                         <Badge variant="outline" className="text-xs">
-                          {formatLabel[script.format]}
+                          {formatLabel[script.format] ?? script.format}
                         </Badge>
                       )}
                       {script.duration && (
                         <Badge variant="outline" className="text-xs">
                           {script.duration === 60 ? "1 min" : `${script.duration}s`}
+                        </Badge>
+                      )}
+                      {script.target_niche && (
+                        <Badge variant="outline" className="text-xs">
+                          🎯 {script.target_niche}
                         </Badge>
                       )}
                     </div>
@@ -464,6 +465,7 @@ export function ScriptsClient({ initialScripts }: Props) {
                       <p className="text-sm">{script.cta}</p>
                     </div>
                   </div>
+                  <ScriptEditChat scriptId={script.id} onScriptUpdated={updateScript} />
                 </CardContent>
               )}
             </Card>

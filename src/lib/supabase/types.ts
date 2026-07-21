@@ -59,8 +59,23 @@ export type Script = {
   cta: string;
   awareness_level?: "high" | "medium" | "low";
   stage?: "attraction" | "conversion" | "nurturing";
-  format?: "problema" | "camara" | "pregunta";
+  format?: string;
   duration?: 15 | 30 | 60;
+  target_niche?: string;
+  structure_key?: string;
+  created_at: string;
+};
+
+export type ScriptEdit = {
+  id: string;
+  script_id: string;
+  user_id: string;
+  role: "user" | "assistant";
+  message: string;
+  resulting_title?: string;
+  resulting_hook?: string;
+  resulting_development?: string;
+  resulting_cta?: string;
   created_at: string;
 };
 
