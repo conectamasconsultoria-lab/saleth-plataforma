@@ -7,9 +7,11 @@ export type VideoPlatform = "tiktok" | "instagram" | "file" | "link";
 const INSTAGRAM_RAPIDAPI_HOST =
   process.env.INSTAGRAM_RAPIDAPI_HOST || "instagram-post-reels-stories-downloader-api.p.rapidapi.com";
 
+const INSTAGRAM_CONTENT_PATH = /instagram\.com\/(reel|p|tv)\//i;
+
 export function detectPlatform(url: string): VideoPlatform {
   if (/tiktok\.com/i.test(url)) return "tiktok";
-  if (/instagram\.com\/(reel|p|tv)\//i.test(url)) return "instagram";
+  if (/instagram\.com/i.test(url)) return "instagram";
   return "link";
 }
 
@@ -26,7 +28,15 @@ export async function resolveTikTokUrl(url: string): Promise<string | null> {
       }
     );
     const data = await res.json();
-    return data?.data?.play || data?.data?.wmplay || data?.data?.music_info?.play || null;
+    if (!res.ok) {
+      console.error("TikTok resolver: error HTTP", res.status, JSON.stringify(data));
+      return null;
+    }
+    const resolved = data?.data?.play || data?.data?.wmplay || data?.data?.music_info?.play || null;
+    if (!resolved) {
+      console.error("TikTok resolver: respuesta sin campo de video reconocido:", JSON.stringify(data));
+    }
+    return resolved;
   } catch (e) {
     console.error("Error resolviendo URL de TikTok:", e);
     return null;
@@ -46,6 +56,10 @@ export async function resolveInstagramUrl(url: string): Promise<string | null> {
       }
     );
     const data = await res.json();
+    if (!res.ok) {
+      console.error("Instagram resolver: error HTTP", res.status, JSON.stringify(data));
+      return null;
+    }
     const resolved =
       data?.video_url ||
       data?.video ||
@@ -69,6 +83,12 @@ export async function resolveInstagramUrl(url: string): Promise<string | null> {
 export async function resolveDownloadableUrl(url: string): Promise<{ url: string; platform: VideoPlatform }> {
   const platform = detectPlatform(url);
 
+  if ((platform === "tiktok" || platform === "instagram") && !process.env.RAPIDAPI_KEY) {
+    throw new Error(
+      "RAPIDAPI_KEY no está configurada en el servidor de producción. Avisale al administrador de la plataforma."
+    );
+  }
+
   if (platform === "tiktok") {
     const resolved = await resolveTikTokUrl(url);
     if (!resolved) throw new Error("No se pudo obtener el video de TikTok. Verificá que el link sea público.");
@@ -76,6 +96,11 @@ export async function resolveDownloadableUrl(url: string): Promise<{ url: string
   }
 
   if (platform === "instagram") {
+    if (!INSTAGRAM_CONTENT_PATH.test(url)) {
+      throw new Error(
+        "Ese link parece ser de un perfil de Instagram, no de un Reel o post. Pegá el link específico del Reel (ej: instagram.com/reel/ABC123)."
+      );
+    }
     const resolved = await resolveInstagramUrl(url);
     if (!resolved) throw new Error("No se pudo obtener el video de Instagram. Verificá que el link sea público.");
     return { url: resolved, platform };
