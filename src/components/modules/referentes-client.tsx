@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,6 +25,10 @@ import {
   ShoppingBag,
   Film,
   Target,
+  Search,
+  Eye,
+  Save,
+  X,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
@@ -38,6 +42,26 @@ type PersonalVideo = {
   title: string;
   description?: string;
   created_at: string;
+};
+
+type ReferenceVideo = {
+  id: string;
+  coach_id: string;
+  url: string;
+  title: string;
+  niche: string;
+  description?: string;
+  created_at: string;
+};
+
+type SearchResult = {
+  video_id: string;
+  url: string;
+  title: string;
+  views: number;
+  likes: number;
+  thumbnail_url: string | null;
+  hashtags: string[];
 };
 
 type NicheMeta = {
@@ -57,112 +81,13 @@ const NICHE_META: Record<string, NicheMeta> = {
   "Coach": { icon: Target, gradient: "from-amber-500 to-amber-600", iconColor: "text-amber-600" },
 };
 
-const REFERENTES: Record<string, string[]> = {
-  "Marca personal": [
-    "https://vt.tiktok.com/ZSQm5Teum/",
-    "https://vt.tiktok.com/ZSQm59maX/",
-    "https://vt.tiktok.com/ZSQm5HGub/",
-    "https://vt.tiktok.com/ZSQmafVkn/",
-    "https://vt.tiktok.com/ZSQma1d1F/",
-    "https://vt.tiktok.com/ZSQmaS1Be/",
-    "https://vt.tiktok.com/ZSQmaekLR/",
-    "https://vt.tiktok.com/ZSQmaAcPw/",
-    "https://vt.tiktok.com/ZSQmarSxj/",
-    "https://vt.tiktok.com/ZSQmavcro/",
-    "https://vt.tiktok.com/ZSQma7q7R/",
-  ],
-  "Asesores inmobiliarios": [
-    "https://vt.tiktok.com/ZSQmaHQ3H/",
-    "https://vt.tiktok.com/ZSQmaxRNF/",
-    "https://vt.tiktok.com/ZSQmaaY5L/",
-    "https://vt.tiktok.com/ZSQmm2V9L/",
-    "https://vt.tiktok.com/ZSQmmJvxd/",
-    "https://www.instagram.com/reel/DWxUNGQkS4N/?igsh=MWszdDhpbGhvZWx2aA==",
-    "https://www.instagram.com/reel/DSJTPJ2Ebdr/?igsh=YjdjMHVhd3JueDlq",
-    "https://www.instagram.com/reel/DYpzoyozKlE/?igsh=OGY5Nmo1d3Zrc2k5",
-    "https://www.instagram.com/reel/DPo-wzsjviy/?igsh=NW52MG4yeDhod2lh",
-    "https://www.instagram.com/reel/DK5LjC6RwiC/?igsh=M3JsdGpwdW4wOXRn",
-    "https://vt.tiktok.com/ZSQmuPpcQ/",
-    "https://vt.tiktok.com/ZSQmH19Xk/",
-    "https://vt.tiktok.com/ZSQmuv8PW/",
-    "https://www.instagram.com/reel/DZQ4doeRnL2/?igsh=ZnkwOGFqdGpmN3pq",
-    "https://vt.tiktok.com/ZSQmHFtmD/",
-    "https://vt.tiktok.com/ZSQmHQ16a/",
-  ],
-  "Agencias de viajes": [
-    "https://vt.tiktok.com/ZSQm9LdgX/",
-    "https://vt.tiktok.com/ZSQm9HWfA/",
-    "https://vt.tiktok.com/ZSQm95QV5/",
-    "https://vt.tiktok.com/ZSQm9BBmv/",
-    "https://vt.tiktok.com/ZSQm9qFc2/",
-    "https://vt.tiktok.com/ZSQm9Cco8/",
-    "https://vt.tiktok.com/ZSQm9Kvu1/",
-    "https://vt.tiktok.com/ZSQm9wEqy/",
-  ],
-  "Nutricionistas y fitness": [
-    "https://vt.tiktok.com/ZSQmxVeCu/",
-    "https://vt.tiktok.com/ZSQmxsN1d/",
-    "https://vt.tiktok.com/ZSQmxpYVa/",
-    "https://vt.tiktok.com/ZSQmQSvo1/",
-    "https://vt.tiktok.com/ZSQmQANy5/",
-    "https://vt.tiktok.com/ZSQmQAYDf/",
-    "https://vt.tiktok.com/ZSQmQ1vWq/",
-    "https://vt.tiktok.com/ZSQmQJ3jN/",
-    "https://vt.tiktok.com/ZSQmQU2YV/",
-    "https://www.instagram.com/reel/DZQrNdFPhdM/?igsh=MXZ4M3VwY2l2NnVtMw==",
-    "https://www.instagram.com/reel/DZEBwEXttA7/?igsh=MXF0NzFoNm53OHZqcg==",
-    "https://vt.tiktok.com/ZSQmCG6jw/",
-  ],
-  "Psicólogos y coaches": [
-    "https://vt.tiktok.com/ZSQmCBXJD/",
-    "https://vt.tiktok.com/ZSQmCBhUE/",
-    "https://vt.tiktok.com/ZSQmCaeVR/",
-    "https://vt.tiktok.com/ZSQmC9npG/",
-    "https://vt.tiktok.com/ZSQmCy9Bu/",
-    "https://vt.tiktok.com/ZSQmCg3MT/",
-    "https://vt.tiktok.com/ZSQmCHuS1/",
-    "https://vt.tiktok.com/ZSQmCGJR2/",
-    "https://vt.tiktok.com/ZSQmXj4Lw/",
-    "https://vt.tiktok.com/ZSQmXNgdr/",
-  ],
-  "Negocios físicos": [
-    "https://vt.tiktok.com/ZSQmXNUhH/",
-    "https://vt.tiktok.com/ZSQmXwKUB/",
-    "https://vt.tiktok.com/ZSQm41TUQ/",
-    "https://vt.tiktok.com/ZSQmXGo45/",
-    "https://vt.tiktok.com/ZSQm4Nv7t/",
-    "https://vt.tiktok.com/ZSQmXv88g/",
-    "https://vt.tiktok.com/ZSQm4k3kw/",
-    "https://vt.tiktok.com/ZSQm4uL3j/",
-    "https://vt.tiktok.com/ZSQm4SrCA/",
-    "https://vt.tiktok.com/ZSQm4DFDY/",
-    "https://vt.tiktok.com/ZSQm4Aaou/",
-    "https://vt.tiktok.com/ZSQm4XMcg/",
-    "https://vt.tiktok.com/ZSQm43qv6/",
-    "https://vt.tiktok.com/ZSQmV11XL/",
-  ],
-  "Agencias de marketing / Filmmakers": [
-    "https://vt.tiktok.com/ZSQmquQVB/",
-    "https://vt.tiktok.com/ZSQmq7U66/",
-    "https://vt.tiktok.com/ZSQmq9FBp/",
-    "https://vt.tiktok.com/ZSQmqc7BF/",
-    "https://vt.tiktok.com/ZSQmqofqG/",
-    "https://vt.tiktok.com/ZSQmqKoDT/",
-    "https://vt.tiktok.com/ZSQmbYfKB/",
-    "https://vt.tiktok.com/ZSQmbDjWg/",
-    "https://vt.tiktok.com/ZSQmbmb2S/",
-    "https://vt.tiktok.com/ZSQmbXpEM/",
-  ],
-  "Coach": [
-    "https://vt.tiktok.com/ZSQmbVPHw/",
-    "https://vt.tiktok.com/ZSQmbVPt3/",
-    "https://vt.tiktok.com/ZSQmbD5JV/",
-    "https://vt.tiktok.com/ZSQmbQxqy/",
-    "https://vt.tiktok.com/ZSQmbxoxc/",
-  ],
-};
+const DEFAULT_NICHE_META: NicheMeta = { icon: User, gradient: "from-gray-400 to-gray-500", iconColor: "text-gray-600" };
 
-const NICHE_ORDER = Object.keys(REFERENTES);
+function formatNumber(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
+  return n.toString();
+}
 
 function getPlatform(url: string): { label: string; className: string } {
   if (url.includes("tiktok.com")) return { label: "TikTok", className: "bg-black text-white border-0" };
@@ -175,16 +100,89 @@ function getPlatform(url: string): { label: string; className: string } {
 
 type Props = {
   initialPersonalVideos: PersonalVideo[];
+  initialLibraryVideos: ReferenceVideo[];
+  isCoach: boolean;
 };
 
-export function ReferentesClient({ initialPersonalVideos }: Props) {
-  const [view, setView] = useState<"biblioteca" | "mis-videos">("biblioteca");
+export function ReferentesClient({ initialPersonalVideos, initialLibraryVideos, isCoach }: Props) {
+  const [view, setView] = useState<"biblioteca" | "mis-videos" | "buscar">("biblioteca");
   const [activeNiche, setActiveNiche] = useState<string | null>(null);
   const [personalVideos, setPersonalVideos] = useState<PersonalVideo[]>(initialPersonalVideos);
+  const [libraryVideos, setLibraryVideos] = useState<ReferenceVideo[]>(initialLibraryVideos);
   const [addingPersonal, setAddingPersonal] = useState(false);
   const [savingPersonal, setSavingPersonal] = useState(false);
   const [personalForm, setPersonalForm] = useState({ url: "", title: "", description: "" });
   const supabase = createClient();
+
+  // ── Buscar ──────────────────────────────────────────────────────────────
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searching, setSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [savingResultId, setSavingResultId] = useState<string | null>(null);
+  const [nicheDraft, setNicheDraft] = useState("");
+  const [savingToLibrary, setSavingToLibrary] = useState(false);
+
+  const nicheGroups = useMemo(() => {
+    const map = new Map<string, ReferenceVideo[]>();
+    for (const v of libraryVideos) {
+      const key = v.niche || "Sin categoría";
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(v);
+    }
+    return map;
+  }, [libraryVideos]);
+  const nicheList = Array.from(nicheGroups.keys());
+
+  async function handleSearch() {
+    if (!searchQuery.trim()) { toast.error("Ingresá una palabra clave o nicho"); return; }
+    setSearching(true);
+    setSearchResults([]);
+    try {
+      const res = await fetch("/api/referentes/buscar", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ query: searchQuery }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || "Error al buscar");
+      setSearchResults(data.videos || []);
+      if (!data.videos?.length) toast.info("No se encontraron videos para esa búsqueda");
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Error al buscar videos");
+    } finally {
+      setSearching(false);
+    }
+  }
+
+  async function handleSaveToLibrary(result: SearchResult) {
+    const niche = nicheDraft.trim();
+    if (!niche) { toast.error("Elegí o escribí un nicho"); return; }
+    setSavingToLibrary(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data, error } = await supabase
+        .from("reference_videos")
+        .insert({ coach_id: user!.id, url: result.url, title: result.title, niche })
+        .select()
+        .single();
+      if (error) throw error;
+      setLibraryVideos((prev) => [data, ...prev]);
+      setSavingResultId(null);
+      setNicheDraft("");
+      toast.success("Guardado en la biblioteca");
+    } catch {
+      toast.error("Error al guardar en la biblioteca");
+    } finally {
+      setSavingToLibrary(false);
+    }
+  }
+
+  async function handleDeleteLibraryVideo(id: string) {
+    const { error } = await supabase.from("reference_videos").delete().eq("id", id);
+    if (error) { toast.error("Error al eliminar"); return; }
+    setLibraryVideos((prev) => prev.filter((v) => v.id !== id));
+    toast.success("Eliminado de la biblioteca");
+  }
 
   // ── CRUD Mis Videos ─────────────────────────────────────────────────────
   async function handleAddPersonal() {
@@ -225,33 +223,154 @@ export function ReferentesClient({ initialPersonalVideos }: Props) {
     </button>
   );
 
-  // ── Vista: Nicho activo ──────────────────────────────────────────────────
+  const tabBar = (
+    <div className="flex gap-1 bg-white rounded-2xl p-1.5 border border-gray-100 w-fit" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+      {tabBtn("biblioteca", "Biblioteca del Coach", BookOpen)}
+      {tabBtn("buscar", "Buscar", Search)}
+      {tabBtn("mis-videos", "Mis Videos", Bookmark)}
+    </div>
+  );
+
+  // ── Vista: Buscar ─────────────────────────────────────────────────────────
+  if (view === "buscar") {
+    return (
+      <div className="space-y-5">
+        {tabBar}
+
+        <div className="flex gap-2">
+          <Input
+            placeholder="Ej: agencia de viajes, asesores inmobiliarios, coach de negocios..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+          />
+          <Button
+            onClick={handleSearch}
+            disabled={searching}
+            className="gap-1.5 text-white flex-shrink-0"
+            style={{ background: "linear-gradient(135deg, #1A6FFF, #00C8FF)" }}
+          >
+            {searching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+            Buscar
+          </Button>
+        </div>
+
+        {searching && (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <Loader2 className="h-8 w-8 animate-spin mb-3" style={{ color: "#1A6FFF" }} />
+            <p className="text-gray-600 font-medium">Buscando videos virales...</p>
+          </div>
+        )}
+
+        {!searching && searchResults.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {searchResults.map((video) => (
+              <div key={video.video_id} className="bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-200" style={{ boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}>
+                <div className="h-24 flex items-center justify-center relative" style={{ background: "linear-gradient(135deg, #0B1D3E, #1A6FFF20)" }}>
+                  <Badge className="absolute top-2 left-2 text-[9px] px-2 py-0.5 font-semibold bg-black text-white border-0">TikTok</Badge>
+                  {video.views > 500_000 && (
+                    <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full text-[9px] font-bold text-white" style={{ background: "linear-gradient(135deg, #FF6B35, #FF8C00)" }}>
+                      VIRAL
+                    </div>
+                  )}
+                </div>
+                <div className="p-3 space-y-2">
+                  <p className="text-xs font-medium text-gray-800 line-clamp-2 leading-snug">{video.title}</p>
+                  <div className="flex items-center gap-3 text-[11px] text-gray-400">
+                    <span className="flex items-center gap-1"><Eye className="h-3 w-3" /> {formatNumber(video.views)}</span>
+                    <span className="flex items-center gap-1"><Heart className="h-3 w-3" /> {formatNumber(video.likes)}</span>
+                  </div>
+
+                  <a href={video.url} target="_blank" rel="noopener noreferrer">
+                    <Button variant="outline" size="sm" className="w-full text-xs gap-1.5 h-8">
+                      <ExternalLink className="h-3 w-3" /> Ver video
+                    </Button>
+                  </a>
+
+                  {isCoach && (
+                    savingResultId === video.video_id ? (
+                      <div className="space-y-1.5">
+                        <Input
+                          autoFocus
+                          list="niche-suggestions"
+                          placeholder="Nicho (ej: Agencias de viajes)"
+                          value={nicheDraft}
+                          onChange={(e) => setNicheDraft(e.target.value)}
+                          className="text-xs h-8"
+                        />
+                        <datalist id="niche-suggestions">
+                          {nicheList.map((n) => <option key={n} value={n} />)}
+                        </datalist>
+                        <div className="flex gap-1.5">
+                          <Button
+                            size="sm"
+                            onClick={() => handleSaveToLibrary(video)}
+                            disabled={savingToLibrary}
+                            className="flex-1 gap-1.5 text-white text-[11px] h-8"
+                            style={{ background: "linear-gradient(135deg, #1A6FFF, #00C8FF)" }}
+                          >
+                            {savingToLibrary ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                            Guardar
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => { setSavingResultId(null); setNicheDraft(""); }} className="text-[11px] h-8">
+                            <X className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => { setSavingResultId(video.video_id); setNicheDraft(""); }}
+                        className="w-full text-xs gap-1.5 h-8"
+                      >
+                        <Bookmark className="h-3 w-3" /> Guardar en biblioteca
+                      </Button>
+                    )
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {!searching && searchResults.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-2xl border border-gray-100" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+            <div className="h-14 w-14 rounded-2xl flex items-center justify-center mb-4" style={{ background: "#EFF6FF" }}>
+              <Search className="h-6 w-6" style={{ color: "#1A6FFF" }} strokeWidth={1.5} />
+            </div>
+            <p className="text-gray-500 font-medium">Buscá videos virales por nicho o palabra clave</p>
+            <p className="text-gray-400 text-sm mt-1 max-w-xs">Ej: &quot;agencia de viajes&quot;, &quot;asesores inmobiliarios&quot;, &quot;coach de negocios&quot;...</p>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ── Vista: Nicho activo (Biblioteca) ────────────────────────────────────
   if (view === "biblioteca" && activeNiche) {
-    const meta = NICHE_META[activeNiche];
-    const links = REFERENTES[activeNiche] || [];
-    const Icon = meta?.icon || User;
-    const tiktokCount = links.filter((u) => u.includes("tiktok")).length;
-    const igCount = links.filter((u) => u.includes("instagram")).length;
+    const meta = NICHE_META[activeNiche] || DEFAULT_NICHE_META;
+    const videos = nicheGroups.get(activeNiche) || [];
+    const Icon = meta.icon;
+    const tiktokCount = videos.filter((v) => v.url.includes("tiktok")).length;
+    const igCount = videos.filter((v) => v.url.includes("instagram")).length;
 
     return (
       <div className="space-y-5">
-        <div className="flex gap-1 bg-white rounded-2xl p-1.5 border border-gray-100 w-fit" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
-          {tabBtn("biblioteca", "Biblioteca del Coach", BookOpen)}
-          {tabBtn("mis-videos", "Mis Videos", Bookmark)}
-        </div>
+        {tabBar}
 
         <button onClick={() => setActiveNiche(null)} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-gray-900 transition-colors">
           <ArrowLeft className="h-4 w-4" /> Volver a nichos
         </button>
 
         <div className="flex items-center gap-4">
-          <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${meta?.gradient || "from-gray-400 to-gray-500"} flex items-center justify-center flex-shrink-0`}>
+          <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${meta.gradient} flex items-center justify-center flex-shrink-0`}>
             <Icon className="h-6 w-6 text-white" strokeWidth={1.8} />
           </div>
           <div>
             <h2 className="text-xl font-bold text-gray-900">{activeNiche}</h2>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-sm text-muted-foreground">{links.length} videos referentes</span>
+              <span className="text-sm text-muted-foreground">{videos.length} videos referentes</span>
               {tiktokCount > 0 && <span className="text-[10px] font-semibold bg-black text-white px-2 py-0.5 rounded-full">TikTok {tiktokCount}</span>}
               {igCount > 0 && <span className="text-[10px] font-semibold bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-0.5 rounded-full">Instagram {igCount}</span>}
             </div>
@@ -259,21 +378,25 @@ export function ReferentesClient({ initialPersonalVideos }: Props) {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-          {links.map((url, i) => {
-            const platform = getPlatform(url);
+          {videos.map((video) => {
+            const platform = getPlatform(video.url);
             return (
-              <Card key={i} className="flex flex-col group hover:shadow-md transition-all border border-gray-100 bg-white">
+              <Card key={video.id} className="flex flex-col group hover:shadow-md transition-all border border-gray-100 bg-white">
                 <CardContent className="p-4 flex flex-col gap-3 h-full">
                   <div className="flex items-center justify-between">
                     <Badge className={`text-[10px] px-2 py-0.5 font-semibold ${platform.className}`}>{platform.label}</Badge>
-                    <span className="text-xs text-gray-300 font-medium">#{i + 1}</span>
+                    {isCoach && (
+                      <button onClick={() => handleDeleteLibraryVideo(video.id)} className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity">
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    )}
                   </div>
                   <div className="flex-1 flex items-center justify-center py-3">
-                    <div className={`h-10 w-10 rounded-xl bg-gradient-to-br ${meta?.gradient || "from-gray-400 to-gray-500"} flex items-center justify-center opacity-20`}>
+                    <div className={`h-10 w-10 rounded-xl bg-gradient-to-br ${meta.gradient} flex items-center justify-center opacity-20`}>
                       <Icon className="h-5 w-5 text-white" strokeWidth={1.8} />
                     </div>
                   </div>
-                  <a href={url} target="_blank" rel="noopener noreferrer">
+                  <a href={video.url} target="_blank" rel="noopener noreferrer">
                     <Button variant="outline" size="sm" className="w-full text-xs gap-1.5 h-8">
                       <ExternalLink className="h-3 w-3" /> Ver video
                     </Button>
@@ -291,10 +414,7 @@ export function ReferentesClient({ initialPersonalVideos }: Props) {
   if (view === "mis-videos") {
     return (
       <div className="space-y-5">
-        <div className="flex gap-1 bg-white rounded-2xl p-1.5 border border-gray-100 w-fit" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
-          {tabBtn("biblioteca", "Biblioteca del Coach", BookOpen)}
-          {tabBtn("mis-videos", "Mis Videos", Bookmark)}
-        </div>
+        {tabBar}
 
         <div className="flex items-center justify-between">
           <p className="text-sm text-gray-500">Tu colección personal de videos que te inspiran o querés guardar como referencia</p>
@@ -368,51 +488,62 @@ export function ReferentesClient({ initialPersonalVideos }: Props) {
     );
   }
 
-  // ── Vista principal: Nichos ─────────────────────────────────────────────
+  // ── Vista principal: Nichos (Biblioteca) ─────────────────────────────────
   return (
     <div className="space-y-5">
-      <div className="flex gap-1 bg-white rounded-2xl p-1.5 border border-gray-100 w-fit" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
-        {tabBtn("biblioteca", "Biblioteca del Coach", BookOpen)}
-        {tabBtn("mis-videos", "Mis Videos", Bookmark)}
-      </div>
+      {tabBar}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {NICHE_ORDER.map((niche) => {
-          const links = REFERENTES[niche];
-          const meta = NICHE_META[niche];
-          const Icon = meta?.icon || User;
-          const tiktokCount = links.filter((u) => u.includes("tiktok")).length;
-          const igCount = links.filter((u) => u.includes("instagram")).length;
+      {nicheList.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-2xl border border-gray-100" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+          <div className="h-14 w-14 rounded-2xl flex items-center justify-center mb-4" style={{ background: "#EFF6FF" }}>
+            <BookOpen className="h-6 w-6" style={{ color: "#1A6FFF" }} strokeWidth={1.5} />
+          </div>
+          <p className="text-gray-500 font-medium">La biblioteca todavía está vacía</p>
+          <p className="text-gray-400 text-sm mt-1 max-w-xs">
+            {isCoach
+              ? "Buscá videos en la pestaña \"Buscar\" y guardalos acá para que todos tus clientes los vean."
+              : "Tu coach todavía no agregó videos referentes."}
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {nicheList.map((niche) => {
+            const videos = nicheGroups.get(niche) || [];
+            const meta = NICHE_META[niche] || DEFAULT_NICHE_META;
+            const Icon = meta.icon;
+            const tiktokCount = videos.filter((v) => v.url.includes("tiktok")).length;
+            const igCount = videos.filter((v) => v.url.includes("instagram")).length;
 
-          return (
-            <Card
-              key={niche}
-              className="cursor-pointer hover:shadow-lg transition-all duration-200 border border-gray-100 overflow-hidden group"
-              onClick={() => setActiveNiche(niche)}
-            >
-              <div className={`h-1.5 w-full bg-gradient-to-r ${meta?.gradient || "from-gray-400 to-gray-500"}`} />
-              <CardContent className="p-5">
-                <div className="flex items-start justify-between mb-4">
-                  <div className={`h-10 w-10 rounded-xl bg-gradient-to-br ${meta?.gradient || "from-gray-400 to-gray-500"} flex items-center justify-center`}>
-                    <Icon className="h-5 w-5 text-white" strokeWidth={1.8} />
+            return (
+              <Card
+                key={niche}
+                className="cursor-pointer hover:shadow-lg transition-all duration-200 border border-gray-100 overflow-hidden group"
+                onClick={() => setActiveNiche(niche)}
+              >
+                <div className={`h-1.5 w-full bg-gradient-to-r ${meta.gradient}`} />
+                <CardContent className="p-5">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className={`h-10 w-10 rounded-xl bg-gradient-to-br ${meta.gradient} flex items-center justify-center`}>
+                      <Icon className="h-5 w-5 text-white" strokeWidth={1.8} />
+                    </div>
+                    <span className="text-2xl font-bold text-gray-300 group-hover:text-gray-400 transition-colors">{videos.length}</span>
                   </div>
-                  <span className="text-2xl font-bold text-gray-300 group-hover:text-gray-400 transition-colors">{links.length}</span>
-                </div>
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Nicho</p>
-                <h3 className="font-bold text-gray-900 text-sm leading-snug mb-3">{niche}</h3>
-                <div className="flex flex-wrap gap-1.5 mb-4">
-                  {tiktokCount > 0 && <span className="text-[10px] font-semibold bg-black text-white px-2 py-0.5 rounded-full">TikTok · {tiktokCount}</span>}
-                  {igCount > 0 && <span className="text-[10px] font-semibold bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-0.5 rounded-full">Instagram · {igCount}</span>}
-                </div>
-                <div className="flex items-center justify-between text-sm text-[#1A6FFF] font-medium">
-                  <span>Ver referentes</span>
-                  <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Nicho</p>
+                  <h3 className="font-bold text-gray-900 text-sm leading-snug mb-3">{niche}</h3>
+                  <div className="flex flex-wrap gap-1.5 mb-4">
+                    {tiktokCount > 0 && <span className="text-[10px] font-semibold bg-black text-white px-2 py-0.5 rounded-full">TikTok · {tiktokCount}</span>}
+                    {igCount > 0 && <span className="text-[10px] font-semibold bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-0.5 rounded-full">Instagram · {igCount}</span>}
+                  </div>
+                  <div className="flex items-center justify-between text-sm text-[#1A6FFF] font-medium">
+                    <span>Ver referentes</span>
+                    <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
