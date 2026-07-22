@@ -54,6 +54,13 @@ type ReferenceVideo = {
   created_at: string;
 };
 
+type ReferenceNiche = {
+  id: string;
+  coach_id: string;
+  name: string;
+  created_at: string;
+};
+
 type SearchResult = {
   video_id: string;
   url: string;
@@ -101,18 +108,30 @@ function getPlatform(url: string): { label: string; className: string } {
 type Props = {
   initialPersonalVideos: PersonalVideo[];
   initialLibraryVideos: ReferenceVideo[];
+  initialNiches: ReferenceNiche[];
   isCoach: boolean;
 };
 
-export function ReferentesClient({ initialPersonalVideos, initialLibraryVideos, isCoach }: Props) {
+export function ReferentesClient({ initialPersonalVideos, initialLibraryVideos, initialNiches, isCoach }: Props) {
   const [view, setView] = useState<"biblioteca" | "mis-videos" | "buscar">("biblioteca");
   const [activeNiche, setActiveNiche] = useState<string | null>(null);
   const [personalVideos, setPersonalVideos] = useState<PersonalVideo[]>(initialPersonalVideos);
   const [libraryVideos, setLibraryVideos] = useState<ReferenceVideo[]>(initialLibraryVideos);
+  const [niches, setNiches] = useState<ReferenceNiche[]>(initialNiches);
   const [addingPersonal, setAddingPersonal] = useState(false);
   const [savingPersonal, setSavingPersonal] = useState(false);
   const [personalForm, setPersonalForm] = useState({ url: "", title: "", description: "" });
   const supabase = createClient();
+
+  // ── Crear rubro ─────────────────────────────────────────────────────────
+  const [creatingNiche, setCreatingNiche] = useState(false);
+  const [newNicheDraft, setNewNicheDraft] = useState("");
+  const [savingNiche, setSavingNiche] = useState(false);
+
+  // ── Añadir video dentro de un rubro ─────────────────────────────────────
+  const [addingVideoToNiche, setAddingVideoToNiche] = useState(false);
+  const [nicheVideoForm, setNicheVideoForm] = useState({ url: "", title: "" });
+  const [savingNicheVideo, setSavingNicheVideo] = useState(false);
 
   // ── Buscar ──────────────────────────────────────────────────────────────
   const [searchQuery, setSearchQuery] = useState("");
@@ -131,7 +150,12 @@ export function ReferentesClient({ initialPersonalVideos, initialLibraryVideos, 
     }
     return map;
   }, [libraryVideos]);
-  const nicheList = Array.from(nicheGroups.keys());
+  // Un rubro puede existir sin tener todavía ningún video (creado con "Crear rubro"),
+  // así que la lista es la unión de los rubros creados + los niches que ya tienen videos.
+  const nicheList = useMemo(() => {
+    const names = new Set<string>([...niches.map((n) => n.name), ...nicheGroups.keys()]);
+    return Array.from(names);
+  }, [niches, nicheGroups]);
 
   async function handleSearch() {
     if (!searchQuery.trim()) { toast.error("Ingresá una palabra clave o nicho"); return; }
@@ -182,6 +206,59 @@ export function ReferentesClient({ initialPersonalVideos, initialLibraryVideos, 
     if (error) { toast.error("Error al eliminar"); return; }
     setLibraryVideos((prev) => prev.filter((v) => v.id !== id));
     toast.success("Eliminado de la biblioteca");
+  }
+
+  async function handleCreateNiche() {
+    const name = newNicheDraft.trim();
+    if (!name) { toast.error("Escribí un nombre para el rubro"); return; }
+    if (nicheList.some((n) => n.toLowerCase() === name.toLowerCase())) {
+      toast.error("Ya existe un rubro con ese nombre");
+      return;
+    }
+    setSavingNiche(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data, error } = await supabase
+        .from("reference_niches")
+        .insert({ coach_id: user!.id, name })
+        .select()
+        .single();
+      if (error) throw error;
+      setNiches((prev) => [data, ...prev]);
+      setNewNicheDraft("");
+      setCreatingNiche(false);
+      toast.success("Rubro creado");
+    } catch {
+      toast.error("Error al crear el rubro");
+    } finally {
+      setSavingNiche(false);
+    }
+  }
+
+  async function handleAddVideoToNiche() {
+    if (!activeNiche) return;
+    if (!nicheVideoForm.url.trim() || !nicheVideoForm.title.trim()) {
+      toast.error("URL y título son obligatorios");
+      return;
+    }
+    setSavingNicheVideo(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data, error } = await supabase
+        .from("reference_videos")
+        .insert({ coach_id: user!.id, url: nicheVideoForm.url.trim(), title: nicheVideoForm.title.trim(), niche: activeNiche })
+        .select()
+        .single();
+      if (error) throw error;
+      setLibraryVideos((prev) => [data, ...prev]);
+      setNicheVideoForm({ url: "", title: "" });
+      setAddingVideoToNiche(false);
+      toast.success("Video agregado al rubro");
+    } catch {
+      toast.error("Error al agregar el video");
+    } finally {
+      setSavingNicheVideo(false);
+    }
   }
 
   // ── CRUD Mis Videos ─────────────────────────────────────────────────────
@@ -367,7 +444,7 @@ export function ReferentesClient({ initialPersonalVideos, initialLibraryVideos, 
           <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${meta.gradient} flex items-center justify-center flex-shrink-0`}>
             <Icon className="h-6 w-6 text-white" strokeWidth={1.8} />
           </div>
-          <div>
+          <div className="flex-1">
             <h2 className="text-xl font-bold text-gray-900">{activeNiche}</h2>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-sm text-muted-foreground">{videos.length} videos referentes</span>
@@ -375,7 +452,46 @@ export function ReferentesClient({ initialPersonalVideos, initialLibraryVideos, 
               {igCount > 0 && <span className="text-[10px] font-semibold bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-0.5 rounded-full">Instagram {igCount}</span>}
             </div>
           </div>
+          {isCoach && (
+            <Button
+              size="sm"
+              onClick={() => setAddingVideoToNiche((v) => !v)}
+              className="gap-1.5 text-white flex-shrink-0"
+              style={{ background: "linear-gradient(135deg, #1A6FFF, #00C8FF)" }}
+            >
+              <Plus className="h-4 w-4" /> Añadir video
+            </Button>
+          )}
         </div>
+
+        {isCoach && addingVideoToNiche && (
+          <Card className="border-blue-200">
+            <CardContent className="pt-5 space-y-3">
+              <div className="space-y-1.5">
+                <Label className="text-sm">URL del video *</Label>
+                <Input placeholder="https://tiktok.com/... o https://instagram.com/..." value={nicheVideoForm.url} onChange={(e) => setNicheVideoForm((f) => ({ ...f, url: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-sm">Título *</Label>
+                <Input placeholder="Ej: Hook de apertura fuerte" value={nicheVideoForm.title} onChange={(e) => setNicheVideoForm((f) => ({ ...f, title: e.target.value }))} />
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" size="sm" onClick={() => setAddingVideoToNiche(false)}>Cancelar</Button>
+                <Button size="sm" onClick={handleAddVideoToNiche} disabled={savingNicheVideo} className="gap-1.5 text-white" style={{ background: "linear-gradient(135deg, #1A6FFF, #00C8FF)" }}>
+                  {savingNicheVideo ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+                  Agregar
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {videos.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-2xl border border-gray-100" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+            <p className="text-gray-500 font-medium">Este rubro todavía no tiene videos</p>
+            {isCoach && <p className="text-gray-400 text-sm mt-1">Usá &quot;Añadir video&quot; arriba, o guardá resultados desde la pestaña &quot;Buscar&quot;</p>}
+          </div>
+        )}
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
           {videos.map((video) => {
@@ -491,7 +607,43 @@ export function ReferentesClient({ initialPersonalVideos, initialLibraryVideos, 
   // ── Vista principal: Nichos (Biblioteca) ─────────────────────────────────
   return (
     <div className="space-y-5">
-      {tabBar}
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        {tabBar}
+        {isCoach && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => { setCreatingNiche((v) => !v); setNewNicheDraft(""); }}
+            className="gap-1.5"
+          >
+            <Plus className="h-4 w-4" /> Crear rubro
+          </Button>
+        )}
+      </div>
+
+      {isCoach && creatingNiche && (
+        <Card className="border-blue-200">
+          <CardContent className="pt-5 space-y-3">
+            <div className="space-y-1.5">
+              <Label className="text-sm">Nombre del rubro *</Label>
+              <Input
+                autoFocus
+                placeholder="Ej: Abogados, Dentistas, E-commerce..."
+                value={newNicheDraft}
+                onChange={(e) => setNewNicheDraft(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleCreateNiche()}
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" size="sm" onClick={() => setCreatingNiche(false)}>Cancelar</Button>
+              <Button size="sm" onClick={handleCreateNiche} disabled={savingNiche} className="gap-1.5 text-white" style={{ background: "linear-gradient(135deg, #1A6FFF, #00C8FF)" }}>
+                {savingNiche ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+                Crear
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {nicheList.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-2xl border border-gray-100" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>

@@ -13,7 +13,7 @@ export default async function ReferentesPage() {
 
   const isCoach = profile?.role === "coach";
 
-  const [{ data: personalVideos }, { data: libraryVideos }] = await Promise.all([
+  const [{ data: personalVideos }, { data: libraryVideos }, { data: niches }] = await Promise.all([
     supabase
       .from("personal_videos")
       .select("*")
@@ -21,6 +21,10 @@ export default async function ReferentesPage() {
       .order("created_at", { ascending: false }),
     supabase
       .from("reference_videos")
+      .select("*")
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("reference_niches")
       .select("*")
       .order("created_at", { ascending: false }),
   ]);
@@ -36,6 +40,7 @@ export default async function ReferentesPage() {
       <ReferentesClient
         initialPersonalVideos={personalVideos ?? []}
         initialLibraryVideos={libraryVideos ?? []}
+        initialNiches={niches ?? []}
         isCoach={isCoach}
       />
     </div>
