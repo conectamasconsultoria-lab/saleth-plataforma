@@ -200,7 +200,7 @@ export function MisReferentesClient({ initialAccounts }: Props) {
       const videos: TikTokVideo[] = data.videos || [];
       setVideoCache((prev) => ({ ...prev, [accountId]: videos }));
       if (videos.length === 0) {
-        toast.info("No se encontraron videos — verificá el usuario o el plan de API");
+        toast.info(data.error || "No se encontraron videos — verificá el usuario o el plan de API");
       }
       return videos;
     } catch {
@@ -289,6 +289,9 @@ export function MisReferentesClient({ initialAccounts }: Props) {
       const data = await res.json();
       const videos: TikTokVideo[] = data.videos || [];
       setVideoCache((prev) => ({ ...prev, [accountId]: videos }));
+      if (videos.length === 0 && data.error) {
+        toast.info(data.error);
+      }
       return videos;
     } catch {
       toast.error("Error al obtener videos");

@@ -29,11 +29,26 @@ export async function POST(req: NextRequest) {
     );
 
     if (!response.ok) {
-      return NextResponse.json({ error: "Error al consultar TikTok API", videos: [] }, { status: 200 });
+      const errorBody = await response.text();
+      console.error("TikTok cuenta resolver: error HTTP", response.status, errorBody);
+      const authIssue = response.status === 401 || response.status === 403;
+      return NextResponse.json(
+        {
+          error: authIssue
+            ? "RapidAPI rechazó la consulta (revisá que la suscripción a tiktok-api23 esté activa en tu cuenta de RapidAPI)"
+            : `Error al consultar la API de TikTok (status ${response.status})`,
+          videos: [],
+        },
+        { status: 200 }
+      );
     }
 
     const data = await response.json();
     const items = data?.itemList || data?.data?.itemList || data?.data?.videos || [];
+
+    if (items.length === 0) {
+      console.error("TikTok cuenta resolver: respuesta sin videos para", cleanUsername, JSON.stringify(data).slice(0, 800));
+    }
 
     const videos = items
       .map((item: Record<string, unknown>) => {
