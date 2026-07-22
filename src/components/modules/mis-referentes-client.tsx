@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import {
@@ -24,6 +25,7 @@ import {
   ChevronUp,
   X,
   RefreshCw,
+  Wand2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -32,6 +34,8 @@ type ReferentAccount = {
   username: string;
   platform: string;
   created_at: string;
+  style_analysis?: string | null;
+  style_analysis_generated_at?: string | null;
 };
 
 type TikTokVideo = {
@@ -161,6 +165,9 @@ export function MisReferentesClient({ initialAccounts }: Props) {
 
   const [adaptingVideoId, setAdaptingVideoId] = useState<string | null>(null);
   const [savingAdapted, setSavingAdapted] = useState(false);
+  const [topicPromptVideoId, setTopicPromptVideoId] = useState<string | null>(null);
+  const [topicDraft, setTopicDraft] = useState("");
+  const [analyzingStyle, setAnalyzingStyle] = useState<string | null>(null);
 
   const fetchedRef = useRef<Set<string>>(new Set());
   const supabase = createClient();
@@ -298,14 +305,16 @@ export function MisReferentesClient({ initialAccounts }: Props) {
     toast.success("Referente eliminado");
   }
 
-  async function handleAdaptVideo(video: TikTokVideo) {
+  async function handleAdaptVideo(video: TikTokVideo, topic?: string) {
     if (!activeAccount) return;
+    setTopicPromptVideoId(null);
+    setTopicDraft("");
     setAdaptingVideoId(video.video_id);
     try {
       const res = await fetch("/api/referentes/adaptar", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ tiktokUrl: video.url, videoTitle: video.title }),
+        body: JSON.stringify({ tiktokUrl: video.url, videoTitle: video.title, topic: topic || undefined }),
       });
       const data = await res.json();
       if (!res.ok || data.error) throw new Error(data.error || "Error");
@@ -347,6 +356,42 @@ export function MisReferentesClient({ initialAccounts }: Props) {
       activeAccount.username,
       activeVideos.map((v) => v.title)
     );
+  }
+
+  async function handleAnalyzeStyle() {
+    if (!activeAccount || activeVideos.length === 0) return;
+    setAnalyzingStyle(activeAccount.id);
+    try {
+      const res = await fetch("/api/referentes/analizar-estilo", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          accountId: activeAccount.id,
+          username: activeAccount.username,
+          videos: activeVideos.map((v) => ({
+            title: v.title,
+            views: v.views,
+            likes: v.likes,
+            thumbnail_url: v.thumbnail_url,
+          })),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || "Error");
+
+      setAccounts((prev) =>
+        prev.map((a) =>
+          a.id === activeAccount.id
+            ? { ...a, style_analysis: data.analysis, style_analysis_generated_at: data.generatedAt }
+            : a
+        )
+      );
+      toast.success("Análisis de estilo listo");
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Error al analizar el estilo");
+    } finally {
+      setAnalyzingStyle(null);
+    }
   }
 
   return (
@@ -472,6 +517,42 @@ export function MisReferentesClient({ initialAccounts }: Props) {
             </div>
           </div>
 
+          {/* Análisis de estilo / marca personal */}
+          {(activeVideos.length > 0 || activeAccount.style_analysis) && (
+            <div className="rounded-xl border border-gray-100 bg-white p-4 space-y-3" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                  <Wand2 className="h-4 w-4 text-gray-400" />
+                  Por qué funciona @{activeAccount.username}
+                </h3>
+                {activeVideos.length > 0 && (
+                  <button
+                    onClick={handleAnalyzeStyle}
+                    disabled={analyzingStyle === activeAccount.id}
+                    className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
+                  >
+                    {analyzingStyle === activeAccount.id ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <RefreshCw className="h-3 w-3" />
+                    )}
+                    {activeAccount.style_analysis ? "Regenerar" : "Analizar estilo"}
+                  </button>
+                )}
+              </div>
+
+              {analyzingStyle === activeAccount.id ? (
+                <p className="text-xs text-gray-400">Analizando formato, comunicación y elementos visuales...</p>
+              ) : activeAccount.style_analysis ? (
+                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{activeAccount.style_analysis}</p>
+              ) : (
+                <p className="text-xs text-gray-400">
+                  Analizá qué hace que el contenido de @{activeAccount.username} funcione: formato, comunicación, elementos visuales, y cómo aplicarlo a tu marca.
+                </p>
+              )}
+            </div>
+          )}
+
           {/* Loading videos */}
           {isLoadingVideos && (
             <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -518,20 +599,53 @@ export function MisReferentesClient({ initialAccounts }: Props) {
                         <span className="flex items-center gap-1"><Eye className="h-3 w-3" /> {formatNumber(video.views)}</span>
                         <span className="flex items-center gap-1"><Heart className="h-3 w-3" /> {formatNumber(video.likes)}</span>
                       </div>
-                      <Button
-                        size="sm"
-                        onClick={() => handleAdaptVideo(video)}
-                        disabled={adaptingVideoId === video.video_id}
-                        className="w-full gap-1.5 text-white text-[11px] h-8"
-                        style={{ background: "linear-gradient(135deg, #1A6FFF, #00C8FF)", boxShadow: "0 3px 10px rgba(26,111,255,0.25)" }}
-                      >
-                        {adaptingVideoId === video.video_id ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        ) : (
-                          <Sparkles className="h-3.5 w-3.5" />
-                        )}
-                        {adaptingVideoId === video.video_id ? "Adaptando..." : "Adaptar a mi nicho"}
-                      </Button>
+                      {topicPromptVideoId === video.video_id ? (
+                        <div className="space-y-1.5">
+                          <Textarea
+                            autoFocus
+                            value={topicDraft}
+                            onChange={(e) => setTopicDraft(e.target.value)}
+                            placeholder="¿Sobre qué tema adaptamos este video? (opcional)"
+                            rows={2}
+                            className="text-[11px]"
+                          />
+                          <div className="flex gap-1.5">
+                            <Button
+                              size="sm"
+                              onClick={() => handleAdaptVideo(video, topicDraft)}
+                              disabled={adaptingVideoId === video.video_id}
+                              className="flex-1 gap-1.5 text-white text-[11px] h-8"
+                              style={{ background: "linear-gradient(135deg, #1A6FFF, #00C8FF)" }}
+                            >
+                              <Sparkles className="h-3.5 w-3.5" />
+                              Adaptar
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => { setTopicPromptVideoId(null); setTopicDraft(""); }}
+                              className="text-[11px] h-8"
+                            >
+                              Cancelar
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <Button
+                          size="sm"
+                          onClick={() => { setTopicPromptVideoId(video.video_id); setTopicDraft(""); }}
+                          disabled={adaptingVideoId === video.video_id}
+                          className="w-full gap-1.5 text-white text-[11px] h-8"
+                          style={{ background: "linear-gradient(135deg, #1A6FFF, #00C8FF)", boxShadow: "0 3px 10px rgba(26,111,255,0.25)" }}
+                        >
+                          {adaptingVideoId === video.video_id ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <Sparkles className="h-3.5 w-3.5" />
+                          )}
+                          {adaptingVideoId === video.video_id ? "Adaptando..." : "Adaptar a mi nicho"}
+                        </Button>
+                      )}
                     </div>
                   </div>
                 ))}

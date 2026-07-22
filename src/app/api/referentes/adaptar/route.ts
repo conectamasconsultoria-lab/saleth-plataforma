@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
-  const { tiktokUrl, videoTitle } = await req.json();
+  const { tiktokUrl, videoTitle, topic } = await req.json();
   if (!tiktokUrl) return NextResponse.json({ error: "URL requerida" }, { status: 400 });
 
   if (!process.env.RAPIDAPI_KEY) {
@@ -100,6 +100,8 @@ ${transcript}
 
 MARCA PERSONAL DEL CREADOR:
 ${brandContext || "(Perfil de marca aún no completado — usá criterio general)"}
+
+${topic ? `TEMA/ÁNGULO ESPECÍFICO PARA ESTA ADAPTACIÓN: ${topic}\nAdaptá el guión para que hable puntualmente de este tema, manteniendo la mecánica viral del video original.` : ""}
 
 ENTREGÁ en formato JSON exacto:
 {
