@@ -1,6 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
+const RAPIDAPI_HOST = "tiktok-api23.p.rapidapi.com";
+
+function rapidApiHeaders(): Record<string, string> {
+  return {
+    "x-rapidapi-host": RAPIDAPI_HOST,
+    "x-rapidapi-key": process.env.RAPIDAPI_KEY!,
+  };
+}
+
+// El endpoint de posts requiere el secUid interno de TikTok, no el @username —
+// hay que resolverlo primero vía "Get User Info".
+async function resolveSecUid(username: string): Promise<string | null> {
+  const res = await fetch(
+    `https://${RAPIDAPI_HOST}/api/user/info?uniqueId=${encodeURIComponent(username)}`,
+    { headers: rapidApiHeaders() }
+  );
+  if (!res.ok) {
+    console.error("TikTok cuenta resolver: error HTTP en user/info", res.status, await res.text());
+    return null;
+  }
+  const data = await res.json();
+  return data?.userInfo?.user?.secUid || null;
+}
+
 // Obtiene los videos más recientes/virales de una cuenta de TikTok
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -17,15 +41,17 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    // tiktok-api23 soporta búsqueda de videos por usuario
+    const secUid = await resolveSecUid(cleanUsername);
+    if (!secUid) {
+      return NextResponse.json(
+        { error: `No se encontró la cuenta @${cleanUsername} en TikTok`, videos: [] },
+        { status: 200 }
+      );
+    }
+
     const response = await fetch(
-      `https://tiktok-api23.p.rapidapi.com/api/user/posts?uniqueId=${encodeURIComponent(cleanUsername)}&count=20&cursor=0`,
-      {
-        headers: {
-          "x-rapidapi-host": "tiktok-api23.p.rapidapi.com",
-          "x-rapidapi-key": process.env.RAPIDAPI_KEY,
-        },
-      }
+      `https://${RAPIDAPI_HOST}/api/user/posts?secUid=${encodeURIComponent(secUid)}&count=20&cursor=0`,
+      { headers: rapidApiHeaders() }
     );
 
     if (!response.ok) {
