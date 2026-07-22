@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
   try {
     // Buscar videos trending por hashtag relacionado al nicho
     const response = await fetch(
-      `https://tiktok-api23.p.rapidapi.com/api/search/video?keywords=${encodeURIComponent(searchQuery)}&count=20&cursor=0`,
+      `https://tiktok-api23.p.rapidapi.com/api/search/video?keyword=${encodeURIComponent(searchQuery)}&count=20&cursor=0`,
       {
         headers: {
           "x-rapidapi-host": "tiktok-api23.p.rapidapi.com",

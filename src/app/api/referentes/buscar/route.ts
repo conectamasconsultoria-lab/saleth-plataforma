@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const response = await fetch(
-      `https://tiktok-api23.p.rapidapi.com/api/search/video?keywords=${encodeURIComponent(query)}&count=20&cursor=0`,
+      `https://tiktok-api23.p.rapidapi.com/api/search/video?keyword=${encodeURIComponent(query)}&count=20&cursor=0`,
       {
         headers: {
           "x-rapidapi-host": "tiktok-api23.p.rapidapi.com",
