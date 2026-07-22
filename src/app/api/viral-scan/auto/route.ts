@@ -36,7 +36,11 @@ export async function POST(req: NextRequest) {
     );
 
     const data = await response.json();
-    const videoList = data?.itemList || data?.data?.videos || [];
+    const videoList = data?.item_list || data?.itemList || data?.data?.videos || [];
+
+    if (videoList.length === 0) {
+      console.error("Escáner viral: respuesta sin videos para", searchQuery, JSON.stringify(data).slice(0, 800));
+    }
 
     for (const item of videoList) {
       const tiktokUrl = `https://www.tiktok.com/@${item.author?.uniqueId}/video/${item.id}`;

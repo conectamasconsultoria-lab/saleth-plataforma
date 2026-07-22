@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
     }
 
     const data = await response.json();
-    const videoList = data?.itemList || data?.data?.itemList || data?.data?.videos || [];
+    const videoList = data?.item_list || data?.itemList || data?.data?.itemList || data?.data?.videos || [];
 
     if (videoList.length === 0) {
       console.error("Buscador de referentes: respuesta sin videos para", query, JSON.stringify(data).slice(0, 800));
