@@ -61,6 +61,13 @@ type Props = {
   initialAccounts: ReferentAccount[];
 };
 
+function extractTikTokUsername(input: string): string {
+  const trimmed = input.trim();
+  const urlMatch = trimmed.match(/tiktok\.com\/@([\w.-]+)/i);
+  if (urlMatch) return urlMatch[1];
+  return trimmed.replace(/^@/, "").replace(/\/+$/, "");
+}
+
 function formatNumber(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
@@ -236,7 +243,7 @@ export function MisReferentesClient({ initialAccounts }: Props) {
   }, [activeAccountId, videoCache, loadingVideos, fetchVideos]);
 
   async function handleAddAccount() {
-    const username = newUsername.trim().replace(/^@/, "");
+    const username = extractTikTokUsername(newUsername);
     if (!username) { toast.error("Ingresá un @usuario de TikTok"); return; }
 
     setAddingAccount(true);
@@ -458,7 +465,7 @@ export function MisReferentesClient({ initialAccounts }: Props) {
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">@</span>
                 <Input
                   className="pl-7"
-                  placeholder="mateomaffia, garyvee, alexhormozi..."
+                  placeholder="mateomaffia, garyvee... o pegá el link de su perfil"
                   value={newUsername}
                   onChange={(e) => setNewUsername(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleAddAccount()}
