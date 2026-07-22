@@ -86,7 +86,7 @@ Sé específico con los números que veas en la imagen.`;
 
     if (error) throw error;
 
-    return NextResponse.json({ uploadId: metricsUpload.id, insights });
+    return NextResponse.json({ uploadId: metricsUpload.id, insights, upload: metricsUpload });
   } catch (e) {
     console.error("Error analizando métricas:", e);
     return NextResponse.json({ error: "Error al analizar la imagen" }, { status: 500 });

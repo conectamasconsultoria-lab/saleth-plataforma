@@ -6,9 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Upload, BarChart3, Image } from "lucide-react";
+import { Loader2, Upload, BarChart3, Image, ChevronDown, ChevronUp } from "lucide-react";
 import type { MetricsUpload } from "@/lib/supabase/types";
 import { cn } from "@/lib/utils";
+import { MetricsChat } from "@/components/modules/metrics-chat";
 
 type Props = { initialUploads: MetricsUpload[] };
 
@@ -19,6 +20,7 @@ export function MetricsClient({ initialUploads }: Props) {
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [currentInsights, setCurrentInsights] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -51,7 +53,7 @@ export function MetricsClient({ initialUploads }: Props) {
       if (!res.ok) throw new Error(data.error);
 
       setCurrentInsights(data.insights);
-      setUploads((prev) => [data.upload ?? { id: Date.now().toString(), platform, insights: data.insights, created_at: new Date().toISOString() } as unknown as MetricsUpload, ...prev]);
+      setUploads((prev) => [data.upload as MetricsUpload, ...prev]);
       setFile(null);
       setPreview(null);
       if (fileRef.current) fileRef.current.value = "";
@@ -134,25 +136,38 @@ export function MetricsClient({ initialUploads }: Props) {
         <div>
           <h2 className="text-sm font-semibold mb-3">Historial de análisis</h2>
           <div className="space-y-3">
-            {uploads.map((upload) => (
-              <Card key={upload.id}>
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-sm">{upload.platform}</CardTitle>
-                    <span className="text-xs text-muted-foreground">
-                      {new Date(upload.created_at).toLocaleDateString("es-AR")}
-                    </span>
-                  </div>
-                </CardHeader>
-                {upload.insights && (
-                  <CardContent className="pt-0">
-                    <p className="text-sm text-muted-foreground line-clamp-3 whitespace-pre-wrap">
-                      {upload.insights}
-                    </p>
-                  </CardContent>
-                )}
-              </Card>
-            ))}
+            {uploads.map((upload) => {
+              const isExpanded = expanded === upload.id;
+              return (
+                <Card key={upload.id}>
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-sm">{upload.platform}</CardTitle>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(upload.created_at).toLocaleDateString("es-AR")}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setExpanded(isExpanded ? null : upload.id)}
+                        >
+                          {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                        </Button>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  {upload.insights && (
+                    <CardContent className="pt-0 space-y-4">
+                      <p className={cn("text-sm text-muted-foreground whitespace-pre-wrap", !isExpanded && "line-clamp-3")}>
+                        {upload.insights}
+                      </p>
+                      {isExpanded && <MetricsChat uploadId={upload.id} />}
+                    </CardContent>
+                  )}
+                </Card>
+              );
+            })}
           </div>
         </div>
       )}
