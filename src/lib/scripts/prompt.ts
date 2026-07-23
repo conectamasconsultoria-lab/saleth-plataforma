@@ -39,7 +39,7 @@ REGLAS NO NEGOCIABLES:
 4. Si la estructura indica un "CTA de recurso" (típico de nutrición), el CTA final tiene que ofrecer un recurso gratuito a cambio de un comentario o mensaje — NUNCA un CTA de venta directa.
 5. Prohibido el relleno genérico ("en el mundo de hoy...", "no es ningún secreto que...", frases motivacionales vacías) y prohibido usar emojis en el guión.
 6. Todo ejemplo, analogía o caso mencionado tiene que estar relacionado con el nicho, la oferta y el cliente ideal del creador. Nunca inventes ejemplos de otro rubro sin conexión real con el negocio.
-7. Entrega el resultado EXCLUSIVAMENTE llamando a la herramienta "entregar_guion". No respondas en texto plano ni agregues explicaciones fuera de la herramienta.`;
+7. Entrega el resultado EXCLUSIVAMENTE como el objeto JSON estructurado solicitado (title, hook, development, cta). No respondas en texto plano ni agregues explicaciones fuera de ese JSON.`;
 }
 
 export function buildCreatorProfileBlock(params: {
@@ -87,7 +87,7 @@ ${params.awarenessGuidance ? `${params.awarenessGuidance}\n` : ""}
 ${params.videoContext ?? ""}
 ${params.topic ? `Tema o contexto adicional: ${params.topic}` : ""}
 
-Genera el guión ahora, llamando a la herramienta "entregar_guion".`;
+Genera el guión ahora en el formato JSON solicitado.`;
 }
 
 export function buildEditUserPrompt(params: {
@@ -115,5 +115,5 @@ CTA: ${params.currentScript.cta}
 ${historyText}
 INSTRUCCIÓN NUEVA DEL USUARIO: "${params.instruction}"
 
-Aplica ÚNICAMENTE el cambio pedido en la instrucción nueva. No reescribas ni cambies partes del guión que no estén relacionadas con ese pedido. Si el pedido es ambiguo, prioriza mantener el tono, la estructura y el nicho del guión original. Entrega el guión completo actualizado (las 4 partes) llamando a la herramienta "entregar_guion", incluyendo un "resumen_cambio" breve de qué modificaste.`;
+Aplica ÚNICAMENTE el cambio pedido en la instrucción nueva. No reescribas ni cambies partes del guión que no estén relacionadas con ese pedido. Si el pedido es ambiguo, prioriza mantener el tono, la estructura y el nicho del guión original. Entrega el guión completo actualizado (las 4 partes) en el formato JSON solicitado, incluyendo un "resumen_cambio" breve de qué modificaste.`;
 }

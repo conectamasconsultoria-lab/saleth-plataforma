@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI } from "@google/genai";
 import { createClient } from "@/lib/supabase/server";
 import { getStructureByKey, getDefaultStructureForStage, type Stage } from "@/lib/scripts/structures";
 import {
@@ -10,9 +10,9 @@ import {
   DURATION_GUIDANCE,
   AWARENESS_GUIDANCE,
 } from "@/lib/scripts/prompt";
-import { ENTREGAR_GUION_TOOL, extractToolInput } from "@/lib/scripts/tool-schema";
+import { GUION_JSON_SCHEMA, parseGuionResponse } from "@/lib/scripts/gemini-schema";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -74,16 +74,19 @@ Video viral de referencia:
   });
 
   try {
-    const message = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 2048,
-      system: buildSystemPrompt(),
-      tools: [ENTREGAR_GUION_TOOL],
-      tool_choice: { type: "tool", name: "entregar_guion" },
-      messages: [{ role: "user", content: userPrompt }],
+    const response = await genAI.models.generateContent({
+      model: "gemini-3.5-flash",
+      contents: userPrompt,
+      config: {
+        systemInstruction: buildSystemPrompt(),
+        maxOutputTokens: 2048,
+        responseMimeType: "application/json",
+        responseJsonSchema: GUION_JSON_SCHEMA,
+        thinkingConfig: { thinkingBudget: 0 },
+      },
     });
 
-    const scriptData = extractToolInput(message);
+    const scriptData = parseGuionResponse(response.text);
 
     const effectiveStage = stage || (contentType === "atraccion" ? "attraction" : contentType === "nutricion" ? "nurturing" : contentType === "ventas" ? "conversion" : null);
 

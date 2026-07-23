@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI } from "@google/genai";
 import { createClient } from "@/lib/supabase/server";
 import { getStructureByKey, getDefaultStructureForStage, type Stage } from "@/lib/scripts/structures";
 import { buildSystemPrompt, buildCreatorProfileBlock, buildEditUserPrompt } from "@/lib/scripts/prompt";
-import { ENTREGAR_GUION_TOOL, extractToolInput } from "@/lib/scripts/tool-schema";
+import { GUION_JSON_SCHEMA, parseGuionResponse } from "@/lib/scripts/gemini-schema";
 import type { ScriptEdit } from "@/lib/supabase/types";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 const MAX_HISTORY_MESSAGES = 20;
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -110,16 +110,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   });
 
   try {
-    const claudeMessage = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 2048,
-      system: buildSystemPrompt(),
-      tools: [ENTREGAR_GUION_TOOL],
-      tool_choice: { type: "tool", name: "entregar_guion" },
-      messages: [{ role: "user", content: userPrompt }],
+    const response = await genAI.models.generateContent({
+      model: "gemini-3.5-flash",
+      contents: userPrompt,
+      config: {
+        systemInstruction: buildSystemPrompt(),
+        maxOutputTokens: 2048,
+        responseMimeType: "application/json",
+        responseJsonSchema: GUION_JSON_SCHEMA,
+        thinkingConfig: { thinkingBudget: 0 },
+      },
     });
 
-    const revised = extractToolInput(claudeMessage);
+    const revised = parseGuionResponse(response.text);
 
     const { data: assistantEdit, error: assistantInsertError } = await supabase
       .from("script_edits")
