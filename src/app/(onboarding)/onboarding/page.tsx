@@ -15,12 +15,12 @@ import { Loader2, ArrowRight, ArrowLeft, CheckCircle } from "lucide-react";
 const STEPS = [
   {
     title: "Tu nicho e industria",
-    description: "Contanos sobre el rubro en el que trabajás",
+    description: "Contanos sobre el rubro en el que trabajas",
     fields: ["niche"],
   },
   {
     title: "Tu oferta principal",
-    description: "¿Qué es lo que vendés o ofrecés?",
+    description: "¿Qué es lo que vendes o ofreces?",
     fields: ["offer"],
   },
   {
@@ -30,7 +30,7 @@ const STEPS = [
   },
   {
     title: "Blueprint de tu marca personal",
-    description: "Definamos cómo querés que te perciban",
+    description: "Definamos cómo quieres que te perciban",
     fields: ["tone", "values", "target_audience", "content_pillars"],
   },
 ];
@@ -74,12 +74,12 @@ export default function OnboardingPage() {
     });
 
     if (error) {
-      toast.error("Error al guardar. Intentá de nuevo.");
+      toast.error("Error al guardar. Intenta de nuevo.");
       setLoading(false);
       return;
     }
 
-    toast.success("¡Perfil completado! Ahora descubrí tu arquetipo");
+    toast.success("¡Perfil completado! Ahora descubre tu arquetipo");
     router.push("/personality");
   }
 
@@ -92,7 +92,7 @@ export default function OnboardingPage() {
           <div className="mx-auto mb-4 h-12 w-12 rounded-xl flex items-center justify-center" style={{background: "linear-gradient(135deg, #1A6FFF, #00C8FF)"}}>
             <span className="text-white font-bold text-lg">C+</span>
           </div>
-          <h1 className="text-2xl font-bold">Configurá tu perfil</h1>
+          <h1 className="text-2xl font-bold">Configura tu perfil</h1>
           <p className="text-muted-foreground mt-1">Paso {step + 1} de {STEPS.length}</p>
         </div>
 
@@ -106,7 +106,7 @@ export default function OnboardingPage() {
           <CardContent className="space-y-4">
             {step === 0 && (
               <div className="space-y-2">
-                <Label>¿En qué nicho o industria trabajás?</Label>
+                <Label>¿En qué nicho o industria trabajas?</Label>
                 <Input
                   placeholder="Ej: Coaching de negocios, Nutrición, Fitness, Real Estate..."
                   value={form.niche}

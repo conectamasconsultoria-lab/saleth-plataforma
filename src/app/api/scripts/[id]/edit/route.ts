@@ -59,7 +59,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     .eq("user_id", user.id)
     .single();
   if (!questionnaire) {
-    return NextResponse.json({ error: "Completá tu perfil primero" }, { status: 400 });
+    return NextResponse.json({ error: "Completa tu perfil primero" }, { status: 400 });
   }
 
   const { data: previousEdits } = await supabase

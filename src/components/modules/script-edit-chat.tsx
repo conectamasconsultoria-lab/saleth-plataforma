@@ -92,7 +92,7 @@ export function ScriptEditChat({ scriptId, onScriptUpdated }: Props) {
         <div className="space-y-2 max-h-64 overflow-y-auto">
           {edits.length === 0 && (
             <p className="text-xs text-muted-foreground">
-              Pedile ajustes al guión: &quot;hazlo más corto&quot;, &quot;más persuasivo&quot;, &quot;cambia el CTA&quot;...
+              Pídele ajustes al guión: &quot;hazlo más corto&quot;, &quot;más persuasivo&quot;, &quot;cambia el CTA&quot;...
             </p>
           )}
           {edits.map((edit) => (

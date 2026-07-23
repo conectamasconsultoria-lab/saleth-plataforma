@@ -35,7 +35,7 @@ export default function PendingPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            Recibirás acceso una vez que el coach apruebe tu cuenta. Podés intentar ingresar nuevamente más tarde.
+            Recibirás acceso una vez que el coach apruebe tu cuenta. Puedes intentar ingresar nuevamente más tarde.
           </p>
           <div className="flex flex-col gap-2">
             <Button onClick={handleRetry} className="w-full">

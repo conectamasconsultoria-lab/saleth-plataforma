@@ -27,7 +27,7 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-      toast.error("Credenciales incorrectas. Revisá tu email y contraseña.");
+      toast.error("Credenciales incorrectas. Revisa tu email y contraseña.");
       setLoading(false);
       return;
     }
@@ -39,7 +39,7 @@ export default function LoginPage() {
   async function handleResetPassword(e: React.FormEvent) {
     e.preventDefault();
     if (!email.trim()) {
-      toast.error("Ingresá tu email primero");
+      toast.error("Ingresa tu email primero");
       return;
     }
     setResetLoading(true);
@@ -50,9 +50,9 @@ export default function LoginPage() {
     });
 
     if (error) {
-      toast.error("Error al enviar el email. Intentá de nuevo.");
+      toast.error("Error al enviar el email. Intenta de nuevo.");
     } else {
-      toast.success("Te enviamos un email para restablecer tu contraseña. Revisá tu bandeja de entrada.");
+      toast.success("Te enviamos un email para restablecer tu contraseña. Revisa tu bandeja de entrada.");
       setResetMode(false);
     }
     setResetLoading(false);
@@ -68,8 +68,8 @@ export default function LoginPage() {
           <CardTitle className="text-2xl">{resetMode ? "Recuperar contraseña" : "Bienvenido"}</CardTitle>
           <CardDescription>
             {resetMode
-              ? "Ingresá tu email y te enviaremos un link para restablecer tu contraseña"
-              : "Ingresá a tu cuenta de Conecta+"}
+              ? "Ingresa tu email y te enviaremos un link para restablecer tu contraseña"
+              : "Ingresa a tu cuenta de Conecta+"}
           </CardDescription>
         </CardHeader>
 
@@ -143,7 +143,7 @@ export default function LoginPage() {
                 Ingresar
               </Button>
               <p className="text-sm text-muted-foreground text-center">
-                ¿No tenés cuenta?{" "}
+                ¿No tienes cuenta?{" "}
                 <Link href="/register" className="text-primary hover:underline font-medium">
                   Registrate
                 </Link>

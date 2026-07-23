@@ -30,9 +30,9 @@ export const ARCHETYPES: Record<ArchetypeName, Archetype> = {
     emoji: "✨",
     color: "#7C3AED",
     bgColor: "#F5F3FF",
-    tagline: "Transformás realidades y creás lo que parecía imposible",
+    tagline: "Transformas realidades y creas lo que parecía imposible",
     description:
-      "Tu marca transforma. Combinás visión, emoción y liderazgo disruptivo para crear experiencias que cambian personas. No solo inspirás — cambiás realidades. Tu audiencia te sigue porque contigo todo parece posible.",
+      "Tu marca transforma. Combinas visión, emoción y liderazgo disruptivo para crear experiencias que cambian personas. No solo inspiras — cambias realidades. Tu audiencia te sigue porque contigo todo parece posible.",
     strengths: [
       "Lanzamientos de alto impacto",
       "Narrativa transformacional",
@@ -47,9 +47,9 @@ export const ARCHETYPES: Record<ArchetypeName, Archetype> = {
     emoji: "🔥",
     color: "#DC2626",
     bgColor: "#FEF2F2",
-    tagline: "Rompés reglas y mostrás que existe otra manera",
+    tagline: "Rompes reglas y muestras que existe otra manera",
     description:
-      "Tu marca desafía. Sos disruptivo/a, apasionado/a y no tenés miedo de decir lo que los demás callan. Tu audiencia te sigue porque les das permiso de pensar diferente y cuestionar lo establecido.",
+      "Tu marca desafía. Eres disruptivo/a, apasionado/a y no tienes miedo de decir lo que los demás callan. Tu audiencia te sigue porque les das permiso de pensar diferente y cuestionar lo establecido.",
     strengths: [
       "Contenido controversia y de opinión",
       "Storytelling personal crudo",
@@ -64,9 +64,9 @@ export const ARCHETYPES: Record<ArchetypeName, Archetype> = {
     emoji: "🏆",
     color: "#B45309",
     bgColor: "#FFFBEB",
-    tagline: "Superás obstáculos e inspirás a otros a hacer lo mismo",
+    tagline: "Superas obstáculos e inspiras a otros a hacer lo mismo",
     description:
-      "Tu marca inspira a través de la acción. Mostrás el camino con tu ejemplo y tu audiencia te sigue porque ven en vos la prueba de que es posible. Sos la persona que ya lo logró y ahora lleva a otros con ella.",
+      "Tu marca inspira a través de la acción. Muestras el camino con tu ejemplo y tu audiencia te sigue porque ven en ti la prueba de que es posible. Eres la persona que ya lo logró y ahora lleva a otros con ella.",
     strengths: [
       "Casos de éxito y resultados reales",
       "Storytelling de superación",
@@ -81,9 +81,9 @@ export const ARCHETYPES: Record<ArchetypeName, Archetype> = {
     emoji: "💜",
     color: "#BE185D",
     bgColor: "#FDF2F8",
-    tagline: "Creás una conexión profunda a través de la pasión y la belleza",
+    tagline: "Creas una conexión profunda a través de la pasión y la belleza",
     description:
-      "Tu marca conecta desde el corazón. Tenés una intensidad y una sensibilidad que hacen que tu audiencia se sienta vista y especial. Tu contenido no se consume — se siente. Generás vínculos profundos y una comunidad fiel.",
+      "Tu marca conecta desde el corazón. Tienes una intensidad y una sensibilidad que hacen que tu audiencia se sienta vista y especial. Tu contenido no se consume — se siente. Generas vínculos profundos y una comunidad fiel.",
     strengths: [
       "Contenido estético y emocional",
       "Comunidad íntima y muy fiel",
@@ -98,14 +98,14 @@ export const ARCHETYPES: Record<ArchetypeName, Archetype> = {
     emoji: "🎨",
     color: "#0891B2",
     bgColor: "#ECFEFF",
-    tagline: "Innovás y creás experiencias únicas con tu sello propio",
+    tagline: "Innovas y creas experiencias únicas con tu sello propio",
     description:
-      "Tu marca crea. Sos estratégico/a e innovador/a, y tu diferencial es la originalidad con intención. Combinás creatividad con estructura, y el resultado son piezas que la gente recuerda y quiere replicar.",
+      "Tu marca crea. Eres estratégico/a e innovador/a, y tu diferencial es la originalidad con intención. Combinas creatividad con estructura, y el resultado son piezas que la gente recuerda y quiere replicar.",
     strengths: [
       "Contenido visual de alto impacto",
       "Formatos innovadores y propios",
       "Proyectos creativos editoriales",
-      "Tendencias que vos marcás",
+      "Tendencias que tú marcas",
     ],
     contentStyle: "Creativo, estructurado y visualmente distintivo",
     referenceBrands: ["Lego", "Adobe", "Dyson"],
@@ -115,9 +115,9 @@ export const ARCHETYPES: Record<ArchetypeName, Archetype> = {
     emoji: "🧭",
     color: "#059669",
     bgColor: "#ECFDF5",
-    tagline: "Siempre buscás lo nuevo y llevás a tu audiencia a descubrirlo",
+    tagline: "Siempre buscas lo nuevo y llevas a tu audiencia a descubrirlo",
     description:
-      "Tu marca explora. Sos curioso/a, independiente y siempre en búsqueda de perspectivas frescas. Tu audiencia te sigue porque con vos siempre hay algo nuevo por descubrir, explorar y experimentar.",
+      "Tu marca explora. Eres curioso/a, independiente y siempre en búsqueda de perspectivas frescas. Tu audiencia te sigue porque contigo siempre hay algo nuevo por descubrir, explorar y experimentar.",
     strengths: [
       "Contenido de tendencias y novedades",
       "Reviews, análisis y experimentos",
@@ -132,9 +132,9 @@ export const ARCHETYPES: Record<ArchetypeName, Archetype> = {
     emoji: "👑",
     color: "#1D4ED8",
     bgColor: "#EFF6FF",
-    tagline: "Liderás con autoridad, expertise y resultados probados",
+    tagline: "Lideras con autoridad, expertise y resultados probados",
     description:
-      "Tu marca lidera. Proyectás autoridad y confianza desde el conocimiento y la trayectoria. Tu audiencia te sigue porque saben que lo que decís funciona — tenés el track record para probarlo.",
+      "Tu marca lidera. Proyectas autoridad y confianza desde el conocimiento y la trayectoria. Tu audiencia te sigue porque saben que lo que dices funciona — tienes el track record para probarlo.",
     strengths: [
       "Contenido de autoridad y expertise",
       "Estrategias y frameworks propios",
@@ -149,9 +149,9 @@ export const ARCHETYPES: Record<ArchetypeName, Archetype> = {
     emoji: "🦉",
     color: "#7E22CE",
     bgColor: "#FAF5FF",
-    tagline: "Compartís conocimiento profundo que transforma perspectivas",
+    tagline: "Compartes conocimiento profundo que transforma perspectivas",
     description:
-      "Tu marca ilumina. Sos la fuente de referencia en tu industria — la persona a quien todos acuden cuando quieren entender algo de verdad. Tu contenido no solo informa: cambia la manera en que la gente piensa.",
+      "Tu marca ilumina. Eres la fuente de referencia en tu industria — la persona a quien todos acuden cuando quieren entender algo de verdad. Tu contenido no solo informa: cambia la manera en que la gente piensa.",
     strengths: [
       "Contenido educativo de profundidad",
       "Frameworks y metodologías propias",
@@ -166,9 +166,9 @@ export const ARCHETYPES: Record<ArchetypeName, Archetype> = {
     emoji: "🎭",
     color: "#EA580C",
     bgColor: "#FFF7ED",
-    tagline: "Hacés que aprender y conectar sea divertido e irresistible",
+    tagline: "Haces que aprender y conectar sea divertido e irresistible",
     description:
-      "Tu marca entretiene. Tenés la habilidad única de hacer que la gente aprenda sin darse cuenta, riéndose. Tu audiencia no solo te sigue — te espera. Creás comunidad a través del humor y la irreverencia.",
+      "Tu marca entretiene. Tienes la habilidad única de hacer que la gente aprenda sin darse cuenta, riéndose. Tu audiencia no solo te sigue — te espera. Creas comunidad a través del humor y la irreverencia.",
     strengths: [
       "Contenido viral y de entretenimiento",
       "Humor educativo y memorable",
@@ -183,9 +183,9 @@ export const ARCHETYPES: Record<ArchetypeName, Archetype> = {
     emoji: "🌟",
     color: "#D97706",
     bgColor: "#FFFBEB",
-    tagline: "Mostrás que la autenticidad pura es el mayor diferencial",
+    tagline: "Muestras que la autenticidad pura es el mayor diferencial",
     description:
-      "Tu marca es refrescante. En un mundo de poses y estrategias, vos aparecés como sos — y eso es exactamente lo que tu audiencia necesita. Tu honestidad y tu visión positiva son tu mayor diferencial.",
+      "Tu marca es refrescante. En un mundo de poses y estrategias, tú apareces como eres — y eso es exactamente lo que tu audiencia necesita. Tu honestidad y tu visión positiva son tu mayor diferencial.",
     strengths: [
       "Contenido auténtico y sin filtros",
       "Storytelling personal genuino",
@@ -202,7 +202,7 @@ export const ARCHETYPES: Record<ArchetypeName, Archetype> = {
     bgColor: "#F0FDF4",
     tagline: "Nutrices el crecimiento de otros con empatía y dedicación genuina",
     description:
-      "Tu marca sostiene. Tenés una capacidad única de hacer que tu audiencia se sienta vista, acompañada y protegida. Tu contenido no solo da información — da contención. Y eso crea vínculos para toda la vida.",
+      "Tu marca sostiene. Tienes una capacidad única de hacer que tu audiencia se sienta vista, acompañada y protegida. Tu contenido no solo da información — da contención. Y eso crea vínculos para toda la vida.",
     strengths: [
       "Contenido de acompañamiento y soporte",
       "Comunidades cálidas y comprometidas",
@@ -217,9 +217,9 @@ export const ARCHETYPES: Record<ArchetypeName, Archetype> = {
     emoji: "🤝",
     color: "#0369A1",
     bgColor: "#F0F9FF",
-    tagline: "Conectás porque sos exactamente como tu audiencia: real y cercano",
+    tagline: "Conectas porque eres exactamente como tu audiencia: real y cercano",
     description:
-      "Tu marca conecta. Sos relatable al 100% — tu audiencia te sigue porque se ve reflejada en vos. No construís un pedestal, construís una comunidad donde todos se sienten bienvenidos e incluidos.",
+      "Tu marca conecta. Eres relatable al 100% — tu audiencia te sigue porque se ve reflejada en ti. No construyes un pedestal, construyes una comunidad donde todos se sienten bienvenidos e incluidos.",
     strengths: [
       "Contenido relatable y cotidiano",
       "Comunidades grandes y diversas",

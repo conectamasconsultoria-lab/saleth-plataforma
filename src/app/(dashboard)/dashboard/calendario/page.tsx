@@ -27,7 +27,7 @@ export default async function CalendarioPage() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Calendario de Publicación</h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          Planificá y organizá tus publicaciones día a día. Agregá contenido, asigná tipo y plataforma, y llevá control del estado.
+          Planifica y organiza tus publicaciones día a día. Agrega contenido, asigna tipo y plataforma, y lleva control del estado.
         </p>
       </div>
       <CalendarioClient initialPosts={posts ?? []} />

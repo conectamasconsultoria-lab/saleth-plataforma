@@ -89,7 +89,7 @@ export default function FormatosPage() {
           <p className="text-sm text-muted-foreground">
             El gancho puede ser textual, visual o verbal — y si son los 3 mucho mejor.
             Un buen gancho determina si tu video se ve o se ignora.
-            Invertí la mayor parte de tu tiempo creativo en los primeros 3 segundos.
+            Invierte la mayor parte de tu tiempo creativo en los primeros 3 segundos.
           </p>
         </CardContent>
       </Card>

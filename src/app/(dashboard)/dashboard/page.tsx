@@ -307,7 +307,7 @@ export default async function DashboardPage() {
                 Todavía no hay actividad
               </p>
               <p className="text-gray-400 text-xs mt-1">
-                Comenzá usando cualquier módulo
+                Comienza usando cualquier módulo
               </p>
             </div>
           ) : (

@@ -49,7 +49,7 @@ export function MetricsClient({ initialUploads }: Props) {
 
   async function handleAnalyze() {
     if (!file) {
-      toast.error("Seleccioná una imagen primero");
+      toast.error("Selecciona una imagen primero");
       return;
     }
     setLoading(true);
@@ -88,7 +88,7 @@ export function MetricsClient({ initialUploads }: Props) {
             Subir screenshot de métricas
           </CardTitle>
           <CardDescription>
-            Capturá la pantalla de métricas de tu red social y subila acá
+            Captura la pantalla de métricas de tu red social y súbela aquí
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -118,7 +118,7 @@ export function MetricsClient({ initialUploads }: Props) {
             ) : (
               <div className="space-y-2">
                 <Image className="h-10 w-10 mx-auto text-muted-foreground opacity-50" />
-                <p className="text-sm font-medium">Hacé clic para subir imagen</p>
+                <p className="text-sm font-medium">Haz clic para subir imagen</p>
                 <p className="text-xs text-muted-foreground">PNG, JPG, WEBP</p>
               </div>
             )}

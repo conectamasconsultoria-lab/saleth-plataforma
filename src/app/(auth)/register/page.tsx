@@ -24,7 +24,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     if (!inviteCode.trim()) {
-      toast.error("Ingresá tu código de invitación");
+      toast.error("Ingresa tu código de invitación");
       setLoading(false);
       return;
     }
@@ -37,7 +37,7 @@ export default function RegisterPage() {
       });
 
       if (!validateRes.ok) {
-        toast.error("Error al validar el código. Intentá de nuevo.");
+        toast.error("Error al validar el código. Intenta de nuevo.");
         setLoading(false);
         return;
       }
@@ -78,7 +78,7 @@ export default function RegisterPage() {
         router.refresh();
       }
     } catch {
-      toast.error("Error de conexión. Intentá de nuevo.");
+      toast.error("Error de conexión. Intenta de nuevo.");
     } finally {
       setLoading(false);
     }
@@ -92,7 +92,7 @@ export default function RegisterPage() {
             <span className="text-white font-bold text-lg">C+</span>
           </div>
           <CardTitle className="text-2xl">Crear cuenta</CardTitle>
-          <CardDescription>Ingresá tu código de invitación para comenzar</CardDescription>
+          <CardDescription>Ingresa tu código de invitación para comenzar</CardDescription>
         </CardHeader>
         <form onSubmit={handleRegister}>
           <CardContent className="space-y-4">
@@ -150,9 +150,9 @@ export default function RegisterPage() {
               Crear cuenta
             </Button>
             <p className="text-sm text-muted-foreground text-center">
-              ¿Ya tenés cuenta?{" "}
+              ¿Ya tienes cuenta?{" "}
               <Link href="/login" className="text-primary hover:underline font-medium">
-                Ingresá
+                Ingresa
               </Link>
             </p>
           </CardFooter>

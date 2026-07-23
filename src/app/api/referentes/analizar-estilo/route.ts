@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
   ]);
 
   if (!questionnaire) {
-    return NextResponse.json({ error: "Completá tu perfil primero" }, { status: 400 });
+    return NextResponse.json({ error: "Completa tu perfil primero" }, { status: 400 });
   }
 
   const bp = (questionnaire.brand_blueprint as Record<string, string>) ?? {};
@@ -88,10 +88,10 @@ export async function POST(req: NextRequest) {
     .join("\n");
 
   const visualInstruction = imageBlocks.length > 0
-    ? "Tenés adjuntas las miniaturas reales de sus videos más vistos — basá la sección de Elementos Visuales en lo que efectivamente se ve en esas imágenes (iluminación, encuadre, fondo/escenografía, edición, colores)."
-    : "No hay miniaturas disponibles para esta cuenta — en la sección de Elementos Visuales aclará explícitamente que es una estimación general basada solo en los títulos, sin inventar detalles visuales específicos que no podés verificar.";
+    ? "Tienes adjuntas las miniaturas reales de sus videos más vistos — basa la sección de Elementos Visuales en lo que efectivamente se ve en esas imágenes (iluminación, encuadre, fondo/escenografía, edición, colores)."
+    : "No hay miniaturas disponibles para esta cuenta — en la sección de Elementos Visuales aclara explícitamente que es una estimación general basada solo en los títulos, sin inventar detalles visuales específicos que no puedes verificar.";
 
-  const prompt = `Sos un experto en análisis de contenido viral y marca personal para creadores de TikTok/Instagram.
+  const prompt = `Eres un experto en análisis de contenido viral y marca personal para creadores de TikTok/Instagram.
 
 Tu tarea: analizar por qué el estilo de @${username} funciona, para que otro creador entienda qué elementos replicar.
 
@@ -103,7 +103,7 @@ ${visualInstruction}
 PERFIL DE MARCA DE QUIEN VA A LEER ESTE ANÁLISIS (para la sección final):
 ${brandContext}
 
-Devolvé un análisis en español, con estos encabezados exactos:
+Devuelve un análisis en español, con estos encabezados exactos:
 
 **Formato y estructura**
 (Tipo de video, ritmo, duración aparente, forma en que arma cada pieza de contenido)
@@ -117,10 +117,10 @@ Devolvé un análisis en español, con estos encabezados exactos:
 **Por qué funciona**
 (Qué conexión genera con su audiencia, qué necesidad o deseo toca)
 
-**Cómo podrías aplicarlo vos**
+**Cómo podrías aplicarlo tú**
 (3-5 recomendaciones concretas conectadas al nicho, oferta y tono del perfil de marca de arriba — no genéricas)
 
-No uses emojis. Sé específico y concreto, evitá frases vacías.`;
+No uses emojis. Sé específico y concreto, evita frases vacías.`;
 
   try {
     const message = await anthropic.messages.create({

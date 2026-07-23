@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   const audioUrl = await resolveTikTokUrl(tiktokUrl);
 
   if (!audioUrl) {
-    return NextResponse.json({ error: "No se pudo obtener el audio del video. Probá con otro video." }, { status: 400 });
+    return NextResponse.json({ error: "No se pudo obtener el audio del video. Prueba con otro video." }, { status: 400 });
   }
 
   // ── 2. Transcribir con AssemblyAI ─────────────────────────────────────────
@@ -88,10 +88,10 @@ export async function POST(req: NextRequest) {
   ].filter(Boolean).join("\n");
 
   // ── 4. Adaptar con Claude ─────────────────────────────────────────────────
-  const prompt = `Sos un experto en guiones virales para TikTok e Instagram Reels.
+  const prompt = `Eres un experto en guiones virales para TikTok e Instagram Reels.
 
 Tu tarea: tomar el guión viral de abajo y ADAPTARLO completamente al nicho y marca personal de este creador.
-Mantené la ESTRUCTURA que lo hace viral (ritmo, mecánica del hook, forma de presentar info), pero cambiá el CONTENIDO para que encaje perfectamente.
+Mantén la ESTRUCTURA que lo hace viral (ritmo, mecánica del hook, forma de presentar info), pero cambia el CONTENIDO para que encaje perfectamente.
 
 VIDEO VIRAL DE REFERENCIA:
 Título: "${videoTitle}"
@@ -99,9 +99,9 @@ Transcripción:
 ${transcript}
 
 MARCA PERSONAL DEL CREADOR:
-${brandContext || "(Perfil de marca aún no completado — usá criterio general)"}
+${brandContext || "(Perfil de marca aún no completado — usa criterio general)"}
 
-${topic ? `TEMA/ÁNGULO ESPECÍFICO PARA ESTA ADAPTACIÓN: ${topic}\nAdaptá el guión para que hable puntualmente de este tema, manteniendo la mecánica viral del video original.` : ""}
+${topic ? `TEMA/ÁNGULO ESPECÍFICO PARA ESTA ADAPTACIÓN: ${topic}\nAdapta el guión para que hable puntualmente de este tema, manteniendo la mecánica viral del video original.` : ""}
 
 ENTREGÁ en formato JSON exacto:
 {

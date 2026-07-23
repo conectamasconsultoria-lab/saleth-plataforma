@@ -102,7 +102,7 @@ export function AdminActions() {
             </div>
           ) : codes.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
-              No hay códigos. Generá uno para invitar clientes.
+              No hay códigos. Genera uno para invitar clientes.
             </p>
           ) : (
             <div className="space-y-2">

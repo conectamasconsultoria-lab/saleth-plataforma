@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
   ]);
 
   if (!questionnaire) {
-    return NextResponse.json({ error: "Completá tu perfil primero" }, { status: 400 });
+    return NextResponse.json({ error: "Completa tu perfil primero" }, { status: 400 });
   }
 
   const bp = (questionnaire.brand_blueprint as Record<string, string>) ?? {};
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     Array.isArray(idf.dolores) && idf.dolores.filter(Boolean).length > 0 && `Dolores del avatar: ${(idf.dolores as string[]).filter(Boolean).join(" / ")}`,
   ].filter(Boolean).join("\n");
 
-  const prompt = `Sos un experto en marketing de contenidos y guiones virales para TikTok e Instagram Reels.
+  const prompt = `Eres un experto en marketing de contenidos y guiones virales para TikTok e Instagram Reels.
 
 Tu tarea: analizar el estilo de contenido del referente @${username} y generar ${count} guiones ORIGINALES inspirados en sus patrones, adaptados al nicho y marca personal de este creador.
 
@@ -63,7 +63,7 @@ INSTRUCCIONES:
 - NO copies los videos del referente — inspírate en su ESTILO y patrones
 - NO uses emojis en los guiones
 
-Respondé en formato JSON exacto:
+Responde en formato JSON exacto:
 {
   "scripts": [
     {

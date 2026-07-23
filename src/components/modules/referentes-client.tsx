@@ -158,7 +158,7 @@ export function ReferentesClient({ initialPersonalVideos, initialLibraryVideos, 
   }, [niches, nicheGroups]);
 
   async function handleSearch() {
-    if (!searchQuery.trim()) { toast.error("Ingresá una palabra clave o nicho"); return; }
+    if (!searchQuery.trim()) { toast.error("Ingresa una palabra clave o nicho"); return; }
     setSearching(true);
     setSearchResults([]);
     try {
@@ -180,7 +180,7 @@ export function ReferentesClient({ initialPersonalVideos, initialLibraryVideos, 
 
   async function handleSaveToLibrary(result: SearchResult) {
     const niche = nicheDraft.trim();
-    if (!niche) { toast.error("Elegí o escribí un nicho"); return; }
+    if (!niche) { toast.error("Elige o escribe un nicho"); return; }
     setSavingToLibrary(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -210,7 +210,7 @@ export function ReferentesClient({ initialPersonalVideos, initialLibraryVideos, 
 
   async function handleCreateNiche() {
     const name = newNicheDraft.trim();
-    if (!name) { toast.error("Escribí un nombre para el rubro"); return; }
+    if (!name) { toast.error("Escribe un nombre para el rubro"); return; }
     if (nicheList.some((n) => n.toLowerCase() === name.toLowerCase())) {
       toast.error("Ya existe un rubro con ese nombre");
       return;
@@ -416,7 +416,7 @@ export function ReferentesClient({ initialPersonalVideos, initialLibraryVideos, 
             <div className="h-14 w-14 rounded-2xl flex items-center justify-center mb-4" style={{ background: "#EFF6FF" }}>
               <Search className="h-6 w-6" style={{ color: "#1A6FFF" }} strokeWidth={1.5} />
             </div>
-            <p className="text-gray-500 font-medium">Buscá videos virales por nicho o palabra clave</p>
+            <p className="text-gray-500 font-medium">Busca videos virales por nicho o palabra clave</p>
             <p className="text-gray-400 text-sm mt-1 max-w-xs">Ej: &quot;agencia de viajes&quot;, &quot;asesores inmobiliarios&quot;, &quot;coach de negocios&quot;...</p>
           </div>
         )}
@@ -489,7 +489,7 @@ export function ReferentesClient({ initialPersonalVideos, initialLibraryVideos, 
         {videos.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-2xl border border-gray-100" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
             <p className="text-gray-500 font-medium">Este rubro todavía no tiene videos</p>
-            {isCoach && <p className="text-gray-400 text-sm mt-1">Usá &quot;Añadir video&quot; arriba, o guardá resultados desde la pestaña &quot;Buscar&quot;</p>}
+            {isCoach && <p className="text-gray-400 text-sm mt-1">Usa &quot;Añadir video&quot; arriba, o guarda resultados desde la pestaña &quot;Buscar&quot;</p>}
           </div>
         )}
 
@@ -533,7 +533,7 @@ export function ReferentesClient({ initialPersonalVideos, initialLibraryVideos, 
         {tabBar}
 
         <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-500">Tu colección personal de videos que te inspiran o querés guardar como referencia</p>
+          <p className="text-sm text-gray-500">Tu colección personal de videos que te inspiran o quieres guardar como referencia</p>
           <Button size="sm" onClick={() => setAddingPersonal((v) => !v)}
             className="gap-1.5 text-white" style={{ background: "linear-gradient(135deg, #1A6FFF, #00C8FF)" }}>
             <Plus className="h-4 w-4" /> Guardar video
@@ -548,12 +548,12 @@ export function ReferentesClient({ initialPersonalVideos, initialLibraryVideos, 
                 <Input placeholder="https://tiktok.com/... o https://instagram.com/..." value={personalForm.url} onChange={(e) => setPersonalForm((f) => ({ ...f, url: e.target.value }))} />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-sm">Título / ¿Por qué lo guardás? *</Label>
+                <Label className="text-sm">Título / ¿Por qué lo guardas? *</Label>
                 <Input placeholder="Ej: Gran hook de apertura, Estructura de storytelling..." value={personalForm.title} onChange={(e) => setPersonalForm((f) => ({ ...f, title: e.target.value }))} />
               </div>
               <div className="space-y-1.5">
                 <Label className="text-sm">Notas (opcional)</Label>
-                <Input placeholder="Qué aprendiste, qué te gustó, qué querés replicar..." value={personalForm.description} onChange={(e) => setPersonalForm((f) => ({ ...f, description: e.target.value }))} />
+                <Input placeholder="Qué aprendiste, qué te gustó, qué quieres replicar..." value={personalForm.description} onChange={(e) => setPersonalForm((f) => ({ ...f, description: e.target.value }))} />
               </div>
               <div className="flex gap-2 justify-end">
                 <Button variant="outline" size="sm" onClick={() => setAddingPersonal(false)}>Cancelar</Button>
@@ -572,7 +572,7 @@ export function ReferentesClient({ initialPersonalVideos, initialLibraryVideos, 
               <Bookmark className="h-6 w-6" style={{ color: "#1A6FFF" }} strokeWidth={1.5} />
             </div>
             <p className="text-gray-500 font-medium">Tu colección está vacía</p>
-            <p className="text-gray-400 text-sm mt-1">Guardá videos que te inspiren para tener tu propia biblioteca de referencia</p>
+            <p className="text-gray-400 text-sm mt-1">Guarda videos que te inspiren para tener tu propia biblioteca de referencia</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
@@ -653,7 +653,7 @@ export function ReferentesClient({ initialPersonalVideos, initialLibraryVideos, 
           <p className="text-gray-500 font-medium">La biblioteca todavía está vacía</p>
           <p className="text-gray-400 text-sm mt-1 max-w-xs">
             {isCoach
-              ? "Buscá videos en la pestaña \"Buscar\" y guardalos acá para que todos tus clientes los vean."
+              ? "Busca videos en la pestaña \"Buscar\" y guárdalos aquí para que todos tus clientes los vean."
               : "Tu coach todavía no agregó videos referentes."}
           </p>
         </div>

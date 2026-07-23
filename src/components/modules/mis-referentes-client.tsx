@@ -200,7 +200,7 @@ export function MisReferentesClient({ initialAccounts }: Props) {
       const videos: TikTokVideo[] = data.videos || [];
       setVideoCache((prev) => ({ ...prev, [accountId]: videos }));
       if (videos.length === 0) {
-        toast.info(data.error || "No se encontraron videos — verificá el usuario o el plan de API");
+        toast.info(data.error || "No se encontraron videos — verifica el usuario o el plan de API");
       }
       return videos;
     } catch {
@@ -244,7 +244,7 @@ export function MisReferentesClient({ initialAccounts }: Props) {
 
   async function handleAddAccount() {
     const username = extractTikTokUsername(newUsername);
-    if (!username) { toast.error("Ingresá un @usuario de TikTok"); return; }
+    if (!username) { toast.error("Ingresa un @usuario de TikTok"); return; }
 
     setAddingAccount(true);
     try {
@@ -255,7 +255,7 @@ export function MisReferentesClient({ initialAccounts }: Props) {
         .select()
         .single();
       if (error) {
-        if (error.code === "23505") { toast.error("Ya tenés esta cuenta agregada"); return; }
+        if (error.code === "23505") { toast.error("Ya tienes esta cuenta agregada"); return; }
         throw error;
       }
 
@@ -468,7 +468,7 @@ export function MisReferentesClient({ initialAccounts }: Props) {
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">@</span>
                 <Input
                   className="pl-7"
-                  placeholder="mateomaffia, garyvee... o pegá el link de su perfil"
+                  placeholder="mateomaffia, garyvee... o pega el link de su perfil"
                   value={newUsername}
                   onChange={(e) => setNewUsername(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleAddAccount()}
@@ -495,9 +495,9 @@ export function MisReferentesClient({ initialAccounts }: Props) {
           <div className="h-16 w-16 rounded-2xl flex items-center justify-center mb-4" style={{ background: "linear-gradient(135deg, #1A6FFF15, #00C8FF10)" }}>
             <User className="h-7 w-7" style={{ color: "#1A6FFF" }} strokeWidth={1.5} />
           </div>
-          <p className="text-gray-600 font-semibold">Aún no tenés referentes</p>
+          <p className="text-gray-600 font-semibold">Aún no tienes referentes</p>
           <p className="text-gray-400 text-sm mt-1 max-w-xs">
-            Agregá cuentas de TikTok que admirás — el sistema obtiene sus videos virales y genera guiones inspirados en su estilo
+            Agrega cuentas de TikTok que admiras — el sistema obtiene sus videos virales y genera guiones inspirados en su estilo
           </p>
           <Button
             onClick={() => setShowAddForm(true)}
@@ -557,7 +557,7 @@ export function MisReferentesClient({ initialAccounts }: Props) {
                 <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{activeAccount.style_analysis}</p>
               ) : (
                 <p className="text-xs text-gray-400">
-                  Analizá qué hace que el contenido de @{activeAccount.username} funcione: formato, comunicación, elementos visuales, y cómo aplicarlo a tu marca.
+                  Analiza qué hace que el contenido de @{activeAccount.username} funcione: formato, comunicación, elementos visuales, y cómo aplicarlo a tu marca.
                 </p>
               )}
             </div>
@@ -668,7 +668,7 @@ export function MisReferentesClient({ initialAccounts }: Props) {
             <div className="flex flex-col items-center justify-center py-10 text-center bg-white rounded-xl border border-gray-100">
               <TrendingUp className="h-8 w-8 mb-2 opacity-20" />
               <p className="text-gray-500 text-sm font-medium">No se encontraron videos</p>
-              <p className="text-gray-400 text-xs mt-1">Verificá que el usuario existe en TikTok</p>
+              <p className="text-gray-400 text-xs mt-1">Verifica que el usuario existe en TikTok</p>
             </div>
           )}
 

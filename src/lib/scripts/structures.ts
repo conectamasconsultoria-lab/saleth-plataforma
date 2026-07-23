@@ -88,12 +88,12 @@ PASO PREVIO: Identifica el sector principal del creador (Salud, Dinero, Amor, De
     subType: "storytelling",
     key: "atraccion-storytelling",
     label: "Storytelling",
-    description: "Contá una historia personal o de un tercero con arco narrativo para captar atención",
+    description: "Cuenta una historia personal o de un tercero con arco narrativo para captar atención",
     formula: "Gancho (tensión) → Contexto → Conflicto → Giro → Resolución → Moraleja → CTA",
     fullText: `ESTRUCTURA: ATRACCIÓN — STORYTELLING
 Fórmula: Gancho (tensión) → Contexto → Conflicto → Giro/aprendizaje → Resolución → Moraleja/conexión con nicho → CTA
 
-1. GANCHO (INICIO EN EL MOMENTO DE TENSIÓN): Arrancá en medio de la acción o en el momento más tenso de la historia, no en el principio cronológico.
+1. GANCHO (INICIO EN EL MOMENTO DE TENSIÓN): Arranca en medio de la acción o en el momento más tenso de la historia, no en el principio cronológico.
    Ejemplo: "Hace dos años estaba a punto de cerrar mi negocio con la cuenta en cero."
 
 2. CONTEXTO (QUIÉN Y CÓMO EMPEZÓ): Dá el contexto mínimo necesario para entender la historia.
@@ -108,12 +108,12 @@ Fórmula: Gancho (tensión) → Contexto → Conflicto → Giro/aprendizaje → 
 5. RESOLUCIÓN: Cómo termina la historia (o dónde está hoy la persona).
    Ejemplo: "Hoy factura X y ayuda a otros a no cometer el mismo error."
 
-6. MORALEJA / CONEXIÓN CON EL NICHO: Transformá la historia en una lección aplicable al espectador.
+6. MORALEJA / CONEXIÓN CON EL NICHO: Transforma la historia en una lección aplicable al espectador.
    Ejemplo: "Si te está pasando lo mismo, el problema no es tu producto. Es tu manera de generar confianza."
 
-7. CTA: De interacción (etapa atracción). Ejemplo: "¿Te pasó algo parecido? Contame en los comentarios."
+7. CTA: De interacción (etapa atracción). Ejemplo: "¿Te pasó algo parecido? Cuéntame en los comentarios."
 
-REGLA: La historia va primero, la lección/nicho viene después. No arranques explicando el nicho — empezá con la escena. Podés usar una historia propia o de un tercero (cliente, referente, caso conocido), siempre con arco: tensión → conflicto → giro → resolución.`,
+REGLA: La historia va primero, la lección/nicho viene después. No arranques explicando el nicho — empieza con la escena. Puedes usar una historia propia o de un tercero (cliente, referente, caso conocido), siempre con arco: tensión → conflicto → giro → resolución.`,
   },
 
   // NUTRICIÓN
@@ -154,22 +154,22 @@ Objetivo: Educar, generar confianza, posicionarte como experto y mover a la pers
     fullText: `ESTRUCTURA: NUTRICIÓN — DOLOR + SOLUCIÓN + VALOR
 Objetivo: Que la persona se identifique con un problema, captes su atención, le entregues una solución accionable y te posiciones como alguien que ya lo resolvió.
 
-1. ABRIR CON EL DOLOR: Empezá describiendo algo que le sucede a tu cliente ideal. La idea es que diga "Eso me pasa a mí."
+1. ABRIR CON EL DOLOR: Empieza describiendo algo que le sucede a tu cliente ideal. La idea es que diga "Eso me pasa a mí."
    Ejemplo: "Estos son los asesores inmobiliarios de hoy en día: todo el día ocupados, pero sin cerrar ventas."
 
-2. AMPLIFICA EL PROBLEMA: Hacé que el dolor se sienta más real.
+2. AMPLIFICA EL PROBLEMA: Haz que el dolor se sienta más real.
    Ejemplo: "Trabajan desde temprano, responden mensajes, hacen visitas... pero al final del mes siguen con las mismas ventas."
 
-3. REVELA LA VERDADERA CAUSA: Mostrá que el problema no es el que ellos creen.
+3. REVELA LA VERDADERA CAUSA: Muestra que el problema no es el que ellos creen.
    Ejemplo: "No es porque el mercado esté malo. El verdadero problema es que nadie los ve como la mejor opción."
 
-4. SOLUCIÓN (EL "QUÉ HACER"): Entregá el paso o principio concreto que resuelve la causa real. Tiene que sonar accionable, no abstracto — esto es lo que diferencia esta estructura de "solo dar valor".
-   Ejemplo: "Lo que tenés que hacer es dejar de vender tu servicio y empezar a vender el resultado que genera. En vez de 'agenda una visita', hablá de 'encontrá la casa de tus sueños sin perder fines de semana'."
+4. SOLUCIÓN (EL "QUÉ HACER"): Entrega el paso o principio concreto que resuelve la causa real. Tiene que sonar accionable, no abstracto — esto es lo que diferencia esta estructura de "solo dar valor".
+   Ejemplo: "Lo que tienes que hacer es dejar de vender tu servicio y empezar a vender el resultado que genera. En vez de 'agenda una visita', habla de 'encuentra la casa de tus sueños sin perder fines de semana'."
 
-5. POSICIONAMIENTO: Hacé que te perciban como alguien que ya resolvió esto.
+5. POSICIONAMIENTO: Haz que te perciban como alguien que ya resolvió esto.
    Ejemplo: "Las personas no compran al que más publica. Compran al que más confianza les genera."
 
-6. RECURSO O SIGUIENTE PASO: No entregues todo. Abrí una conversación.
+6. RECURSO O SIGUIENTE PASO: No entregues todo. Abre una conversación.
    Ejemplo: "Tengo una plantilla con los contenidos que más clientes generan. Comenta 'PLANTILLA' y te la envío."
 
 REGLA: El paso 4 (SOLUCIÓN) tiene que ser una acción concreta que la persona podría aplicar hoy mismo, no una promesa vaga de "vas a mejorar".`,
@@ -184,24 +184,24 @@ REGLA: El paso 4 (SOLUCIÓN) tiene que ser una acción concreta que la persona p
     fullText: `ESTRUCTURA: NUTRICIÓN — PROBLEMA + CONSECUENCIA
 Fórmula: Gancho (problema concreto) → Consecuencia corto plazo → Consecuencia largo plazo → Giro (causa real) → Valor → CTA de recurso
 
-1. GANCHO (PROBLEMA CONCRETO): Nombrá un problema específico y reconocible del cliente ideal, no una queja genérica.
+1. GANCHO (PROBLEMA CONCRETO): Nombra un problema específico y reconocible del cliente ideal, no una queja genérica.
    Ejemplo: "La mayoría de los emprendedores publica contenido todos los días... y aun así no vende."
 
 2. CONSECUENCIA A CORTO PLAZO: Qué le pasa a la persona si el problema sigue igual, en su día a día inmediato.
    Ejemplo: "Sigue invirtiendo horas en contenido que nadie convierte, mientras la competencia sí está facturando."
 
-3. CONSECUENCIA A LARGO PLAZO: Proyectá el problema hacia el futuro si nunca se resuelve.
+3. CONSECUENCIA A LARGO PLAZO: Proyecta el problema hacia el futuro si nunca se resuelve.
    Ejemplo: "Si esto sigue así, en un año vas a tener las mismas redes sociales, pero con menos energía y menos plata."
 
-4. GIRO (LA VERDADERA CAUSA): Revelá que el problema tiene una causa puntual y resoluble — no es falta de esfuerzo ni de suerte.
+4. GIRO (LA VERDADERA CAUSA): Revela que el problema tiene una causa puntual y resoluble — no es falta de esfuerzo ni de suerte.
    Ejemplo: "El problema no es que no publiques suficiente. Es que tu contenido no está conectado a una estrategia de ventas."
 
-5. VALOR: Explicá brevemente el principio o el primer paso para revertir la consecuencia.
-   Ejemplo: "Antes de grabar cualquier video, tenés que saber en qué etapa del embudo está esa persona."
+5. VALOR: Explica brevemente el principio o el primer paso para revertir la consecuencia.
+   Ejemplo: "Antes de grabar cualquier video, tienes que saber en qué etapa del embudo está esa persona."
 
 6. CTA DE RECURSO: "Comenta 'ESTRATEGIA' y te mando la guía para dejar de publicar a ciegas."
 
-REGLA: La consecuencia tiene que sentirse específica y cercana, no genérica ("vas a perder dinero"). Usá escenas y tiempos concretos (esta semana, este mes, este año) en vez de afirmaciones abstractas.`,
+REGLA: La consecuencia tiene que sentirse específica y cercana, no genérica ("vas a perder dinero"). Usa escenas y tiempos concretos (esta semana, este mes, este año) en vez de afirmaciones abstractas.`,
   },
   {
     contentType: "nutricion",
@@ -213,25 +213,25 @@ REGLA: La consecuencia tiene que sentirse específica y cercana, no genérica ("
     fullText: `ESTRUCTURA: NUTRICIÓN — TIPS DE NICHO
 Fórmula: Gancho (promesa de lista) → Intro → Tip 1 → Tip 2 → Tip 3 → Remate → CTA de recurso
 
-1. GANCHO (PROMESA DE LISTA): Anunciá cuántos tips y qué logran.
+1. GANCHO (PROMESA DE LISTA): Anuncia cuántos tips y qué logran.
    Ejemplo: "3 tips para que tus clientes te paguen sin pedir descuento."
 
 2. INTRO BREVE: Una línea de contexto de por qué estos tips importan o de dónde salen.
    Ejemplo: "Esto es lo que uso yo y mis clientes antes de cualquier negociación."
 
 3. TIP 1 + POR QUÉ FUNCIONA: Acción concreta, no teoría.
-   Ejemplo: "Tip 1: nunca menciones el precio antes de mostrar el resultado. Cuando hablás de precio primero, la persona compara; cuando hablás de resultado primero, la persona desea."
+   Ejemplo: "Tip 1: nunca menciones el precio antes de mostrar el resultado. Cuando hablas de precio primero, la persona compara; cuando hablas de resultado primero, la persona desea."
 
 4. TIP 2 + POR QUÉ FUNCIONA.
 
-5. TIP 3 + POR QUÉ FUNCIONA (podés sumar tip 4 o 5 si la duración lo permite).
+5. TIP 3 + POR QUÉ FUNCIONA (puedes sumar tip 4 o 5 si la duración lo permite).
 
 6. CIERRE / REMATE: Una frase que conecte los tips con el resultado final que le importa al cliente ideal.
-   Ejemplo: "Aplicá estos 3 y vas a notar que las negociaciones se acortan solas."
+   Ejemplo: "Aplica estos 3 y vas a notar que las negociaciones se acortan solas."
 
 7. CTA DE RECURSO: "Comenta 'TIPS' y te mando la lista completa con ejemplos."
 
-REGLA: Cada tip tiene que ser accionable HOY, no teoría abstracta. Usá verbos en imperativo ("dejá de...", "empezá a...", "nunca..."). Si la duración es de 15 segundos, usá solo 2 tips en vez de forzar 3.`,
+REGLA: Cada tip tiene que ser accionable HOY, no teoría abstracta. Usa verbos en imperativo ("deja de...", "empieza a...", "nunca..."). Si la duración es de 15 segundos, usa solo 2 tips en vez de forzar 3.`,
   },
   {
     contentType: "nutricion",
@@ -243,22 +243,22 @@ REGLA: Cada tip tiene que ser accionable HOY, no teoría abstracta. Usá verbos 
     fullText: `ESTRUCTURA: NUTRICIÓN — VALOR (PURO)
 Fórmula: Gancho (resultado/curiosidad) → Contexto → Desarrollo paso a paso → Ejemplo → Cierre de autoridad → CTA de recurso
 
-1. GANCHO (RESULTADO O CURIOSIDAD): Anunciá qué van a aprender o lograr.
+1. GANCHO (RESULTADO O CURIOSIDAD): Anuncia qué van a aprender o lograr.
    Ejemplo: "Así es como planifico el contenido de todo un mes en 20 minutos."
 
 2. CONTEXTO BREVE: Por qué esto le sirve a cualquiera en el nicho.
-   Ejemplo: "No importa si recién empezás o ya tenés una comunidad grande, esto te ahorra horas cada semana."
+   Ejemplo: "No importa si recién empiezas o ya tienes una comunidad grande, esto te ahorra horas cada semana."
 
-3. DESARROLLO DEL VALOR (PASO A PASO): Enseñá el proceso o idea central, con al menos 2-3 sub-pasos concretos.
+3. DESARROLLO DEL VALOR (PASO A PASO): Enseña el proceso o idea central, con al menos 2-3 sub-pasos concretos.
    Ejemplo: "Primero defino los 4 pilares de contenido. Después asigno un pilar por semana. Por último grabo todo el mes en un solo día."
 
-4. EJEMPLO O CASO: Aterrizá la idea con un ejemplo real o hipotético.
-   Ejemplo: "Por ejemplo: si tu pilar de esta semana es 'testimonios', ya sabés que los 7 videos van a salir de ahí, sin pensarlo dos veces."
+4. EJEMPLO O CASO: Aterriza la idea con un ejemplo real o hipotético.
+   Ejemplo: "Por ejemplo: si tu pilar de esta semana es 'testimonios', ya sabes que los 7 videos van a salir de ahí, sin pensarlo dos veces."
 
 5. CIERRE DE AUTORIDAD: Una frase que remate el valor entregado.
-   Ejemplo: "Así es como dejás de improvisar contenido todos los días."
+   Ejemplo: "Así es como dejas de improvisar contenido todos los días."
 
-6. CTA DE RECURSO: "Escribí 'PLANNER' y te mando la plantilla que uso yo."
+6. CTA DE RECURSO: "Escribe 'PLANNER' y te mando la plantilla que uso yo."
 
 REGLA: No hay dolor ni objeción en esta estructura — es 100% aporte. El gancho vende la utilidad del contenido en sí mismo, no un problema a resolver.`,
   },
@@ -331,24 +331,24 @@ Fórmula: RESULTADO FINAL → PROBLEMA INICIAL → FRUSTRACIÓN → SOLUCIÓN �
     fullText: `ESTRUCTURA: VENTAS — ANHELO
 Fórmula: Hook (anhelo) → Contraste con realidad actual → Puente (solución) → Beneficios de identidad → Objeciones → CTA
 
-1. HOOK (ANHELO): Nombrá directamente lo que el cliente ideal más desea, en presente, como si ya lo tuviera.
-   Ejemplo: "Imaginate cerrar el mes sabiendo exactamente cuánto vas a facturar, sin depender de la suerte."
+1. HOOK (ANHELO): Nombra directamente lo que el cliente ideal más desea, en presente, como si ya lo tuviera.
+   Ejemplo: "Imagínate cerrar el mes sabiendo exactamente cuánto vas a facturar, sin depender de la suerte."
 
-2. CONTRASTE CON LA REALIDAD ACTUAL: Mostrá brevemente la distancia entre el anhelo y su situación hoy, sin quedarte ahí.
-   Ejemplo: "Hoy quizás sentís que cada mes empezás de cero."
+2. CONTRASTE CON LA REALIDAD ACTUAL: Muestra brevemente la distancia entre el anhelo y su situación hoy, sin quedarte ahí.
+   Ejemplo: "Hoy quizás sientes que cada mes empiezas de cero."
 
-3. PRESENTA EL PUENTE (SOLUCIÓN): Mostrá tu producto/servicio como el camino directo al anhelo.
+3. PRESENTA EL PUENTE (SOLUCIÓN): Muestra tu producto/servicio como el camino directo al anhelo.
    Ejemplo: "Por eso armamos un sistema que te da clientes recurrentes, no solo ventas sueltas."
 
-4. BENEFICIOS EN CLAVE DE IDENTIDAD: Hablá de en quién se convierte la persona al lograrlo, no solo qué obtiene.
+4. BENEFICIOS EN CLAVE DE IDENTIDAD: Habla de en quién se convierte la persona al lograrlo, no solo qué obtiene.
    Ejemplo: "No se trata solo de vender más. Se trata de ser la persona que tiene el negocio bajo control."
 
-5. ELIMINA OBJECIONES: Anticipá la objeción principal y respondela brevemente.
+5. ELIMINA OBJECIONES: Anticipa la objeción principal y respondela brevemente.
    Ejemplo: "No hace falta que tengas un equipo grande para aplicar esto."
 
 6. CTA: "Escribinos 'LISTO' y te contamos cómo aplica a tu caso."
 
-REGLA DE ROOM: El anhelo tiene que sonar aspiracional y específico del nicho, no genérico ("ser exitoso"). Nombrá el resultado exacto que esa persona visualiza para sí misma.`,
+REGLA DE ROOM: El anhelo tiene que sonar aspiracional y específico del nicho, no genérico ("ser exitoso"). Nombra el resultado exacto que esa persona visualiza para sí misma.`,
   },
 ];
 

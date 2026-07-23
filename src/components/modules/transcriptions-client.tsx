@@ -48,11 +48,11 @@ export function TranscriptionsClient({ initialTranscriptions }: Props) {
 
   async function handleTranscribe() {
     if (mode === "url" && !videoUrl.trim()) {
-      toast.error("Ingresá la URL del video");
+      toast.error("Ingresa la URL del video");
       return;
     }
     if (mode === "file" && !file) {
-      toast.error("Seleccioná un archivo");
+      toast.error("Selecciona un archivo");
       return;
     }
 
@@ -104,7 +104,7 @@ export function TranscriptionsClient({ initialTranscriptions }: Props) {
       try {
         data = JSON.parse(text);
       } catch {
-        throw new Error("Error del servidor. Verificá que el deploy haya terminado e intentá de nuevo.");
+        throw new Error("Error del servidor. Verifica que el deploy haya terminado e intenta de nuevo.");
       }
 
       if (!res.ok) throw new Error(data.error || "Error al transcribir");
@@ -119,7 +119,7 @@ export function TranscriptionsClient({ initialTranscriptions }: Props) {
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       if (msg.includes("Payload too large") || msg.includes("Request En") || msg.includes("413")) {
-        toast.error("El archivo es muy grande para subir. Probá con uno más pequeño (máx. 50MB).");
+        toast.error("El archivo es muy grande para subir. Prueba con uno más pequeño (máx. 50MB).");
       } else {
         toast.error(msg || "Error al transcribir");
       }
@@ -143,7 +143,7 @@ export function TranscriptionsClient({ initialTranscriptions }: Props) {
     if (selected) {
       const maxSize = 50 * 1024 * 1024;
       if (selected.size > maxSize) {
-        toast.error("El archivo es muy grande. Máximo 50MB. Podés aumentar el límite en Supabase Storage.");
+        toast.error("El archivo es muy grande. Máximo 50MB. Puedes aumentar el límite en Supabase Storage.");
         return;
       }
       setFile(selected);
@@ -166,7 +166,7 @@ export function TranscriptionsClient({ initialTranscriptions }: Props) {
             Transcribir audio/video
           </CardTitle>
           <CardDescription>
-            Subí un archivo, o pegá un link de TikTok, Instagram Reels, o una URL directa a un archivo de audio/video
+            Sube un archivo, o pega un link de TikTok, Instagram Reels, o una URL directa a un archivo de audio/video
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -217,7 +217,7 @@ export function TranscriptionsClient({ initialTranscriptions }: Props) {
                   className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-colors"
                 >
                   <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                  <p className="text-sm font-medium">Hacé click para seleccionar</p>
+                  <p className="text-sm font-medium">Haz click para seleccionar</p>
                   <p className="text-xs text-muted-foreground mt-1">
                     MP3, MP4, WAV, M4A, WebM — máx. 50MB
                   </p>
@@ -240,7 +240,7 @@ export function TranscriptionsClient({ initialTranscriptions }: Props) {
                 onChange={(e) => setVideoUrl(e.target.value)}
               />
               <p className="text-xs text-muted-foreground">
-                Pegá el link de un video de TikTok o Instagram Reels, o un link directo a un archivo
+                Pega el link de un video de TikTok o Instagram Reels, o un link directo a un archivo
                 (.mp3, .mp4, .wav, etc.). YouTube todavía no está soportado.
               </p>
             </div>

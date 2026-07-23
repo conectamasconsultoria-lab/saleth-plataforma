@@ -62,7 +62,7 @@ export function MetricsChat({ uploadId }: Props) {
     <div className="rounded-lg border bg-card p-3 space-y-3">
       <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
         <MessageSquare className="h-4 w-4" />
-        Preguntale a este análisis
+        Pregúntale a este análisis
       </div>
 
       {loadingHistory ? (
@@ -73,7 +73,7 @@ export function MetricsChat({ uploadId }: Props) {
         <div className="space-y-2 max-h-64 overflow-y-auto">
           {chats.length === 0 && (
             <p className="text-xs text-muted-foreground">
-              Preguntale cosas como &quot;¿por qué bajó el alcance?&quot; o &quot;qué publicación funcionó mejor&quot;.
+              Pregúntale cosas como &quot;¿por qué bajó el alcance?&quot; o &quot;qué publicación funcionó mejor&quot;.
             </p>
           )}
           {chats.map((chat) => (
@@ -99,7 +99,7 @@ export function MetricsChat({ uploadId }: Props) {
         <Textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Preguntale algo sobre este análisis..."
+          placeholder="Pregúntale algo sobre este análisis..."
           rows={2}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {

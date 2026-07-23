@@ -15,7 +15,7 @@ export default async function TranscriptionsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Transcripciones</h1>
-        <p className="text-muted-foreground mt-1">Transcribí cualquier audio o video a texto en segundos</p>
+        <p className="text-muted-foreground mt-1">Transcribe cualquier audio o video a texto en segundos</p>
       </div>
       <TranscriptionsClient initialTranscriptions={transcriptions ?? []} />
     </div>

@@ -125,7 +125,7 @@ const FORMATS = [
     icon: Sparkles,
     activeColor: "border-fuchsia-500 bg-fuchsia-100 dark:bg-fuchsia-900 ring-2 ring-fuchsia-500/30",
     color: "border-border bg-card hover:border-fuchsia-300",
-    description: "Escribí tu propio formato de grabación (unboxing, POV, duet...)",
+    description: "Escribe tu propio formato de grabación (unboxing, POV, duet...)",
   },
 ];
 
@@ -171,7 +171,7 @@ export function ScriptsClient({ initialScripts, archetype }: Props) {
 
   async function handleGenerate() {
     if (!canGenerate) {
-      toast.error("Completá los 4 pasos: nivel de conciencia, etapa, formato y duración");
+      toast.error("Completa los 4 pasos: nivel de conciencia, etapa, formato y duración");
       return;
     }
     setLoading(true);
@@ -246,7 +246,7 @@ export function ScriptsClient({ initialScripts, archetype }: Props) {
             <Wand2 className="h-4 w-4 text-primary" />
             Nuevo guión con IA
           </CardTitle>
-          <CardDescription>Definí nivel de conciencia, etapa, formato y duración para tu guión</CardDescription>
+          <CardDescription>Define nivel de conciencia, etapa, formato y duración para tu guión</CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
           {/* Paso 1: Nivel de conciencia */}
@@ -301,7 +301,7 @@ export function ScriptsClient({ initialScripts, archetype }: Props) {
           {/* Paso 3: Estructura narrativa */}
           {selectedType && (
             <div>
-              <Label className="text-sm font-semibold mb-3 block">3. ¿Qué estructura narrativa querés usar?</Label>
+              <Label className="text-sm font-semibold mb-3 block">3. ¿Qué estructura narrativa quieres usar?</Label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {selectedType.subtypes.map((st) => (
                   <button

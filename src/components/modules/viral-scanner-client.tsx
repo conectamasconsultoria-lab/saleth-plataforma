@@ -73,7 +73,7 @@ export function ViralScannerClient({ initialVideos, userNiche }: Props) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-      toast.success("Guión generado. Podés verlo en la sección Guiones.");
+      toast.success("Guión generado. Puedes verlo en la sección Guiones.");
       router.push(`/dashboard/scripts?new=${data.scriptId}`);
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Error al generar guión");
@@ -91,7 +91,7 @@ export function ViralScannerClient({ initialVideos, userNiche }: Props) {
             <Link2 className="h-4 w-4 text-primary" />
             Agregar video manualmente
           </CardTitle>
-          <CardDescription>Pegá la URL de un video de TikTok para transformarlo en guión</CardDescription>
+          <CardDescription>Pega la URL de un video de TikTok para transformarlo en guión</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex gap-3">
@@ -122,7 +122,7 @@ export function ViralScannerClient({ initialVideos, userNiche }: Props) {
         <div className="text-center py-16 text-muted-foreground">
           <TrendingUp className="h-12 w-12 mx-auto mb-4 opacity-30" />
           <p className="font-medium">Aún no hay videos</p>
-          <p className="text-sm mt-1">Pegá una URL o hacé un escaneo automático</p>
+          <p className="text-sm mt-1">Pega una URL o haz un escaneo automático</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -24,7 +24,7 @@ export function PromptsCoachView({ initialPrompts }: Props) {
 
   async function handleCreate() {
     if (!form.title || !form.prompt_text) {
-      toast.error("Completá el título y el prompt");
+      toast.error("Completa el título y el prompt");
       return;
     }
     setSaving(true);

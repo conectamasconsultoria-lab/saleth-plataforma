@@ -4,18 +4,18 @@ import { Layers, Sparkles, Wand2, Lightbulb } from "lucide-react";
 
 const TIPS = [
   "El 80% del resultado depende de la portada — debe detener el scroll en menos de 1 segundo. Si el título no engancha, nadie pasa al resto.",
-  "Una idea por slide (o por story). No satures: si necesitás explicar dos cosas, son dos slides, no una.",
-  "Mantené consistencia visual: mismos colores y tipografía en todas las piezas. Podés configurar tu identidad de marca en Ajustes → Identidad Visual.",
+  "Una idea por slide (o por story). No satures: si necesitas explicar dos cosas, son dos slides, no una.",
+  "Mantén consistencia visual: mismos colores y tipografía en todas las piezas. Puedes configurar tu identidad de marca en Ajustes → Identidad Visual.",
   "Textos cortos y legibles: máximo 3-4 líneas por slide, tipografía grande, alto contraste con el fondo.",
-  "Terminá siempre con un CTA claro y único (guardar, comentar una palabra clave, o compartir) — nunca pidas tres acciones a la vez.",
-  "En Stories: usá stickers interactivos (encuestas, preguntas, cuenta regresiva) para generar interacción real, no solo views pasivas.",
-  "En Stories: armá series conectadas (\"parte 1 de 3\") para generar el hábito de que te sigan viendo.",
+  "Termina siempre con un CTA claro y único (guardar, comentar una palabra clave, o compartir) — nunca pidas tres acciones a la vez.",
+  "En Stories: usa stickers interactivos (encuestas, preguntas, cuenta regresiva) para generar interacción real, no solo views pasivas.",
+  "En Stories: arma series conectadas (\"parte 1 de 3\") para generar el hábito de que te sigan viendo.",
 ];
 
 const STRUCTURES = [
   {
     title: "Los errores que cometen tus clientes",
-    formula: "Portada (los N errores) → 1 error por slide (por qué pasa + ejemplo + corrección) → \"¿cuál estás cometiendo vos?\"",
+    formula: "Portada (los N errores) → 1 error por slide (por qué pasa + ejemplo + corrección) → \"¿cuál estás cometiendo tú?\"",
     when: "Ideal para generar identificación inmediata — el lector piensa \"eso me pasa a mí\" desde la portada.",
   },
   {
@@ -25,7 +25,7 @@ const STRUCTURES = [
   },
   {
     title: "Cómo lograrlo en N pasos",
-    formula: "Promesa de resultado específico → 1 paso accionable por slide, en orden lógico, con un tip cada uno → \"¿en qué paso estás vos?\"",
+    formula: "Promesa de resultado específico → 1 paso accionable por slide, en orden lógico, con un tip cada uno → \"¿en qué paso estás tú?\"",
     when: "Ideal para contenido tipo tutorial o guía práctica.",
   },
   {
@@ -35,17 +35,17 @@ const STRUCTURES = [
   },
   {
     title: "Tu método paso a paso",
-    formula: "Portada con promesa de un método propio y probado → presentás el sistema (con nombre si es posible), cada fase con ejemplos reales → CTA de acción concreta",
+    formula: "Portada con promesa de un método propio y probado → presentas el sistema (con nombre si es posible), cada fase con ejemplos reales → CTA de acción concreta",
     when: "Ideal para mostrar autoridad con un sistema replicable, no solo consejos sueltos.",
   },
   {
     title: "Antes y después",
-    formula: "Contraste poderoso en portada → cada slide alterna una dimensión del \"antes\" y el \"después\" (mentalidad, resultados, rutina) → \"¿en qué parte del camino estás vos?\"",
+    formula: "Contraste poderoso en portada → cada slide alterna una dimensión del \"antes\" y el \"después\" (mentalidad, resultados, rutina) → \"¿en qué parte del camino estás tú?\"",
     when: "Ideal para storytelling de transformación, personal o de un cliente.",
   },
   {
     title: "Lista de aprendizajes",
-    formula: "Portada de acumulación de valor → 1 aprendizaje corto y memorable por slide, de menor a mayor impacto → \"¿con cuál te quedás?\"",
+    formula: "Portada de acumulación de valor → 1 aprendizaje corto y memorable por slide, de menor a mayor impacto → \"¿con cuál te quedas?\"",
     when: "Ideal para condensar mucho valor rápido, tipo \"todo lo que aprendí sobre X\".",
   },
 ];
@@ -134,12 +134,12 @@ export default function CarouselsPage() {
 
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Estudiá referentes reales</CardTitle>
+          <CardTitle className="text-base">Estudia referentes reales</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
             Además de estas estructuras, es muy útil ver cómo las aplican creadores que ya dominan el formato — por ejemplo,
-            revisá el feed de creadores como <strong>Ramiro Curi</strong> y <strong>Jan Bastarda</strong> para ver estas
+            revisa el feed de creadores como <strong>Ramiro Curi</strong> y <strong>Jan Bastarda</strong> para ver estas
             fórmulas funcionando en la práctica y adaptar lo que veas a tu propio estilo.
           </p>
         </CardContent>
@@ -152,7 +152,7 @@ export default function CarouselsPage() {
           Biblioteca de prompts para Canva
         </h2>
         <p className="text-sm text-muted-foreground mb-3">
-          Pegá estos prompts en el generador de imágenes con IA de Canva (Magic Media / Texto a Imagen) y reemplazá lo que
+          Pega estos prompts en el generador de imágenes con IA de Canva (Magic Media / Texto a Imagen) y reemplaza lo que
           está entre corchetes por los datos de tu marca.
         </p>
         <div className="space-y-3">

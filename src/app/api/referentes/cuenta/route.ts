@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           error: authIssue
-            ? "RapidAPI rechazó la consulta (revisá que la suscripción a tiktok-api23 esté activa en tu cuenta de RapidAPI)"
+            ? "RapidAPI rechazó la consulta (revisa que la suscripción a tiktok-api23 esté activa en tu cuenta de RapidAPI)"
             : `Error al consultar la API de TikTok (status ${response.status})`,
           videos: [],
         },

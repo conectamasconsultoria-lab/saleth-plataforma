@@ -357,7 +357,7 @@ export function AuditoriasClient({ initialData }: Props) {
   }
 
   function deleteOferta(idx: number) {
-    if (data.ofertas.length <= 1) { toast.error("Necesitás al menos una oferta"); return; }
+    if (data.ofertas.length <= 1) { toast.error("Necesitas al menos una oferta"); return; }
     const updated = data.ofertas.filter((_, i) => i !== idx);
     setData((d) => ({ ...d, ofertas: updated }));
     setActiveOfertaIdx(Math.min(idx, updated.length - 1));
@@ -368,7 +368,7 @@ export function AuditoriasClient({ initialData }: Props) {
   const answered = checklistKeys.filter((k) => data.adquisicion[k] !== "").length;
   const allAnswered = answered === checklistKeys.length;
   const siCount = checklistKeys.filter((k) => data.adquisicion[k] === "Sí").length;
-  const resultado = siCount >= 9 ? "✅ Listo para publicidad paga y outreach orgánico" : siCount >= 6 ? "⚡ Listo para outreach orgánico — trabajar la oferta antes de pagar ads" : "🔧 Necesitás validar tu oferta y audiencia primero";
+  const resultado = siCount >= 9 ? "✅ Listo para publicidad paga y outreach orgánico" : siCount >= 6 ? "⚡ Listo para outreach orgánico — trabajar la oferta antes de pagar ads" : "🔧 Necesitas validar tu oferta y audiencia primero";
 
   const darkContainer = { background: "linear-gradient(180deg, #0B1D3E 0%, #071428 100%)" };
 
@@ -678,11 +678,11 @@ export function AuditoriasClient({ initialData }: Props) {
 
             <SubHeader title="Experiencia y Habilidad Actual" />
             <div className="grid grid-cols-[1fr_200px] border-b border-white/10">
-              <div className="px-4 py-3 text-sm text-white/70 border-r border-white/10">¿Tu tasa de cierre supera el 20% de las reuniones que tomás?</div>
+              <div className="px-4 py-3 text-sm text-white/70 border-r border-white/10">¿Tu tasa de cierre supera el 20% de las reuniones que tomas?</div>
               <div className="px-3 py-2"><YesNoSelect value={data.adquisicion.tasa_cierre} onChange={(v) => setAdq("tasa_cierre", v)} /></div>
             </div>
             <div className="grid grid-cols-[1fr_200px]">
-              <div className="px-4 py-3 text-sm text-white/70 border-r border-white/10">Seleccioná el canal de adquisición con el que has obtenido mejores resultados hasta el momento</div>
+              <div className="px-4 py-3 text-sm text-white/70 border-r border-white/10">Selecciona el canal de adquisición con el que has obtenido mejores resultados hasta el momento</div>
               <div className="px-3 py-2">
                 <select className={cellSelect} value={data.adquisicion.mejor_canal} onChange={(e) => setAdq("mejor_canal", e.target.value)}>
                   <option value="">Selecciona</option>
@@ -720,7 +720,7 @@ export function AuditoriasClient({ initialData }: Props) {
         <div style={darkContainer} className="rounded-2xl overflow-hidden border border-white/10">
           <div className="px-5 pt-5 pb-3">
             <h2 className="text-xl font-bold text-white mb-1">Clasificador de Clientes</h2>
-            <p className="text-xs text-white/70">Evaluá a un prospecto antes de aceptarlo como cliente. Completá cada criterio para ver si encaja con tu perfil de cliente ideal.</p>
+            <p className="text-xs text-white/70">Evalúa a un prospecto antes de aceptarlo como cliente. Completa cada criterio para ver si encaja con tu perfil de cliente ideal.</p>
           </div>
           <div className="mx-5 mb-5 rounded-xl overflow-hidden border border-white/10">
             {[

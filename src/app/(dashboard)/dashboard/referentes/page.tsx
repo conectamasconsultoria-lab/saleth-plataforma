@@ -34,7 +34,7 @@ export default async function ReferentesPage() {
       <div>
         <h1 className="text-2xl font-bold">Videos Referentes</h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          Buscá videos virales por nicho, guardalos en la biblioteca compartida, y armá tu colección personal
+          Busca videos virales por nicho, guárdalos en la biblioteca compartida, y arma tu colección personal
         </p>
       </div>
       <ReferentesClient

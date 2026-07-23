@@ -72,7 +72,7 @@ export default function PersonalityPage() {
 
       setPhase("result");
     } catch {
-      toast.error("Error al guardar. Intentá de nuevo.");
+      toast.error("Error al guardar. Intenta de nuevo.");
     } finally {
       setSaving(false);
     }
@@ -223,7 +223,7 @@ export default function PersonalityPage() {
           >
             <span className="text-white font-bold text-lg">C+</span>
           </div>
-          <h1 className="text-2xl font-bold text-white">Descubrí tu arquetipo de marca</h1>
+          <h1 className="text-2xl font-bold text-white">Descubre tu arquetipo de marca</h1>
           <p className="text-white/50 mt-1 text-sm">
             Página {page + 1} de {TOTAL_PAGES} · {QUIZ_QUESTIONS.length} preguntas en total
           </p>

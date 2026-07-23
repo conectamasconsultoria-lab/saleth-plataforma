@@ -97,18 +97,18 @@ export async function resolveDownloadableUrl(url: string): Promise<{ url: string
 
   if (platform === "tiktok") {
     const resolved = await resolveTikTokUrl(url);
-    if (!resolved) throw new Error("No se pudo obtener el video de TikTok. Verificá que el link sea público.");
+    if (!resolved) throw new Error("No se pudo obtener el video de TikTok. Verifica que el link sea público.");
     return { url: resolved, platform };
   }
 
   if (platform === "instagram") {
     if (!INSTAGRAM_CONTENT_PATH.test(url)) {
       throw new Error(
-        "Ese link parece ser de un perfil de Instagram, no de un Reel o post. Pegá el link específico del Reel (ej: instagram.com/reel/ABC123)."
+        "Ese link parece ser de un perfil de Instagram, no de un Reel o post. Pega el link específico del Reel (ej: instagram.com/reel/ABC123)."
       );
     }
     const resolved = await resolveInstagramUrl(url);
-    if (!resolved) throw new Error("No se pudo obtener el video de Instagram. Verificá que el link sea público.");
+    if (!resolved) throw new Error("No se pudo obtener el video de Instagram. Verifica que el link sea público.");
     return { url: resolved, platform };
   }
 

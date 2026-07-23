@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
 
   const { query } = await req.json();
   if (!query || !query.trim()) {
-    return NextResponse.json({ error: "Ingresá una palabra clave o nicho" }, { status: 400 });
+    return NextResponse.json({ error: "Ingresa una palabra clave o nicho" }, { status: 400 });
   }
 
   if (!process.env.RAPIDAPI_KEY) {
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           error: authIssue
-            ? "RapidAPI rechazó la consulta (revisá la suscripción a tiktok-api23)"
+            ? "RapidAPI rechazó la consulta (revisa la suscripción a tiktok-api23)"
             : `Error al consultar la API de TikTok (status ${response.status})`,
           videos: [],
         },

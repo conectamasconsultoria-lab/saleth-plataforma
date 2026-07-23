@@ -308,23 +308,23 @@ export function EstrategiaClient({ initialStrategy, questionnaire, role: _role }
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Identidad de Marca</CardTitle>
-              <CardDescription>El núcleo de quién sos y para qué existís</CardDescription>
+              <CardDescription>El núcleo de quién eres y para qué existes</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Field label="Misión — ¿Para qué existís?" hint="El impacto que generás en las personas">
+              <Field label="Misión — ¿Para qué existes?" hint="El impacto que generas en las personas">
                 <Textarea rows={3} placeholder="Ej: Existo para ayudar a coaches y emprendedores a construir una marca personal que les permita vivir de su conocimiento con libertad..." value={data.brand_elements.mision} onChange={(e) => setBrand("mision", e.target.value)} />
               </Field>
               <Field label="Visión — ¿Hacia dónde vas?" hint="Tu aspiración a largo plazo">
                 <Textarea rows={2} placeholder="Ej: Ser la referente latinoamericana en marca personal para coaches..." value={data.brand_elements.vision} onChange={(e) => setBrand("vision", e.target.value)} />
               </Field>
-              <Field label="Propósito de Marca — ¿Qué cambio generás en el mundo?" hint="Más profundo que la misión: tu 'por qué'">
+              <Field label="Propósito de Marca — ¿Qué cambio generas en el mundo?" hint="Más profundo que la misión: tu 'por qué'">
                 <Textarea rows={2} placeholder="Ej: Creo que cada persona tiene un conocimiento único que merece ser compartido..." value={data.brand_elements.proposito} onChange={(e) => setBrand("proposito", e.target.value)} />
               </Field>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Field label="Promesa de Marca" hint="La transformación que garantizás">
-                  <Input placeholder="Ej: En 90 días tenés una marca que vende sola" value={data.brand_elements.promesa} onChange={(e) => setBrand("promesa", e.target.value)} />
+                <Field label="Promesa de Marca" hint="La transformación que garantizas">
+                  <Input placeholder="Ej: En 90 días tienes una marca que vende sola" value={data.brand_elements.promesa} onChange={(e) => setBrand("promesa", e.target.value)} />
                 </Field>
-                <Field label="Tu Diferencial" hint="¿Qué hacés que nadie más hace igual?">
+                <Field label="Tu Diferencial" hint="¿Qué haces que nadie más hace igual?">
                   <Input placeholder="Ej: Combino psicología, estrategia y creatividad..." value={data.brand_elements.diferencial} onChange={(e) => setBrand("diferencial", e.target.value)} />
                 </Field>
               </div>
@@ -335,14 +335,14 @@ export function EstrategiaClient({ initialStrategy, questionnaire, role: _role }
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Personalidad de Marca</CardTitle>
-              <CardDescription>Cómo hablás, qué representás y quién sos</CardDescription>
+              <CardDescription>Cómo hablas, qué representas y quién eres</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Field label="Tono de Voz" hint="3-5 adjetivos que describen cómo comunicás">
+                <Field label="Tono de Voz" hint="3-5 adjetivos que describen cómo comunicas">
                   <Input placeholder="Ej: Directo, empático, motivacional, con humor" value={data.brand_elements.tono_voz} onChange={(e) => setBrand("tono_voz", e.target.value)} />
                 </Field>
-                <Field label="Valores de Marca" hint="3-5 valores que guían todo lo que hacés">
+                <Field label="Valores de Marca" hint="3-5 valores que guían todo lo que haces">
                   <Input placeholder="Ej: Autenticidad, resultados, libertad, comunidad" value={data.brand_elements.valores} onChange={(e) => setBrand("valores", e.target.value)} />
                 </Field>
               </div>
@@ -356,7 +356,7 @@ export function EstrategiaClient({ initialStrategy, questionnaire, role: _role }
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Tu Audiencia Ideal</CardTitle>
-              <CardDescription>A quién le hablás y qué los mueve</CardDescription>
+              <CardDescription>A quién le hablas y qué los mueve</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <Field label="Perfil de tu Cliente Ideal" hint="Quién es, qué hace, dónde está en su vida">
@@ -370,7 +370,7 @@ export function EstrategiaClient({ initialStrategy, questionnaire, role: _role }
                   <Textarea rows={4} placeholder={"• Ser reconocido/a como referente\n• Tener una marca que venda sola\n• Generar ingresos sin depender de nadie\n• Sentir que su trabajo tiene impacto"} value={data.brand_elements.deseos_cliente} onChange={(e) => setBrand("deseos_cliente", e.target.value)} />
                 </Field>
               </div>
-              <Field label="¿Por qué te eligen a vos?" hint="Tu ventaja percibida: qué ven en vos que no encuentran en otros">
+              <Field label="¿Por qué te eligen a ti?" hint="Tu ventaja percibida: qué ven en ti que no encuentran en otros">
                 <Textarea rows={2} placeholder="Ej: Porque soy honesta, voy al grano, no vendo humo y mis estrategias son prácticas y reales..." value={data.brand_elements.por_que_eligen} onChange={(e) => setBrand("por_que_eligen", e.target.value)} />
               </Field>
             </CardContent>
@@ -430,7 +430,7 @@ export function EstrategiaClient({ initialStrategy, questionnaire, role: _role }
               },
               {
                 label: "LENGUAJE PROPIO",
-                placeholder: `Frases clave:\n"Corrés todo el día… pero no sabés para qué"\n"Tenés todo… pero no lo disfrutás"\n"No es falta de tiempo… es falta de dirección"\n\nCierre característico: "Pensalo."`,
+                placeholder: `Frases clave:\n"Corres todo el día… pero no sabes para qué"\n"Tienes todo… pero no lo disfrutas"\n"No es falta de tiempo… es falta de dirección"\n\nCierre característico: "Pensalo."`,
                 value: data.identity_framework.lenguaje_propio,
                 onChange: (v) => setIdent("lenguaje_propio", v),
               },
@@ -595,7 +595,7 @@ export function EstrategiaClient({ initialStrategy, questionnaire, role: _role }
               },
               {
                 label: "Piedras",
-                placeholder: `"No es falta de ganas… es que no entendés qué te pasa"\n"No necesitás más motivación"\n"El problema no se soluciona pensando positivo"\n"No es falta de tiempo… es falta de dirección"\n\nMensaje central: Ellos entretienen o contienen, yo ayudo a transformar.`,
+                placeholder: `"No es falta de ganas… es que no entiendes qué te pasa"\n"No necesitas más motivación"\n"El problema no se soluciona pensando positivo"\n"No es falta de tiempo… es falta de dirección"\n\nMensaje central: Ellos entretienen o contienen, yo ayudo a transformar.`,
                 value: data.communication_framework.piedras,
                 onChange: (v) => setComm("piedras", v),
               },
@@ -669,7 +669,7 @@ export function EstrategiaClient({ initialStrategy, questionnaire, role: _role }
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Semana Tipo</CardTitle>
-                <CardDescription>Qué publicás cada día de la semana</CardDescription>
+                <CardDescription>Qué publicas cada día de la semana</CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
                 {DIAS.map((dia) => (
@@ -689,8 +689,8 @@ export function EstrategiaClient({ initialStrategy, questionnaire, role: _role }
             <div className="space-y-5">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">Formatos que Usás</CardTitle>
-                  <CardDescription>Seleccioná todos los que apliquen</CardDescription>
+                  <CardTitle className="text-base">Formatos que Usas</CardTitle>
+                  <CardDescription>Selecciona todos los que apliquen</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
@@ -760,7 +760,7 @@ export function EstrategiaClient({ initialStrategy, questionnaire, role: _role }
             <CardContent>
               <Textarea
                 rows={8}
-                placeholder={`Contá tu historia de origen. Podés seguir esta estructura:\n\n¿Dónde estabas antes? (situación inicial, dolores, limitaciones)\n¿Qué pasó? (el quiebre, el momento bisagra, la decisión)\n¿Qué descubriste o aprendiste? (la transformación, el insight)\n¿Dónde estás hoy? (resultado, misión, por qué hacés lo que hacés)\n¿A quién querés ayudar con lo que aprendiste?`}
+                placeholder={`Cuenta tu historia de origen. Puedes seguir esta estructura:\n\n¿Dónde estabas antes? (situación inicial, dolores, limitaciones)\n¿Qué pasó? (el quiebre, el momento bisagra, la decisión)\n¿Qué descubriste o aprendiste? (la transformación, el insight)\n¿Dónde estás hoy? (resultado, misión, por qué haces lo que haces)\n¿A quién quieres ayudar con lo que aprendiste?`}
                 value={data.story_planner.historia_origen}
                 onChange={(e) => setStory("historia_origen", e.target.value)}
               />
@@ -774,14 +774,14 @@ export function EstrategiaClient({ initialStrategy, questionnaire, role: _role }
               <CardDescription>El antes y después de alguien a quien ayudaste. La historia más convincente para vender.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Field label="¿Quién es tu cliente?" hint="Perfil breve, sin nombre real si no querés">
+              <Field label="¿Quién es tu cliente?" hint="Perfil breve, sin nombre real si no quieres">
                 <Input placeholder="Ej: Coach de vida, 38 años, tenía clientes pero cobraba barato y no se diferenciaba..." value={data.story_planner.transformacion_cliente} onChange={(e) => setStory("transformacion_cliente", e.target.value)} />
               </Field>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Field label="Antes — ¿Cómo llegó? ¿Qué problema tenía?" hint="">
                   <Textarea rows={4} placeholder="Ej: Estaba agotada, cobraba $300 por sesión, tenía miedo de subir precios, no sabía cómo diferenciarse..." value={data.story_planner.antes} onChange={(e) => setStory("antes", e.target.value)} />
                 </Field>
-                <Field label="Después — ¿Qué logró trabajando con vos?" hint="">
+                <Field label="Después — ¿Qué logró trabajando contigo?" hint="">
                   <Textarea rows={4} placeholder="Ej: Triplicó sus precios, rediseñó su oferta, lleva una lista de espera y trabaja solo 20hs semanales..." value={data.story_planner.despues} onChange={(e) => setStory("despues", e.target.value)} />
                 </Field>
               </div>
@@ -792,7 +792,7 @@ export function EstrategiaClient({ initialStrategy, questionnaire, role: _role }
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Secuencia de 5 Stories</CardTitle>
-              <CardDescription>Planificá un arco narrativo completo para tus Stories. Cada story lleva a la siguiente.</CardDescription>
+              <CardDescription>Planifica un arco narrativo completo para tus Stories. Cada story lleva a la siguiente.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               {data.story_planner.secuencia_stories.map((story, i) => (
@@ -808,7 +808,7 @@ export function EstrategiaClient({ initialStrategy, questionnaire, role: _role }
                       i === 1 ? "Story 2 — Contexto: el problema o situación" :
                       i === 2 ? "Story 3 — Desarrollo: qué descubriste / qué hacer" :
                       i === 3 ? "Story 4 — Profundización: el detalle clave o giro" :
-                      "Story 5 — CTA: ¿Qué querés que hagan? (guardar, responder, comprar)"
+                      "Story 5 — CTA: ¿Qué quieres que hagan? (guardar, responder, comprar)"
                     }
                     value={story}
                     onChange={(e) => {
@@ -826,7 +826,7 @@ export function EstrategiaClient({ initialStrategy, questionnaire, role: _role }
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Tus Hooks de Apertura Favoritos</CardTitle>
-              <CardDescription>Las primeras palabras que usás en Stories y videos que enganchan a tu audiencia</CardDescription>
+              <CardDescription>Las primeras palabras que usas en Stories y videos que enganchan a tu audiencia</CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
               {data.story_planner.hooks.map((hook, i) => (
@@ -878,7 +878,7 @@ export function EstrategiaClient({ initialStrategy, questionnaire, role: _role }
                 <Package className="h-6 w-6" style={{ color: "#1A6FFF" }} strokeWidth={1.5} />
               </div>
               <p className="text-gray-500 font-medium">Tu cápsula está vacía</p>
-              <p className="text-gray-400 text-sm mt-1">Agregá herramientas, plantillas, lecturas y recursos útiles</p>
+              <p className="text-gray-400 text-sm mt-1">Agrega herramientas, plantillas, lecturas y recursos útiles</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -433,7 +433,7 @@ export function CalendarioClient({ initialPosts }: Props) {
     try {
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       if (authError || !user) {
-        toast.error("Sesión expirada — recargá la página");
+        toast.error("Sesión expirada — recarga la página");
         return;
       }
 
@@ -584,7 +584,7 @@ export function CalendarioClient({ initialPosts }: Props) {
           Sugerir plan de publicación
         </Button>
         {showPlans && (
-          <span className="text-[11px] text-gray-400">Elegí tu ritmo y el calendario se llena automáticamente</span>
+          <span className="text-[11px] text-gray-400">Elige tu ritmo y el calendario se llena automáticamente</span>
         )}
       </div>
 
@@ -839,7 +839,7 @@ export function CalendarioClient({ initialPosts }: Props) {
                       <Calendar className="h-5 w-5" style={{ color: "#1A6FFF" }} strokeWidth={1.5} />
                     </div>
                     <p className="text-gray-500 text-sm font-medium">Sin publicaciones</p>
-                    <p className="text-gray-400 text-xs mt-1">Agregá tu primera publicación para este día</p>
+                    <p className="text-gray-400 text-xs mt-1">Agrega tu primera publicación para este día</p>
                   </div>
                 ) : (
                   selectedPosts.map((post, idx) => {
@@ -913,8 +913,8 @@ export function CalendarioClient({ initialPosts }: Props) {
           ) : (
             <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
               <Calendar className="h-8 w-8 mx-auto mb-3 text-gray-300" />
-              <p className="text-gray-500 text-sm font-medium">Seleccioná un día</p>
-              <p className="text-gray-400 text-xs mt-1">Hacé clic en un día del calendario para ver o agregar publicaciones</p>
+              <p className="text-gray-500 text-sm font-medium">Selecciona un día</p>
+              <p className="text-gray-400 text-xs mt-1">Haz clic en un día del calendario para ver o agregar publicaciones</p>
             </div>
           )}
         </div>

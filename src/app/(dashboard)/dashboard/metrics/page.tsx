@@ -16,7 +16,7 @@ export default async function MetricsPage() {
       <div>
         <h1 className="text-2xl font-bold">Análisis de Métricas</h1>
         <p className="text-muted-foreground mt-1">
-          Subí un screenshot de tus métricas y la IA te dará insights accionables
+          Sube un screenshot de tus métricas y la IA te dará insights accionables
         </p>
       </div>
       <MetricsClient initialUploads={uploads ?? []} />

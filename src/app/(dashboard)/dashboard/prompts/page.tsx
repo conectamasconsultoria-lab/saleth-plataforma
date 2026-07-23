@@ -26,7 +26,7 @@ export default async function PromptsPage() {
         <h1 className="text-2xl font-bold">Biblioteca de Prompts</h1>
         <p className="text-muted-foreground mt-1">
           {isCoach
-            ? "Creá y gestioná los prompts que compartís con tus clientes"
+            ? "Crea y gestiona los prompts que compartes con tus clientes"
             : "Prompts de tu coach para potenciar tu contenido con IA"}
         </p>
       </div>

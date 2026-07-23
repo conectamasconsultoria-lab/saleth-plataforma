@@ -2,11 +2,11 @@ import type { StructureDefinition } from "./structures";
 
 const KNOWN_FORMAT_GUIDANCE: Record<string, string> = {
   problema: `FORMATO DE GRABACIÓN: Formato de Problema
-Escribí el gancho y el desarrollo como una situación cotidiana incómoda que el cliente ideal reconozca al instante ("eso me pasa a mí"). Describí la escena o situación en vez de hablar todo el tiempo directo a cámara. Amplificá el dolor antes de revelar la causa real.`,
+Escribe el gancho y el desarrollo como una situación cotidiana incómoda que el cliente ideal reconozca al instante ("eso me pasa a mí"). Describe la escena o situación en vez de hablar todo el tiempo directo a cámara. Amplifica el dolor antes de revelar la causa real.`,
   camara: `FORMATO DE GRABACIÓN: Hablando a Cámara
-Escribí el guión en primera persona, como si el creador hablara directo a cámara de principio a fin. Lenguaje conversacional, frases cortas, energía alta y autoridad desde el segundo 1. Sin descripciones de escena — todo es texto hablado.`,
+Escribe el guión en primera persona, como si el creador hablara directo a cámara de principio a fin. Lenguaje conversacional, frases cortas, energía alta y autoridad desde el segundo 1. Sin descripciones de escena — todo es texto hablado.`,
   pregunta: `FORMATO DE GRABACIÓN: Pregunta de Instagram
-Estructurá el guión como si respondiera una pregunta real de la audiencia (caja de preguntas de Instagram). Empezá citando o parafraseando la pregunta, y respondé aportando valor concreto y accionable.`,
+Estructura el guión como si respondiera una pregunta real de la audiencia (caja de preguntas de Instagram). Empieza citando o parafraseando la pregunta, y responde aportando valor concreto y accionable.`,
 };
 
 export function getFormatGuidance(format?: string | null): string | null {
@@ -14,7 +14,7 @@ export function getFormatGuidance(format?: string | null): string | null {
   const known = KNOWN_FORMAT_GUIDANCE[format];
   if (known) return known;
   return `FORMATO DE GRABACIÓN (personalizado por el usuario): "${format}"
-Adaptá el guión de la forma más natural posible a este formato de grabación, manteniendo el resto de las reglas (estructura, tono, duración).`;
+Adapta el guión de la forma más natural posible a este formato de grabación, manteniendo el resto de las reglas (estructura, tono, duración).`;
 }
 
 export const DURATION_GUIDANCE: Record<number, string> = {
@@ -30,16 +30,16 @@ export const AWARENESS_GUIDANCE: Record<string, string> = {
 };
 
 export function buildSystemPrompt(): string {
-  return `Sos un experto en copywriting y marketing de contenidos para TikTok e Instagram, especializado en adaptar cada guión al negocio específico del creador (nunca en contenido genérico de plantilla).
+  return `Eres un experto en copywriting y marketing de contenidos para TikTok e Instagram, especializado en adaptar cada guión al negocio específico del creador (nunca en contenido genérico de plantilla).
 
 REGLAS NO NEGOCIABLES:
 1. La voz, el tono y los valores de marca del creador (indicados en el mensaje del usuario) tienen PRIORIDAD ABSOLUTA sobre cualquier convención genérica de copywriting. Nunca escribas algo que no calce con ese tono.
-2. Seguí la estructura narrativa indicada PASO A PASO, en el mismo orden y sin saltearte ni agregar pasos.
-3. La duración objetivo es un límite DURO de extensión, no una sugerencia. Contá aproximadamente las palabras del guión completo (hook + development + cta) y ajustate al rango indicado.
+2. Sigue la estructura narrativa indicada PASO A PASO, en el mismo orden y sin saltearte ni agregar pasos.
+3. La duración objetivo es un límite DURO de extensión, no una sugerencia. Cuenta aproximadamente las palabras del guión completo (hook + development + cta) y ajustate al rango indicado.
 4. Si la estructura indica un "CTA de recurso" (típico de nutrición), el CTA final tiene que ofrecer un recurso gratuito a cambio de un comentario o mensaje — NUNCA un CTA de venta directa.
 5. Prohibido el relleno genérico ("en el mundo de hoy...", "no es ningún secreto que...", frases motivacionales vacías) y prohibido usar emojis en el guión.
 6. Todo ejemplo, analogía o caso mencionado tiene que estar relacionado con el nicho, la oferta y el cliente ideal del creador. Nunca inventes ejemplos de otro rubro sin conexión real con el negocio.
-7. Entregá el resultado EXCLUSIVAMENTE llamando a la herramienta "entregar_guion". No respondas en texto plano ni agregues explicaciones fuera de la herramienta.`;
+7. Entrega el resultado EXCLUSIVAMENTE llamando a la herramienta "entregar_guion". No respondas en texto plano ni agregues explicaciones fuera de la herramienta.`;
 }
 
 export function buildCreatorProfileBlock(params: {
@@ -87,7 +87,7 @@ ${params.awarenessGuidance ? `${params.awarenessGuidance}\n` : ""}
 ${params.videoContext ?? ""}
 ${params.topic ? `Tema o contexto adicional: ${params.topic}` : ""}
 
-Generá el guión ahora, llamando a la herramienta "entregar_guion".`;
+Genera el guión ahora, llamando a la herramienta "entregar_guion".`;
 }
 
 export function buildEditUserPrompt(params: {
@@ -99,7 +99,7 @@ export function buildEditUserPrompt(params: {
 }): string {
   const historyText = params.editHistory.length
     ? `HISTORIAL DE EDICIÓN PREVIO (más antiguo primero):\n${params.editHistory
-        .map((e) => `${e.role === "user" ? "Usuario" : "Vos"}: ${e.message}`)
+        .map((e) => `${e.role === "user" ? "Usuario" : "Tú"}: ${e.message}`)
         .join("\n")}\n`
     : "";
 
@@ -115,5 +115,5 @@ CTA: ${params.currentScript.cta}
 ${historyText}
 INSTRUCCIÓN NUEVA DEL USUARIO: "${params.instruction}"
 
-Aplicá ÚNICAMENTE el cambio pedido en la instrucción nueva. No reescribas ni cambies partes del guión que no estén relacionadas con ese pedido. Si el pedido es ambiguo, priorizá mantener el tono, la estructura y el nicho del guión original. Entregá el guión completo actualizado (las 4 partes) llamando a la herramienta "entregar_guion", incluyendo un "resumen_cambio" breve de qué modificaste.`;
+Aplica ÚNICAMENTE el cambio pedido en la instrucción nueva. No reescribas ni cambies partes del guión que no estén relacionadas con ese pedido. Si el pedido es ambiguo, prioriza mantener el tono, la estructura y el nicho del guión original. Entrega el guión completo actualizado (las 4 partes) llamando a la herramienta "entregar_guion", incluyendo un "resumen_cambio" breve de qué modificaste.`;
 }

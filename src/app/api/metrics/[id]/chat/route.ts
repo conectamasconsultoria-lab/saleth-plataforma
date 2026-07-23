@@ -84,10 +84,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const mediaType = (fileBlob.type || "image/png") as "image/jpeg" | "image/png" | "image/gif" | "image/webp";
 
     const historyText = (previousChats ?? []).slice(-MAX_HISTORY_MESSAGES)
-      .map((c) => `${c.role === "user" ? "Usuario" : "Vos"}: ${c.message}`)
+      .map((c) => `${c.role === "user" ? "Usuario" : "Tú"}: ${c.message}`)
       .join("\n");
 
-    const prompt = `Sos un experto analista de métricas de redes sociales para creadores de contenido.
+    const prompt = `Eres un experto analista de métricas de redes sociales para creadores de contenido.
 
 Contexto del creador:
 - Nicho: ${questionnaire?.niche || "marketing digital"}
@@ -100,7 +100,7 @@ ${upload.insights}
 ${historyText ? `HISTORIAL DE LA CONVERSACIÓN (más antiguo primero):\n${historyText}\n` : ""}
 El usuario te pregunta: "${message}"
 
-Respondé en español, de forma concreta, basándote en lo que ves en la imagen adjunta y en el análisis ya hecho. Si la pregunta no se puede responder con la información disponible, decilo claramente en vez de inventar datos.`;
+Responde en español, de forma concreta, basándote en lo que ves en la imagen adjunta y en el análisis ya hecho. Si la pregunta no se puede responder con la información disponible, decilo claramente en vez de inventar datos.`;
 
     const claudeMessage = await anthropic.messages.create({
       model: "claude-sonnet-4-6",

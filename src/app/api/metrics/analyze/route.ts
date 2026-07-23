@@ -36,14 +36,14 @@ export async function POST(req: NextRequest) {
   const base64 = Buffer.from(fileBuffer).toString("base64");
   const mediaType = file.type as "image/jpeg" | "image/png" | "image/gif" | "image/webp";
 
-  const prompt = `Sos un experto analista de métricas de redes sociales para creadores de contenido.
+  const prompt = `Eres un experto analista de métricas de redes sociales para creadores de contenido.
 
 Contexto del creador:
 - Nicho: ${questionnaire?.niche || "marketing digital"}
 - Oferta: ${questionnaire?.offer || ""}
 - Plataforma: ${platform}
 
-Analizá el screenshot de métricas que te comparto y devolvé un análisis detallado en español que incluya:
+Analiza el screenshot de métricas que te comparto y devuelve un análisis detallado en español que incluya:
 
 1. **Resumen ejecutivo** (2-3 oraciones sobre el estado general)
 2. **Métricas destacadas** (qué números son buenos, qué números necesitan mejora)

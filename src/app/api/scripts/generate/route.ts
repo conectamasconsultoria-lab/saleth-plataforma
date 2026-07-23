@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (!questionnaire) {
-    return NextResponse.json({ error: "Completá tu perfil primero" }, { status: 400 });
+    return NextResponse.json({ error: "Completa tu perfil primero" }, { status: 400 });
   }
 
   let videoContext = "";
