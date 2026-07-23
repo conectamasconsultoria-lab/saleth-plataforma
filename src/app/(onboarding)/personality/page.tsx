@@ -17,14 +17,6 @@ import {
 const QUESTIONS_PER_PAGE = 3;
 const TOTAL_PAGES = Math.ceil(QUIZ_QUESTIONS.length / QUESTIONS_PER_PAGE);
 
-const SCALE_LABELS = [
-  "Muy en\ndesacuerdo",
-  "En\ndesacuerdo",
-  "Neutral",
-  "De\nacuerdo",
-  "Muy de\nacuerdo",
-];
-
 type Phase = "quiz" | "result";
 
 export default function PersonalityPage() {
@@ -247,14 +239,24 @@ export default function PersonalityPage() {
                   border: "1px solid rgba(255,255,255,0.08)",
                 }}
               >
-                <p className="text-white font-medium text-sm mb-6 leading-relaxed">
-                  {q.id}. {q.statement}
+                <p className="text-white/40 text-xs font-semibold uppercase tracking-wider mb-3">
+                  {q.id}. ¿Con cuál te identificás más?
                 </p>
 
-                {/* Escala */}
+                {/* Las dos afirmaciones enfrentadas */}
+                <div className="grid grid-cols-2 gap-3 mb-5">
+                  <p className="text-white/70 text-xs leading-relaxed bg-white/5 rounded-xl p-3">
+                    {q.left}
+                  </p>
+                  <p className="text-white/70 text-xs leading-relaxed bg-white/5 rounded-xl p-3 text-right">
+                    {q.right}
+                  </p>
+                </div>
+
+                {/* Escala forzada 1-4, sin punto medio neutral */}
                 <div>
                   <div className="flex items-center justify-between gap-2">
-                    {[1, 2, 3, 4, 5].map((val) => (
+                    {[1, 2, 3, 4].map((val) => (
                       <button
                         key={val}
                         onClick={() => answer(q.id, val)}
@@ -289,8 +291,8 @@ export default function PersonalityPage() {
                   </div>
                   {/* Labels */}
                   <div className="flex justify-between mt-2 px-1">
-                    <span className="text-white/30 text-xs">Muy en desacuerdo</span>
-                    <span className="text-white/30 text-xs">Muy de acuerdo</span>
+                    <span className="text-white/30 text-xs">Más cerca de la izquierda</span>
+                    <span className="text-white/30 text-xs">Más cerca de la derecha</span>
                   </div>
                 </div>
               </div>

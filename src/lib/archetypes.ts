@@ -232,15 +232,21 @@ export const ARCHETYPES: Record<ArchetypeName, Archetype> = {
 };
 
 // 12 preguntas × 4 dimensiones (3 preguntas cada una)
-// Dimension M (Motivación): 1=Conexión, 5=Logro/Impacto
-// Dimension E (Expresión): 1=Racional, 5=Emocional
-// Dimension I (Innovación): 1=Clásico, 5=Disruptivo
-// Dimension R (Rol): 1=Facilita, 5=Guía/Lidera
-
+// Dimension M (Motivación): left=Conexión, right=Logro/Impacto
+// Dimension E (Expresión): left=Racional, right=Emocional
+// Dimension I (Innovación): left=Clásico, right=Disruptivo
+// Dimension R (Rol): left=Facilita, right=Guía/Lidera
+//
+// Cada pregunta enfrenta dos afirmaciones igual de válidas/positivas (ninguna
+// suena "mejor" que la otra) para no sesgar las respuestas hacia un solo polo
+// — antes, casi todas las afirmaciones apuntaban al polo "aspiracional" (líder,
+// disruptivo, con logros), por lo que casi cualquier usuario terminaba dando
+// "Alto" en las 4 dimensiones y siempre caía en El Mago (HHHH).
 export type QuizQuestion = {
   id: number;
   dimension: "M" | "E" | "I" | "R";
-  statement: string;
+  left: string;
+  right: string;
 };
 
 export const QUIZ_QUESTIONS: QuizQuestion[] = [
@@ -248,77 +254,77 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   {
     id: 1,
     dimension: "M",
-    statement:
-      "Mi prioridad con mi marca personal es destacar, lograr resultados tangibles y ser reconocido/a en mi industria",
+    left: "Mi prioridad es construir una comunidad cercana y genuina en torno a mi marca",
+    right: "Mi prioridad es destacar, lograr resultados tangibles y ser reconocido/a en mi industria",
   },
   {
     id: 2,
     dimension: "M",
-    statement:
-      "Prefiero ser referente y líder en mi nicho más que simplemente pertenecer a una comunidad de pares",
+    left: "Prefiero sentirme parte de mi comunidad, entre pares, más que por encima como líder",
+    right: "Prefiero ser el referente y líder visible de mi nicho, más que uno más del grupo",
   },
   {
     id: 3,
     dimension: "M",
-    statement:
-      "Me motiva más alcanzar logros individuales concretos que el crecimiento colectivo de mi comunidad",
+    left: "Me motiva más el crecimiento colectivo de mi comunidad que mis logros individuales",
+    right: "Me motivan más mis logros individuales concretos que el crecimiento colectivo de mi comunidad",
   },
   // Expresión
   {
     id: 4,
     dimension: "E",
-    statement:
-      "En mis contenidos, priorizo conectar desde la emoción y la experiencia personal más que desde datos o análisis",
+    left: "En mis contenidos, priorizo datos, argumentos y análisis claros",
+    right: "En mis contenidos, priorizo conectar desde la emoción y la experiencia personal",
   },
   {
     id: 5,
     dimension: "E",
-    statement:
-      "Me importa más que mi audiencia me sienta cercano/a y humano/a que me perciba como una autoridad",
+    left: "Prefiero que mi audiencia me perciba como una autoridad sólida y confiable en el tema",
+    right: "Prefiero que mi audiencia me sienta cercano/a y humano/a, más que una autoridad distante",
   },
   {
     id: 6,
     dimension: "E",
-    statement:
-      "Comparto mis vulnerabilidades, miedos y procesos internos con mi comunidad habitualmente",
+    left: "Suelo mantener mis procesos y vulnerabilidades en privado, mostrando resultados más que el camino",
+    right: "Comparto abiertamente mis vulnerabilidades, miedos y procesos internos con mi comunidad",
   },
   // Innovación
   {
     id: 7,
     dimension: "I",
-    statement:
-      "Parte de mi identidad de marca es hacer las cosas de manera diferente a lo que se acostumbra en mi industria",
+    left: "Prefiero seguir los métodos ya probados y confiables de mi industria",
+    right: "Parte de mi identidad de marca es hacer las cosas de manera diferente a lo acostumbrado en mi industria",
   },
   {
     id: 8,
     dimension: "I",
-    statement:
-      "Me genera incomodidad seguir las tendencias o hacer las cosas 'como siempre se hacen'",
+    left: "Me siento cómodo/a siguiendo las tendencias establecidas de mi nicho",
+    right: "Me genera incomodidad seguir las tendencias o hacer las cosas 'como siempre se hacen'",
   },
   {
     id: 9,
     dimension: "I",
-    statement:
-      "Prefiero arriesgarme con algo experimental y creativo que seguir un método probado y seguro",
+    left: "Prefiero un método probado y seguro antes que arriesgarme con algo experimental",
+    right: "Prefiero arriesgarme con algo experimental y creativo antes que seguir un método probado",
   },
   // Rol
   {
     id: 10,
     dimension: "R",
-    statement:
-      "Me siento cómodo/a siendo reconocido/a como la figura de autoridad que señala el camino a seguir",
+    left: "Prefiero acompañar y facilitar para que cada quien encuentre su propio camino",
+    right: "Me siento cómodo/a siendo la figura de autoridad que señala el camino a seguir",
   },
   {
     id: 11,
     dimension: "R",
-    statement:
-      "En mis contenidos, tiendo a dar dirección clara y estructurada más que invitar a cada uno a encontrar su propio camino",
+    left: "En mis contenidos, invito a cada persona a encontrar su propio camino más que darle una única dirección",
+    right: "En mis contenidos, doy una dirección clara y estructurada más que invitar a cada quien a su propio camino",
   },
   {
     id: 12,
     dimension: "R",
-    statement:
-      "Me resulta natural asumir el liderazgo y ser la voz principal en conversaciones de mi nicho",
+    left: "Prefiero dar un paso al costado y que otros tomen protagonismo en las conversaciones de mi nicho",
+    right: "Me resulta natural asumir el liderazgo y ser la voz principal en conversaciones de mi nicho",
   },
 ];
 
@@ -367,17 +373,21 @@ export function calculateArchetype(answers: Record<number, number>): {
 
   // Promedios
   const scores: DimensionScores = {
-    M: counts.M > 0 ? dims.M / counts.M : 3,
-    E: counts.E > 0 ? dims.E / counts.E : 3,
-    I: counts.I > 0 ? dims.I / counts.I : 3,
-    R: counts.R > 0 ? dims.R / counts.R : 3,
+    M: counts.M > 0 ? dims.M / counts.M : 2.5,
+    E: counts.E > 0 ? dims.E / counts.E : 2.5,
+    I: counts.I > 0 ? dims.I / counts.I : 2.5,
+    R: counts.R > 0 ? dims.R / counts.R : 2.5,
   };
 
+  // Escala forzada 1-4 (sin punto medio neutral): el promedio de 3 preguntas
+  // enteras nunca puede caer justo en 2.5, así que no hay empates estructurales
+  // como sí los había con la escala 1-5 (donde un promedio de 3.0 exacto
+  // siempre se clasificaba como "Alto", sesgando todo hacia El Mago).
   const key =
-    (scores.M >= 3 ? "H" : "L") +
-    (scores.E >= 3 ? "H" : "L") +
-    (scores.I >= 3 ? "H" : "L") +
-    (scores.R >= 3 ? "H" : "L");
+    (scores.M >= 2.5 ? "H" : "L") +
+    (scores.E >= 2.5 ? "H" : "L") +
+    (scores.I >= 2.5 ? "H" : "L") +
+    (scores.R >= 2.5 ? "H" : "L");
 
   return { archetype: ARCHETYPE_MAP[key], scores };
 }
