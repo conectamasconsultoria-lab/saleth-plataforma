@@ -20,7 +20,6 @@ import {
   ChevronDown,
   ChevronUp,
   Wand2,
-  LayoutGrid,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Transcription } from "@/lib/supabase/types";
@@ -137,10 +136,6 @@ export function TranscriptionsClient({ initialTranscriptions }: Props) {
 
   function useInScripts(transcript: string) {
     router.push(`/dashboard/scripts?prefillTopic=${encodeURIComponent(transcript.slice(0, MAX_PREFILL_LENGTH))}`);
-  }
-
-  function useInCarousels(transcript: string) {
-    router.push(`/dashboard/carousels?prefillTopic=${encodeURIComponent(transcript.slice(0, MAX_PREFILL_LENGTH))}`);
   }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -307,10 +302,6 @@ export function TranscriptionsClient({ initialTranscriptions }: Props) {
                     <Button variant="outline" size="sm" onClick={() => useInScripts(t.transcript)}>
                       <Wand2 className="h-4 w-4 mr-2" />
                       Usar en Guion
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => useInCarousels(t.transcript)}>
-                      <LayoutGrid className="h-4 w-4 mr-2" />
-                      Usar en Carrusel
                     </Button>
                   </div>
                 </CardContent>

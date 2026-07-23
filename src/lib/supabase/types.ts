@@ -79,20 +79,6 @@ export type ScriptEdit = {
   created_at: string;
 };
 
-export type Carousel = {
-  id: string;
-  user_id: string;
-  topic: string;
-  formula: string;
-  export_format: string;
-  slides: {
-    slide_number: number;
-    title: string;
-    content: string;
-  }[];
-  created_at: string;
-};
-
 export type MetricsUpload = {
   id: string;
   user_id: string;

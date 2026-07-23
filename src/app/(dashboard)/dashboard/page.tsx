@@ -2,7 +2,6 @@ import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import {
   FileText,
-  Layers,
   TrendingUp,
   Captions,
   BarChart3,
@@ -26,14 +25,12 @@ export default async function DashboardPage() {
     { data: profile },
     { data: questionnaire },
     { count: scriptsCount },
-    { count: carouselsCount },
     { count: viralCount },
     { count: transcriptionsCount },
     { count: metricsCount },
     { count: promptsCount },
     { count: referentesCount },
     { data: recentScripts },
-    { data: recentCarousels },
     { data: recentTranscriptions },
   ] = await Promise.all([
     supabase
@@ -48,10 +45,6 @@ export default async function DashboardPage() {
       .single(),
     supabase
       .from("scripts")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", user!.id),
-    supabase
-      .from("carousels")
       .select("*", { count: "exact", head: true })
       .eq("user_id", user!.id),
     supabase
@@ -78,12 +71,6 @@ export default async function DashboardPage() {
       .order("created_at", { ascending: false })
       .limit(3),
     supabase
-      .from("carousels")
-      .select("id, created_at, topic")
-      .eq("user_id", user!.id)
-      .order("created_at", { ascending: false })
-      .limit(3),
-    supabase
       .from("transcriptions")
       .select("id, created_at")
       .eq("user_id", user!.id)
@@ -96,7 +83,6 @@ export default async function DashboardPage() {
   const archetype = archetypeName ? ARCHETYPES[archetypeName] : null;
   const totalActions =
     (scriptsCount ?? 0) +
-    (carouselsCount ?? 0) +
     (transcriptionsCount ?? 0) +
     (metricsCount ?? 0);
 
@@ -106,12 +92,6 @@ export default async function DashboardPage() {
       label: "Guión generado con IA",
       date: s.created_at,
       href: "/dashboard/scripts",
-    })),
-    ...(recentCarousels ?? []).map((c) => ({
-      icon: Layers,
-      label: `Carrusel: ${c.topic ?? "Sin título"}`,
-      date: c.created_at,
-      href: "/dashboard/carousels",
     })),
     ...(recentTranscriptions ?? []).map((t) => ({
       icon: Captions,
@@ -130,13 +110,6 @@ export default async function DashboardPage() {
       icon: FileText,
       href: "/dashboard/scripts",
       desc: "generados con IA",
-    },
-    {
-      label: "Carruseles",
-      value: carouselsCount ?? 0,
-      icon: Layers,
-      href: "/dashboard/carousels",
-      desc: "estructurados",
     },
     {
       label: "Videos virales",
@@ -178,7 +151,6 @@ export default async function DashboardPage() {
   const quickActions = [
     { href: "/dashboard/viral-scanner", label: "Escanear video viral", icon: TrendingUp },
     { href: "/dashboard/scripts", label: "Generar guión con IA", icon: FileText },
-    { href: "/dashboard/carousels", label: "Crear carrusel", icon: Layers },
     { href: "/dashboard/metrics", label: "Analizar métricas", icon: BarChart3 },
     { href: "/dashboard/transcriptions", label: "Transcribir video", icon: Captions },
   ];

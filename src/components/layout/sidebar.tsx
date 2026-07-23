@@ -54,7 +54,6 @@ const clientSections: NavSection[] = [
     title: "Crear Contenido",
     items: [
       { href: "/dashboard/scripts", label: "Guiones", icon: FileText },
-      { href: "/dashboard/carousels", label: "Carruseles", icon: Layers },
       { href: "/dashboard/viral-scanner", label: "Escáner Viral", icon: TrendingUp },
     ],
   },
@@ -70,6 +69,7 @@ const clientSections: NavSection[] = [
   {
     title: "Aprender",
     items: [
+      { href: "/dashboard/carousels", label: "Carruseles y Stories", icon: Layers },
       { href: "/dashboard/prompts", label: "Biblioteca de Prompts", icon: BookOpen },
       { href: "/dashboard/recursos", label: "Recursos", icon: FolderOpen },
     ],

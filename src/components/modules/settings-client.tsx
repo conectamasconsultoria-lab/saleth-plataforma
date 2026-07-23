@@ -174,7 +174,7 @@ export function SettingsClient({ initialQuestionnaire, profile }: Props) {
             Identidad visual de marca
           </CardTitle>
           <CardDescription>
-            Define el color, estilo y tipografía con los que se generan tus carruseles y otras piezas visuales
+            Define el color, estilo y tipografía de tu marca personal
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -271,7 +271,7 @@ export function SettingsClient({ initialQuestionnaire, profile }: Props) {
                   textTransform: activeFont.uppercase ? "uppercase" : "none",
                 }}
               >
-                Así se va a ver la marca en tus carruseles
+                Así se va a ver tu marca
               </p>
               <p
                 className="text-xs mt-1"
