@@ -5,15 +5,16 @@ import {
   TrendingUp,
   Captions,
   BarChart3,
-  BookOpen,
-  Video,
   ArrowRight,
   Clock,
   Zap,
   Activity,
+  CheckCircle2,
 } from "lucide-react";
 import { ARCHETYPES } from "@/lib/archetypes";
 import type { ArchetypeName } from "@/lib/archetypes";
+
+const WEEKLY_SCRIPT_GOAL = 3;
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -21,17 +22,19 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString();
+
   const [
     { data: profile },
     { data: questionnaire },
     { count: scriptsCount },
-    { count: viralCount },
     { count: transcriptionsCount },
     { count: metricsCount },
-    { count: promptsCount },
-    { count: referentesCount },
     { data: recentScripts },
     { data: recentTranscriptions },
+    { count: scriptsThisWeekCount },
+    { data: lastMetricsUpload },
+    { data: recentViralVideos },
   ] = await Promise.all([
     supabase
       .from("profiles")
@@ -48,9 +51,6 @@ export default async function DashboardPage() {
       .select("*", { count: "exact", head: true })
       .eq("user_id", user!.id),
     supabase
-      .from("viral_videos")
-      .select("*", { count: "exact", head: true }),
-    supabase
       .from("transcriptions")
       .select("*", { count: "exact", head: true })
       .eq("user_id", user!.id),
@@ -58,12 +58,6 @@ export default async function DashboardPage() {
       .from("metrics_uploads")
       .select("*", { count: "exact", head: true })
       .eq("user_id", user!.id),
-    supabase
-      .from("coach_prompts")
-      .select("*", { count: "exact", head: true }),
-    supabase
-      .from("reference_videos")
-      .select("*", { count: "exact", head: true }),
     supabase
       .from("scripts")
       .select("id, created_at")
@@ -76,6 +70,22 @@ export default async function DashboardPage() {
       .eq("user_id", user!.id)
       .order("created_at", { ascending: false })
       .limit(2),
+    supabase
+      .from("scripts")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user!.id)
+      .gte("created_at", sevenDaysAgo),
+    supabase
+      .from("metrics_uploads")
+      .select("created_at")
+      .eq("user_id", user!.id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from("viral_videos")
+      .select("niche")
+      .gte("scanned_at", sevenDaysAgo),
   ]);
 
   const firstName = profile?.full_name?.split(" ")[0] ?? "bienvenido";
@@ -85,6 +95,48 @@ export default async function DashboardPage() {
     (scriptsCount ?? 0) +
     (transcriptionsCount ?? 0) +
     (metricsCount ?? 0);
+
+  // Panel accionable: sugerencias calculadas a partir de la actividad real,
+  // en vez de solo mostrar conteos crudos.
+  const scriptsGap = Math.max(0, WEEKLY_SCRIPT_GOAL - (scriptsThisWeekCount ?? 0));
+  const lastMetricsDate = lastMetricsUpload?.created_at ? new Date(lastMetricsUpload.created_at) : null;
+  const daysSinceLastMetrics = lastMetricsDate
+    ? Math.floor((Date.now() - lastMetricsDate.getTime()) / 86400000)
+    : null;
+  const needsMetricsReview = daysSinceLastMetrics === null || daysSinceLastMetrics > 7;
+  const niche = questionnaire?.niche;
+  const viralVideosInNicheThisWeek = niche
+    ? (recentViralVideos ?? []).filter((v) => v.niche === niche).length
+    : 0;
+
+  const suggestions: { icon: typeof FileText; title: string; desc: string; href: string }[] = [];
+
+  if (scriptsGap > 0) {
+    suggestions.push({
+      icon: FileText,
+      title: `Crear ${scriptsGap} guion${scriptsGap > 1 ? "es" : ""}`,
+      desc: `Llevas ${scriptsThisWeekCount ?? 0} de ${WEEKLY_SCRIPT_GOAL} esta semana`,
+      href: "/dashboard/scripts",
+    });
+  }
+  if (needsMetricsReview) {
+    suggestions.push({
+      icon: BarChart3,
+      title: "Analizar el rendimiento de la semana pasada",
+      desc: lastMetricsDate
+        ? `Tu último análisis fue hace ${daysSinceLastMetrics} días`
+        : "Todavía no subiste ningún análisis de métricas",
+      href: "/dashboard/metrics",
+    });
+  }
+  if (viralVideosInNicheThisWeek > 0) {
+    suggestions.push({
+      icon: TrendingUp,
+      title: `Hay ${viralVideosInNicheThisWeek} video${viralVideosInNicheThisWeek > 1 ? "s" : ""} viral${viralVideosInNicheThisWeek > 1 ? "es" : ""} nuevo${viralVideosInNicheThisWeek > 1 ? "s" : ""} en tu nicho`,
+      desc: "Mira si podés adaptar alguno a tu contenido",
+      href: "/dashboard/viral-scanner",
+    });
+  }
 
   const recentActivity = [
     ...(recentScripts ?? []).map((s) => ({
@@ -102,51 +154,6 @@ export default async function DashboardPage() {
   ]
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 6);
-
-  const stats = [
-    {
-      label: "Guiones",
-      value: scriptsCount ?? 0,
-      icon: FileText,
-      href: "/dashboard/scripts",
-      desc: "generados con IA",
-    },
-    {
-      label: "Videos virales",
-      value: viralCount ?? 0,
-      icon: TrendingUp,
-      href: "/dashboard/viral-scanner",
-      desc: "escaneados",
-    },
-    {
-      label: "Transcripciones",
-      value: transcriptionsCount ?? 0,
-      icon: Captions,
-      href: "/dashboard/transcriptions",
-      desc: "realizadas",
-    },
-    {
-      label: "Análisis de métricas",
-      value: metricsCount ?? 0,
-      icon: BarChart3,
-      href: "/dashboard/metrics",
-      desc: "subidos",
-    },
-    {
-      label: "Prompts disponibles",
-      value: promptsCount ?? 0,
-      icon: BookOpen,
-      href: "/dashboard/prompts",
-      desc: "en biblioteca",
-    },
-    {
-      label: "Videos referentes",
-      value: referentesCount ?? 0,
-      icon: Video,
-      href: "/dashboard/referentes",
-      desc: "de industria",
-    },
-  ];
 
   const quickActions = [
     { href: "/dashboard/viral-scanner", label: "Escanear video viral", icon: TrendingUp },
@@ -228,41 +235,52 @@ export default async function DashboardPage() {
         </Link>
       )}
 
-      {/* Stats grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <Link key={stat.href} href={stat.href}>
-              <div
-                className="bg-white rounded-2xl p-4 border border-gray-100 hover:-translate-y-0.5 transition-all duration-200 hover:shadow-md cursor-pointer group"
-                style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div
-                    className="h-9 w-9 rounded-xl flex items-center justify-center"
-                    style={{
-                      backgroundColor: "#EFF6FF",
-                      boxShadow: "0 4px 10px rgba(26,111,255,0.12)",
-                    }}
-                  >
-                    <Icon
-                      className="h-4 w-4"
-                      style={{ color: "#1A6FFF" }}
-                      strokeWidth={1.8}
-                    />
+      {/* Panel accionable */}
+      <div
+        className="bg-white rounded-2xl p-5 border border-gray-100"
+        style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}
+      >
+        <h2 className="font-semibold text-gray-900 text-sm mb-4">
+          ¿Qué necesitas hacer hoy?
+        </h2>
+
+        {suggestions.length === 0 ? (
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-green-50">
+            <div className="h-9 w-9 rounded-xl flex items-center justify-center bg-white flex-shrink-0">
+              <CheckCircle2 className="h-4.5 w-4.5 text-green-600" strokeWidth={1.8} />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-gray-900">¡Vas al día! 🎉</p>
+              <p className="text-xs text-gray-500">Ya cumpliste tus objetivos de esta semana</p>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {suggestions.map((s) => {
+              const Icon = s.icon;
+              return (
+                <Link key={s.href + s.title} href={s.href}>
+                  <div className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 cursor-pointer group">
+                    <div
+                      className="h-9 w-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                      style={{
+                        backgroundColor: "#EFF6FF",
+                        boxShadow: "0 4px 10px rgba(26,111,255,0.12)",
+                      }}
+                    >
+                      <Icon className="h-4 w-4" style={{ color: "#1A6FFF" }} strokeWidth={1.8} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-900">{s.title}</p>
+                      <p className="text-xs text-gray-400">{s.desc}</p>
+                    </div>
+                    <ArrowRight className="h-3.5 w-3.5 text-gray-300 group-hover:text-blue-400 transition-colors flex-shrink-0" />
                   </div>
-                  <ArrowRight className="h-3.5 w-3.5 text-gray-300 group-hover:text-blue-400 transition-colors mt-0.5" />
-                </div>
-                <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                <p className="text-xs font-semibold text-gray-700 mt-0.5">
-                  {stat.label}
-                </p>
-                <p className="text-xs text-gray-400">{stat.desc}</p>
-              </div>
-            </Link>
-          );
-        })}
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Bottom row */}

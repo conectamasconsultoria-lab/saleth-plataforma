@@ -10,6 +10,7 @@ import { Loader2, Upload, BarChart3, Image, ChevronDown, ChevronUp } from "lucid
 import type { MetricsUpload } from "@/lib/supabase/types";
 import { cn } from "@/lib/utils";
 import { MetricsChat } from "@/components/modules/metrics-chat";
+import { AnalyticsChat } from "@/components/modules/analytics-chat";
 
 type Props = { initialUploads: MetricsUpload[] };
 
@@ -143,6 +144,9 @@ export function MetricsClient({ initialUploads }: Props) {
           </CardContent>
         </Card>
       )}
+
+      {/* Chat de análisis agregado */}
+      <AnalyticsChat />
 
       {/* Historial */}
       {uploads.length > 0 && (
