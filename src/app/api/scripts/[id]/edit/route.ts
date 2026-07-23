@@ -91,6 +91,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     targetAudience: brandBlueprint?.target_audience,
     contentPillars: brandBlueprint?.content_pillars,
     targetNiche: script.target_niche || null,
+    archetype: questionnaire.personality_archetype || null,
   });
 
   const editHistory = (previousEdits ?? []).slice(-MAX_HISTORY_MESSAGES) as Array<{ role: "user" | "assistant"; message: string }>;

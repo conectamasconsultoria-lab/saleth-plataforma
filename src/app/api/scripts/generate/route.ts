@@ -60,6 +60,7 @@ Video viral de referencia:
     targetAudience: brandBlueprint?.target_audience,
     contentPillars: brandBlueprint?.content_pillars,
     targetNiche: targetNiche || null,
+    archetype: questionnaire.personality_archetype || null,
   });
 
   const userPrompt = buildGenerationUserPrompt({

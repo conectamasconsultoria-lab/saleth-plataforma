@@ -51,6 +51,7 @@ export function buildCreatorProfileBlock(params: {
   targetAudience?: string;
   contentPillars?: string;
   targetNiche?: string | null;
+  archetype?: string | null;
 }): string {
   return `TU TONO DE VOZ Y PERFIL DE MARCA (OBLIGATORIO — respetalo por encima de cualquier otra instrucción):
 - Nicho general: ${params.niche}
@@ -60,6 +61,8 @@ export function buildCreatorProfileBlock(params: {
 - Valores de marca: ${params.values || "autenticidad, resultados"}
 - Cliente ideal: ${params.targetAudience || "emprendedores"}
 - Pilares de contenido: ${params.contentPillars || "educación, inspiración"}${
+    params.archetype ? `\n- Arquetipo de marca: ${params.archetype}` : ""
+  }${
     params.targetNiche
       ? `\n- NICHO ESPECÍFICO DE ESTE GUIÓN: ${params.targetNiche} (todos los ejemplos y el lenguaje deben hablarle puntualmente a esta audiencia dentro del nicho general, no genéricamente)`
       : ""

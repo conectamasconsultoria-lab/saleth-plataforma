@@ -26,6 +26,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { Carousel } from "@/lib/supabase/types";
 import { resolveBrandFont } from "@/lib/fonts";
+import { ARCHETYPES, type ArchetypeName } from "@/lib/archetypes";
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -37,7 +38,7 @@ type BrandProfile = {
   brand_style?: "dark" | "light";
   brand_font?: string;
 } | null;
-type Props = { initialCarousels: Carousel[]; profile?: BrandProfile };
+type Props = { initialCarousels: Carousel[]; profile?: BrandProfile; archetype?: string | null };
 
 // ─── Helpers de marca y formato ────────────────────────────────────────────────
 
@@ -157,7 +158,8 @@ type ExportFormat = keyof typeof FORMATS;
 
 // ─── Componente principal ──────────────────────────────────────────────────────
 
-export function CarouselsClient({ initialCarousels, profile }: Props) {
+export function CarouselsClient({ initialCarousels, profile, archetype }: Props) {
+  const archetypeInfo = archetype ? ARCHETYPES[archetype as ArchetypeName] : null;
   const searchParams = useSearchParams();
   const [carousels, setCarousels] = useState<Carousel[]>(initialCarousels);
   const [idea, setIdea] = useState("");
@@ -364,6 +366,18 @@ export function CarouselsClient({ initialCarousels, profile }: Props) {
 
       {/* ── Panel izquierdo: generador + historial ─────────────────────── */}
       <div className="xl:col-span-2 space-y-4">
+
+        {archetypeInfo && (
+          <div
+            className="flex items-center gap-2.5 rounded-lg border px-4 py-2.5 text-sm"
+            style={{ background: archetypeInfo.bgColor, borderColor: `${archetypeInfo.color}30`, color: archetypeInfo.color }}
+          >
+            <span className="text-lg leading-none">{archetypeInfo.emoji}</span>
+            <span>
+              Tus carruseles se adaptan a tu arquetipo de marca: <strong>{archetypeInfo.name}</strong> — {archetypeInfo.contentStyle.toLowerCase()}
+            </span>
+          </div>
+        )}
 
         <Card className="shadow-sm">
           <CardHeader className="pb-3">

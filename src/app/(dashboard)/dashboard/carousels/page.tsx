@@ -17,13 +17,23 @@ export default async function CarouselsPage() {
     .eq("user_id", user!.id)
     .single();
 
+  const { data: questionnaire } = await supabase
+    .from("questionnaires")
+    .select("personality_archetype")
+    .eq("user_id", user!.id)
+    .single();
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Carruseles</h1>
         <p className="text-muted-foreground mt-1">Generá estructuras de carrusel personalizadas para Instagram y LinkedIn</p>
       </div>
-      <CarouselsClient initialCarousels={carousels ?? []} profile={profile} />
+      <CarouselsClient
+        initialCarousels={carousels ?? []}
+        profile={profile}
+        archetype={questionnaire?.personality_archetype ?? null}
+      />
     </div>
   );
 }

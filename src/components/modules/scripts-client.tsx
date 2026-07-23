@@ -28,8 +28,9 @@ import { cn } from "@/lib/utils";
 import type { Script } from "@/lib/supabase/types";
 import { getStructuresByContentType, STAGE_MAP, type ContentType } from "@/lib/scripts/structures";
 import { ScriptEditChat } from "@/components/modules/script-edit-chat";
+import { ARCHETYPES, type ArchetypeName } from "@/lib/archetypes";
 
-type Props = { initialScripts: Script[] };
+type Props = { initialScripts: Script[]; archetype: string | null };
 
 const AWARENESS_LEVELS = [
   {
@@ -140,7 +141,8 @@ const formatLabel: Record<string, string> = {
   pregunta: "Pregunta de Instagram",
 };
 
-export function ScriptsClient({ initialScripts }: Props) {
+export function ScriptsClient({ initialScripts, archetype }: Props) {
+  const archetypeInfo = archetype ? ARCHETYPES[archetype as ArchetypeName] : null;
   const searchParams = useSearchParams();
   const [scripts, setScripts] = useState<Script[]>(initialScripts);
   const [awarenessLevel, setAwarenessLevel] = useState<string | null>(null);
@@ -225,6 +227,18 @@ export function ScriptsClient({ initialScripts }: Props) {
 
   return (
     <div className="space-y-6">
+      {archetypeInfo && (
+        <div
+          className="flex items-center gap-2.5 rounded-lg border px-4 py-2.5 text-sm"
+          style={{ background: archetypeInfo.bgColor, borderColor: `${archetypeInfo.color}30`, color: archetypeInfo.color }}
+        >
+          <span className="text-lg leading-none">{archetypeInfo.emoji}</span>
+          <span>
+            Tus guiones se adaptan a tu arquetipo de marca: <strong>{archetypeInfo.name}</strong> — {archetypeInfo.contentStyle.toLowerCase()}
+          </span>
+        </div>
+      )}
+
       {/* Generador */}
       <Card>
         <CardHeader className="pb-3">
