@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,6 +22,19 @@ export function MetricsClient({ initialUploads }: Props) {
   const [currentInsights, setCurrentInsights] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  // Los uploads ya vienen ordenados por fecha desc (fetch inicial + prepend al
+  // analizar uno nuevo), así que agrupar por mes preserva ese orden sin resortear.
+  const groupedUploads = useMemo(() => {
+    const groups = new Map<string, MetricsUpload[]>();
+    for (const upload of uploads) {
+      const label = new Date(upload.created_at).toLocaleDateString("es-AR", { month: "long", year: "numeric" });
+      const key = label.charAt(0).toUpperCase() + label.slice(1);
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key)!.push(upload);
+    }
+    return groups;
+  }, [uploads]);
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
@@ -133,42 +146,47 @@ export function MetricsClient({ initialUploads }: Props) {
 
       {/* Historial */}
       {uploads.length > 0 && (
-        <div>
-          <h2 className="text-sm font-semibold mb-3">Historial de análisis</h2>
-          <div className="space-y-3">
-            {uploads.map((upload) => {
-              const isExpanded = expanded === upload.id;
-              return (
-                <Card key={upload.id}>
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-sm">{upload.platform}</CardTitle>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(upload.created_at).toLocaleDateString("es-AR")}
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setExpanded(isExpanded ? null : upload.id)}
-                        >
-                          {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                        </Button>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  {upload.insights && (
-                    <CardContent className="pt-0 space-y-4">
-                      <p className={cn("text-sm text-muted-foreground whitespace-pre-wrap", !isExpanded && "line-clamp-3")}>
-                        {upload.insights}
-                      </p>
-                      {isExpanded && <MetricsChat uploadId={upload.id} />}
-                    </CardContent>
-                  )}
-                </Card>
-              );
-            })}
-          </div>
+        <div className="space-y-6">
+          <h2 className="text-sm font-semibold">Historial de análisis</h2>
+          {Array.from(groupedUploads.entries()).map(([monthLabel, monthUploads]) => (
+            <div key={monthLabel} className="space-y-3">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{monthLabel}</h3>
+              <div className="space-y-3">
+                {monthUploads.map((upload) => {
+                  const isExpanded = expanded === upload.id;
+                  return (
+                    <Card key={upload.id}>
+                      <CardHeader className="pb-2">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-sm">{upload.platform}</CardTitle>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(upload.created_at).toLocaleDateString("es-AR")}
+                            </span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setExpanded(isExpanded ? null : upload.id)}
+                            >
+                              {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                            </Button>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      {upload.insights && (
+                        <CardContent className="pt-0 space-y-4">
+                          <p className={cn("text-sm text-muted-foreground whitespace-pre-wrap", !isExpanded && "line-clamp-3")}>
+                            {upload.insights}
+                          </p>
+                          {isExpanded && <MetricsChat uploadId={upload.id} />}
+                        </CardContent>
+                      )}
+                    </Card>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>
