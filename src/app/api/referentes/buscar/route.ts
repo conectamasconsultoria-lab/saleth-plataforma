@@ -32,11 +32,14 @@ export async function POST(req: NextRequest) {
       const errorBody = await response.text();
       console.error("Buscador de referentes: error HTTP", response.status, errorBody);
       const authIssue = response.status === 401 || response.status === 403;
+      const rateLimited = response.status === 429;
       return NextResponse.json(
         {
           error: authIssue
             ? "RapidAPI rechazó la consulta (revisa la suscripción a tiktok-api23)"
-            : `Error al consultar la API de TikTok (status ${response.status})`,
+            : rateLimited
+              ? "Límite de la API de TikTok alcanzado, espera unos minutos y vuelve a intentar"
+              : `Error al consultar la API de TikTok (status ${response.status})`,
           videos: [],
         },
         { status: 200 }

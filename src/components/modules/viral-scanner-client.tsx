@@ -53,7 +53,7 @@ export function ViralScannerClient({ initialVideos, userNiche }: Props) {
         body: JSON.stringify({ niche: userNiche }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+      if (!res.ok || data.error) throw new Error(data.error || "Error en el escaneo");
       toast.success(`Se encontraron ${data.count} videos nuevos`);
       router.refresh();
     } catch (e: unknown) {

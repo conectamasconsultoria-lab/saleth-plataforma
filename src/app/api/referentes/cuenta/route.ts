@@ -10,19 +10,30 @@ function rapidApiHeaders(): Record<string, string> {
   };
 }
 
+function describeRapidApiError(status: number): string {
+  const authIssue = status === 401 || status === 403;
+  const rateLimited = status === 429;
+  return authIssue
+    ? "RapidAPI rechazó la consulta (revisa que la suscripción a tiktok-api23 esté activa en tu cuenta de RapidAPI)"
+    : rateLimited
+      ? "Límite de la API de TikTok alcanzado, espera unos minutos y vuelve a intentar"
+      : `Error al consultar la API de TikTok (status ${status})`;
+}
+
 // El endpoint de posts requiere el secUid interno de TikTok, no el @username —
 // hay que resolverlo primero vía "Get User Info".
-async function resolveSecUid(username: string): Promise<string | null> {
+async function resolveSecUid(username: string): Promise<{ secUid: string | null; error?: string }> {
   const res = await fetch(
     `https://${RAPIDAPI_HOST}/api/user/info?uniqueId=${encodeURIComponent(username)}`,
     { headers: rapidApiHeaders() }
   );
   if (!res.ok) {
-    console.error("TikTok cuenta resolver: error HTTP en user/info", res.status, await res.text());
-    return null;
+    const errorBody = await res.text();
+    console.error("TikTok cuenta resolver: error HTTP en user/info", res.status, errorBody);
+    return { secUid: null, error: describeRapidApiError(res.status) };
   }
   const data = await res.json();
-  return data?.userInfo?.user?.secUid || null;
+  return { secUid: data?.userInfo?.user?.secUid || null };
 }
 
 // Obtiene los videos más recientes/virales de una cuenta de TikTok
@@ -41,7 +52,10 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const secUid = await resolveSecUid(cleanUsername);
+    const { secUid, error: secUidError } = await resolveSecUid(cleanUsername);
+    if (secUidError) {
+      return NextResponse.json({ error: secUidError, videos: [] }, { status: 200 });
+    }
     if (!secUid) {
       return NextResponse.json(
         { error: `No se encontró la cuenta @${cleanUsername} en TikTok`, videos: [] },
@@ -57,20 +71,14 @@ export async function POST(req: NextRequest) {
     if (!response.ok) {
       const errorBody = await response.text();
       console.error("TikTok cuenta resolver: error HTTP", response.status, errorBody);
-      const authIssue = response.status === 401 || response.status === 403;
       return NextResponse.json(
-        {
-          error: authIssue
-            ? "RapidAPI rechazó la consulta (revisa que la suscripción a tiktok-api23 esté activa en tu cuenta de RapidAPI)"
-            : `Error al consultar la API de TikTok (status ${response.status})`,
-          videos: [],
-        },
+        { error: describeRapidApiError(response.status), videos: [] },
         { status: 200 }
       );
     }
 
     const data = await response.json();
-    const items = data?.itemList || data?.data?.itemList || data?.data?.videos || [];
+    const items = data?.itemList || data?.item_list || data?.data?.itemList || data?.data?.videos || [];
 
     if (items.length === 0) {
       console.error("TikTok cuenta resolver: respuesta sin videos para", cleanUsername, JSON.stringify(data).slice(0, 800));

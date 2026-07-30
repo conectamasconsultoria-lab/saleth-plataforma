@@ -35,6 +35,19 @@ export async function POST(req: NextRequest) {
       }
     );
 
+    if (!response.ok) {
+      const errorBody = await response.text();
+      console.error("Escáner viral: error HTTP", response.status, errorBody);
+      const authIssue = response.status === 401 || response.status === 403;
+      const rateLimited = response.status === 429;
+      const message = authIssue
+        ? "RapidAPI rechazó la consulta (revisa que la suscripción a tiktok-api23 esté activa)"
+        : rateLimited
+          ? "Límite de la API de TikTok alcanzado, espera unos minutos y vuelve a intentar"
+          : `Error al consultar la API de TikTok (status ${response.status})`;
+      return NextResponse.json({ error: message, count: 0 }, { status: 200 });
+    }
+
     const data = await response.json();
     const videoList = data?.item_list || data?.itemList || data?.data?.videos || [];
 
