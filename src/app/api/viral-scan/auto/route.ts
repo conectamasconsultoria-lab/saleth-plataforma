@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { searchTikTokVideos } from "@/lib/tiktok-search";
 
 // Este endpoint es llamado tanto manualmente como por el cron job de Vercel
 export async function POST(req: NextRequest) {
@@ -25,63 +26,31 @@ export async function POST(req: NextRequest) {
 
   try {
     // Buscar videos trending por hashtag relacionado al nicho
-    const response = await fetch(
-      `https://tiktok-api23.p.rapidapi.com/api/search/video?keyword=${encodeURIComponent(searchQuery)}&count=20&cursor=0`,
-      {
-        headers: {
-          "x-rapidapi-host": "tiktok-api23.p.rapidapi.com",
-          "x-rapidapi-key": process.env.RAPIDAPI_KEY,
-        },
-      }
-    );
+    const { videos, error } = await searchTikTokVideos(searchQuery, 20);
 
-    if (!response.ok) {
-      const errorBody = await response.text();
-      console.error("Escáner viral: error HTTP", response.status, errorBody);
-      const authIssue = response.status === 401 || response.status === 403;
-      const rateLimited = response.status === 429;
-      const message = authIssue
-        ? "RapidAPI rechazó la consulta (revisa que la suscripción a tiktok-api23 esté activa)"
-        : rateLimited
-          ? "Límite de la API de TikTok alcanzado, espera unos minutos y vuelve a intentar"
-          : `Error al consultar la API de TikTok (status ${response.status})`;
-      return NextResponse.json({ error: message, count: 0 }, { status: 200 });
+    if (error && videos.length === 0) {
+      return NextResponse.json({ error, count: 0 }, { status: 200 });
     }
 
-    const data = await response.json();
-    const videoList = data?.item_list || data?.itemList || data?.data?.videos || [];
-
-    if (videoList.length === 0) {
-      console.error("Escáner viral: respuesta sin videos para", searchQuery, JSON.stringify(data).slice(0, 800));
-    }
-
-    for (const item of videoList) {
-      const tiktokUrl = `https://www.tiktok.com/@${item.author?.uniqueId}/video/${item.id}`;
-      const views = item.stats?.playCount || item.statistics?.playCount || 0;
-
+    for (const item of videos) {
       // Solo guardar videos con más de 100k vistas
-      if (views < 100000) continue;
+      if (item.views < 100000) continue;
 
       const { data: existing } = await supabase
         .from("viral_videos")
         .select("id")
-        .eq("tiktok_url", tiktokUrl)
+        .eq("tiktok_url", item.url)
         .single();
 
       if (existing) continue;
 
-      const hashtags = (item.challenges || item.textExtra || [])
-        .filter((t: Record<string, unknown>) => t.hashtagName || t.title)
-        .map((t: Record<string, unknown>) => (t.hashtagName || t.title) as string)
-        .slice(0, 10);
-
       await supabase.from("viral_videos").insert({
-        tiktok_url: tiktokUrl,
-        title: item.desc || item.contents?.[0]?.desc || "Video viral",
-        hashtags,
+        tiktok_url: item.url,
+        title: item.title,
+        hashtags: item.hashtags,
         niche: searchQuery,
-        views,
-        thumbnail_url: item.video?.cover || item.video?.originCover || null,
+        views: item.views,
+        thumbnail_url: item.thumbnail_url,
         source: "auto",
         scanned_at: new Date().toISOString(),
       });
